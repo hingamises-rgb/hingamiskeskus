@@ -136,8 +136,8 @@ import Layout from '../layouts/Layout.astro';
 <section class="location">
   <h3 class="location__title">Aadress</h3>
   <p class="location__address">Söle 14c, Tallinn</p>
+  <img src="/images/hoone.jpg" alt="Hingamiskeskus Söle 14c" class="location__photo" loading="lazy" />
 </section>
-<img src="/images/hoone.jpg" alt="Hingamiskeskus Söle 14c" class="location__photo" loading="lazy" />
 
 <!-- FOOTER -->
 <footer class="footer">
@@ -335,7 +335,7 @@ import Layout from '../layouts/Layout.astro';
   }
   .benefit:last-child { margin-bottom: 0; }
   .benefit__icon {
-    width: 80px;
+    width: 55px;
     height: auto;
     margin: 0 auto 10px;
   }
@@ -390,9 +390,10 @@ import Layout from '../layouts/Layout.astro';
     margin-bottom: 20px;
   }
   .experience__photo {
-    width: 100%;
+    width: 80%;
+    max-width: 320px;
     border-radius: 4px;
-    margin-bottom: 20px;
+    margin: 0 auto 20px;
   }
   .experience__text {
     font-size: 14px;
@@ -468,8 +469,9 @@ import Layout from '../layouts/Layout.astro';
   /* LOCATION */
   .location {
     background: #1f6d85;
-    padding: 20px 24px;
+    padding: 20px 24px 24px;
     color: #fff;
+    text-align: center;
   }
   .location__title {
     font-size: 18px;
@@ -480,7 +482,9 @@ import Layout from '../layouts/Layout.astro';
     font-size: 14px;
   }
   .location__photo {
-    width: 100%;
+    width: 80%;
+    max-width: 320px;
+    margin: 0 auto;
     display: block;
   }
 
@@ -494,6 +498,7 @@ import Layout from '../layouts/Layout.astro';
     height: 30px;
     width: auto;
     margin: 0 auto 20px;
+    display: block;
   }
   .footer__contact h3,
   .footer__hours h3 {
@@ -532,7 +537,7 @@ import Layout from '../layouts/Layout.astro';
     .hero__title { font-size: 42px; }
     .hero__content { max-width: 700px; }
     .intro, .about, .benefits, .experience, .partners { padding: 48px 40px; }
-    .benefit__icon { width: 100px; }
+    .benefit__icon { width: 70px; }
     .partners__grid {
       flex-direction: row;
       flex-wrap: wrap;
