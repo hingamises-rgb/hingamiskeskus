@@ -1,0 +1,295 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { blogPosts } from '../data/blog-posts.ts';
+
+function formatDate(dateStr: string) {
+  const d = new Date(dateStr);
+  return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`;
+}
+---
+
+<Layout title="Blogi | Hingamiskeskus – Vabastav hingamine ja floating Tallinnas">
+
+<!-- HEADER -->
+<header class="header">
+  <a href="/" class="header__logo">
+    <img src="/images/logo.svg" alt="Hingamiskeskus" height="30" />
+  </a>
+  <div class="header__right">
+    <a href="/e-pood" class="header__cart" aria-label="Ostukorv">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+    </a>
+    <button class="header__burger" aria-label="Menüü">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- PAGE TITLE -->
+<section class="page-hero">
+  <h1 class="page-hero__title">Blogi</h1>
+</section>
+
+<!-- BLOG INTRO -->
+<section class="blog-intro">
+  <h2 class="blog-intro__heading">Tere tulemast Hingamiskeskuse blogisse!</h2>
+  <p>Siit leiad inspireerivaid artikleid teadliku ehk vabastava hingamise ja floatingu kohta Tallinnas. Meie missioon on pakkuda süvalõõgastust, taastumist ja sisemist tasakaalu läbi tõhusate keha-meele praktikate.</p>
+  <p><strong>Floating</strong> ehk hõljumine Epsomi soolases vees ei ole lihtsalt luksuslik lõõgastus see on tõenduspõhine praktika, mida kasutavad sportlased, ettevõtjad ja stressirohkes elutempos inimesed. Uuringud on näidanud, et üks tund floatingut võib pakkuda sama sügavat puhkust kui 4 tundi und. Hingamiskeskuses toimub floating mugavas vannis, mitte kapslis, mis teeb selle eriti sobivaks ka neile, kes tunnevad end kinnistes ruumides ebamugavalt.</p>
+  <p><strong>Vabastav hingamine</strong> ehk teadlik hingamine on protsess, mis aitab vabaneda emotsionaalsetest ja kehalistest pingetest. See on loomulik viis tuua kehasse rohkem eluenergiat, maandada stressi ja saavutada sisemine selgus ja tasakaal.</p>
+  <p>Lisaks jagame blogis nõuandeid ja lugusid sellest, kuidas teadlik hingamine aitab kaasa keskendumisele, sportlikule sooritusele, emotsionaalsele tasakaalule ja paremale unele. Kõik, kes otsivad hingamistööd Tallinnas, leiavad siit praktilist ja sügavat sisu.</p>
+  <p>Oled sa sportlane, lapseootel ema, ületöötanud või lihtsalt otsid vaikust, siis Hingamiskeskuse blogi aitab sul liikuda tasakaalu, rahu ja taastumise suunas. Loe, jaga, katseta ja leia enda tee parema enesetundeni.</p>
+</section>
+
+<!-- BLOG GRID -->
+<section class="blog-grid-section">
+  <div class="blog-grid">
+    {blogPosts.map((post) => (
+      <article class="blog-card">
+        <h3 class="blog-card__title">{post.title}</h3>
+        <p class="blog-card__desc">{post.desc}</p>
+        <div class="blog-card__meta">
+          <span class="blog-card__author">Hingamiskeskus</span>
+          <span class="blog-card__date">{formatDate(post.date)} · {post.readTime} min lugemine</span>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="location">
+    <h3 class="location__title">Aadress</h3>
+    <p class="location__address">Sõle 14c, Tallinn</p>
+    <img src="/images/hoone.jpg" alt="Hingamiskeskus Sõle 14c" class="location__photo" loading="lazy" />
+  </div>
+  <div class="footer__main">
+    <img src="/images/logo-valge.png" alt="Hingamiskeskus" class="footer__logo" />
+    <div class="footer__contact">
+      <h3>Kontakt</h3>
+      <p>E-post: Info@hingamiskeskus.ee</p>
+      <p>Telefoninumber:</p>
+      <p>+372 56695898</p>
+      <p>+372 56497689</p>
+      <p>(klienditugi 10.00-17.00)</p>
+      <p>Hingamises OÜ</p>
+      <p>EE147700771009732310</p>
+    </div>
+    <div class="footer__hours">
+      <h3>Lahtiolekuajad</h3>
+      <p>E-R 8.30 - 20.00</p>
+      <p>L-P 11.00 - 18.00</p>
+    </div>
+    <div class="footer__social">
+      <a href="https://www.facebook.com/Hingamiskeskus" aria-label="Facebook" target="_blank" rel="noopener">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/hingamiskeskus/" aria-label="Instagram" target="_blank" rel="noopener">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+      </a>
+    </div>
+    <div class="footer__legal">
+      <a href="/privaatsuspoliitika">Privaatsuspoliitika</a> | <a href="/muugitingimused">Müügitingimused</a>
+    </div>
+  </div>
+</footer>
+
+</Layout>
+
+<style>
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .header__logo img { height: 28px; width: auto; }
+  .header__right { display: flex; align-items: center; gap: 16px; }
+  .header__cart { color: #1d1e20; }
+  .header__burger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+  }
+  .header__burger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #1d1e20;
+  }
+
+  /* PAGE HERO */
+  .page-hero {
+    background: #f3fcff;
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .page-hero__title {
+    font-size: 32px;
+    font-weight: 400;
+  }
+
+  /* BLOG INTRO */
+  .blog-intro {
+    background: #f3fcff;
+    padding: 0 24px 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .blog-intro__heading {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .blog-intro p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1d1e20;
+    margin-bottom: 16px;
+  }
+  .blog-intro p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* BLOG GRID */
+  .blog-grid-section {
+    padding: 32px 16px 48px;
+  }
+  .blog-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* BLOG CARD */
+  .blog-card {
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    padding-bottom: 24px;
+  }
+  .blog-card:last-child {
+    border-bottom: none;
+  }
+  .blog-card__title {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    color: #1d1e20;
+  }
+  .blog-card__desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 12px;
+  }
+  .blog-card__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 13px;
+    color: #888;
+  }
+  .blog-card__author {
+    font-weight: 500;
+    color: #1d1e20;
+  }
+
+  /* FOOTER */
+  .location {
+    background: #f3fcff;
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .location__title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .location__address {
+    margin-bottom: 16px;
+  }
+  .location__photo {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 10px;
+  }
+  .footer__main {
+    background: #1d1e20;
+    color: #fff;
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .footer__logo {
+    width: 180px;
+    margin-bottom: 24px;
+  }
+  .footer__contact, .footer__hours {
+    margin-bottom: 24px;
+  }
+  .footer__contact h3, .footer__hours h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  .footer__contact p, .footer__hours p {
+    font-size: 14px;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+  .footer__social {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .footer__social a { color: #fff; }
+  .footer__legal {
+    font-size: 12px;
+    opacity: 0.6;
+  }
+  .footer__legal a { color: #fff; text-decoration: none; }
+
+  /* DESKTOP */
+  @media (min-width: 768px) {
+    .header__burger { display: none; }
+    .blog-intro {
+      padding: 0 40px 48px;
+    }
+    .blog-grid-section {
+      padding: 40px 40px 60px;
+    }
+    .blog-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+    }
+    .blog-card {
+      border-bottom: none;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 10px;
+      padding: 24px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .blog-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .blog-card__title {
+      font-size: 18px;
+    }
+    .blog-card__desc {
+      font-size: 13px;
+    }
+  }
+</style>
