@@ -1,17 +1,544 @@
 ---
-
+import Layout from '../layouts/Layout.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Vabastav hingamine ja floating Tallinnas | Hingamiskeskus">
+
+<!-- HEADER -->
+<header class="header">
+  <a href="/" class="header__logo">
+    <img src="/images/logo.svg" alt="Hingamiskeskus" height="30" />
+  </a>
+  <div class="header__right">
+    <a href="/e-pood" class="header__cart" aria-label="Ostukorv">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+    </a>
+    <button class="header__burger" aria-label="Menüü">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <img src="/images/hero-bg.jpg" alt="" class="hero__bg" loading="eager" />
+  <div class="hero__overlay"></div>
+  <div class="hero__content">
+    <h1 class="hero__title">Vabane<br>ärevusest ja<br>pingetest</h1>
+    <p class="hero__event">Järgmine<br>grupihingamine<br>toimub 09.07 kell<br>18:00</p>
+    <a href="#" class="hero__register">GRUPIHINGAMISELE REGISTREERI SIIN!</a>
+    <a href="/e-pood/proovipakett" class="hero__cta-btn">3X PROOVIPAKETT SOODUSHIND 75€ (TAVAHIND120€)</a>
+    <div class="hero__services">
+      <a href="/teenused/vabastav-hingamine" class="hero__service-btn">VABASTAV HINGAMINE</a>
+      <a href="/teenused/floating" class="hero__service-btn">FLOATING</a>
+    </div>
+    <a href="/uritused" class="hero__service-btn hero__service-btn--center">ÜRITUSED</a>
+  </div>
+</section>
+
+<!-- PAIK MIS ON LOODUD -->
+<section class="intro">
+  <h2 class="intro__title">Paik, mis on loodud lõõgastuse ja rahulolu...</h2>
+  <p class="intro__text">Pakume valikut ja kuidas vabastav hingamine ja floating loovad koos ideaalsed tingimused meele ja keha lõõgastumiseks.</p>
+  <p class="intro__text">See on koht, kus igapäevaelu asemel valitseb vaikus ja rahu ning võimalus avastada iseennast ja kogeda meelelist heaolu.</p>
+  <p class="intro__text">Vabastav hingamise seansid on mõeldud stressi leevendamiseks ja sisemise rahu saavutamiseks. Floating pakub ainulaadset võimalust kehale ja vaimul kaaluta olekus puhata. Koos moodustavad need teraapiad tõhusa duo, mis toetavad nii füüsilist kui ka vaimset tervist. Vabastav hingamine ja floating aitavad leida uut energiat, parandada und ning tõsta meeleolu.</p>
+  <p class="intro__text">Meie keskuses on iga detail loodud selleks, et pakkuda parimat võimalikku kogemust!</p>
+</section>
+
+<!-- MIS ON VABASTAV HINGAMINE -->
+<section class="about">
+  <h2 class="about__title">MIS ON VABASTAV HINGAMINE?</h2>
+  <p class="about__text">Vabastava hingamise päritolu saab viia tuhandete aastate tagusesse aega ja siduda iidsete India joogide pranayama hingamisega, nii Lõuna-Ameerika, Austraalia ja Aafrika shamanistlike rituaalide kui ka Hiina qi gong praktikatega.</p>
+  <p class="about__text">Juba aastatuhandeid on teadvustatud hingamistehnikaid kasutatud keha ja meele puhastamiseks, et saavutada teadvuses tasakaal ja harmoonia.</p>
+  <p class="about__text">Kaasaegne hingamistöö sai alguse ärksatel 60-ndatel aastatel läbi <em>holotroopse-</em> ja "uuestisünni" hingamisteraapiate. Tol ajastul uuesti leitud ja katsetatud tehnikad sillutasid teed hingelise tärkamise ja tervendamise juurde, mille järele tohutult januneti.</p>
+  <p class="about__text">Esimest korda liideti psühholoogia läbi teadliku hingamise erinevate meetodite igapäeva ellu.</p>
+  <p class="about__text">Viimasel aastakümnel on erinevad hingamistehnikad eriti suurt tähelepanu saamas kuna jällegi huvituvad inimesed sisemisest kasvust ja hingelise- ning kehalise tervenemise meetoditest.</p>
+  <p class="about__text">Hingamisseansil praktiseeritav kiirendatud hingamine viib inimese seisundisse, milles teadvus avardub ning allasurutud traumad, mõtted, pinged ja emotsioonid saavad vabaneda.</p>
+</section>
+
+<!-- 6 KASU IKOONI -->
+<section class="benefits">
+  <div class="benefit">
+    <img src="/images/icon-puhastab.png" alt="" class="benefit__icon" loading="lazy" />
+    <h3 class="benefit__title">Puhastab Keha</h3>
+    <p class="benefit__text">Kiirendatud ja sügavate hingetõmmetega puhastub keha <strong>ebavajalikest jääkainetest</strong></p>
+  </div>
+  <div class="benefit">
+    <img src="/images/icon-stress.png" alt="" class="benefit__icon" loading="lazy" />
+    <h3 class="benefit__title">Vähendab stressi</h3>
+    <p class="benefit__text">Rahulik keskkond viib sind <strong>meditatiivsesse olekusse</strong>, kus automaatselt väheneb sinu stressitase</p>
+  </div>
+  <div class="benefit">
+    <img src="/images/icon-emotsioonid.png" alt="" class="benefit__icon" loading="lazy" />
+    <h3 class="benefit__title">Vabastab keha emotsioonidest</h3>
+    <p class="benefit__text">Inimesed <strong>suruvad alateadlikult oma emotsioone alla</strong> ja seetõttu võivad muutuda pahuraks või pingeliseks</p>
+  </div>
+  <div class="benefit">
+    <img src="/images/icon-uni.png" alt="" class="benefit__icon" loading="lazy" />
+    <h3 class="benefit__title">Parandab unekvaliteeti</h3>
+    <p class="benefit__text">Hingamisharjutused <strong>vabastavad keha pingetest</strong> ja <strong>rahustavad kesknärvisüsteemi</strong>, parandades sedasi unetust</p>
+  </div>
+  <div class="benefit">
+    <img src="/images/icon-keskendumis.png" alt="" class="benefit__icon" loading="lazy" />
+    <h3 class="benefit__title">Parandab keskendumisvõimet</h3>
+    <p class="benefit__text">Meditatiivne olek parandab keskendumisvõimet ja <strong>oskust fokuseerida</strong></p>
+  </div>
+  <div class="benefit">
+    <img src="/images/icon-aeg.png" alt="" class="benefit__icon" loading="lazy" />
+    <h3 class="benefit__title">Võta argielust aeg maha</h3>
+    <p class="benefit__text">Hea viis lõõgastuda ja võtta <strong>aeg iseendale</strong></p>
+  </div>
+</section>
+
+<!-- TEAL CTA -->
+<section class="cta-ribbon">
+  <h2 class="cta-ribbon__title">Broneeri omale aeg juba täna</h2>
+  <a href="https://admin.hopitude.com/widget/hingamiskeskus" class="cta-ribbon__btn">SIIT</a>
+</section>
+
+<!-- KOGE UUT ELUKVALITEETI -->
+<section class="experience">
+  <h2 class="experience__heading">KOGE UUT ELUKVALITEETI</h2>
+  <p class="experience__subheading">Läbi teadliku hingamise ja floatimise tervislikuma minani</p>
+  <img src="/images/terapeut.jpg" alt="Hingamiskeskuse terapeut" class="experience__photo" loading="lazy" />
+  <p class="experience__text">Hingamiskeskus on ainus koht Eestis, kus saab kogeda floatingut ja teadlikku hingamist ühe seansina. Teadlik hingamine on teaduspõhiselt kinnitatud praktika, mille kasulikku mõju inimestele on palju uuritud. Tegemist on kogenud terapeudi juhitud teadliku hingamise seansiga, mis suunab inimese sügavale meditatiivsesse seisundisse. Nagu nimigi viitab, aitab see praktika leevendada ärevust, vabaneda rasketest emotsioonidest ja traumadest.</p>
+  <a href="/teenused/vabastav-hingamine" class="experience__btn">LOE JUURDE</a>
+</section>
+
+<!-- TAGASISIDE -->
+<section class="testimonials">
+  <h2 class="testimonials__title">Loe, mida külastajad räägivad oma kogemusest</h2>
+  <div class="testimonial">
+    <p class="testimonial__text">Teadlik hingamine teeb mulle alati meeldiva restardi. Meel on värskem ja selgem. Olen käinud hingamas alati sisetunde järgi: kui miski vaevab või kui tunnen mõningast ärevust või raskustunnet. Minu jaoks on vabastav hingamine ja ka igapäevane teadlik hingamise jälgimine esimene samm oma sisemaailma korrastamisel. See on hea tervise ja helgema igapäeva alustala.</p>
+    <p class="testimonial__recommend">Kindlasti soovitan.</p>
+    <p class="testimonial__author">KRISTI MERIVÄLI</p>
+  </div>
+  <div class="testimonial">
+    <p class="testimonial__text">Käisin üsna lõpurasedana tunniajasel floatingu sessioonil. Olin varasemalt ühe korra varem käinud. Väga mõnus ja lõõgastav kogemus oli. Hea oli tunda enda suurenenud kehakaalu juures kaaluta olekut ja hõljuda seal soojas vees. Peale seanssi oli hea rahutunne sees ja tuli väga hea ööuni. Hea oli see, et oli võimalus jätta tuli põlema ja kate pealt lahti. Ei pidanud kartma pimeduse või "kapsi sees" olemise pärast. Kokkuvõttes jäin väga rahule käiguga ja soovitan ka teistel rasedatel proovima minna.</p>
+    <p class="testimonial__author">MARITE</p>
+  </div>
+</section>
+
+<!-- KOOSTÖÖPARTNERID -->
+<section class="partners">
+  <h2 class="partners__title">KOOSTÖÖPARTNERID</h2>
+  <div class="partners__grid">
+    <img src="/images/partner-kehakool.png" alt="K.Heinleht Kehakool" loading="lazy" />
+    <img src="/images/partner-lumiorav.png" alt="Lumiorav" loading="lazy" />
+    <img src="/images/partner-akadeemia.png" alt="Teadliku Loomise ja Hingamise Akadeemia" loading="lazy" />
+    <img src="/images/partner-spirit.png" alt="Spirit Studio" loading="lazy" />
+  </div>
+</section>
+
+<!-- AADRESS + HOONE -->
+<section class="location">
+  <h3 class="location__title">Aadress</h3>
+  <p class="location__address">Söle 14c, Tallinn</p>
+</section>
+<img src="/images/hoone.jpg" alt="Hingamiskeskus Söle 14c" class="location__photo" loading="lazy" />
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer__main">
+    <img src="/images/logo-valge.png" alt="Hingamiskeskus" class="footer__logo" />
+    <div class="footer__contact">
+      <h3>Kontakt</h3>
+      <p>E-post: Info@hingamiskeskus.ee</p>
+      <p>Telefoninumber:</p>
+      <p>+372 56695898</p>
+      <p>+372 56497689</p>
+      <p>(klienditugi 10.00-17.00)</p>
+      <p>Hingamises OÜ</p>
+      <p>EE147700771009732310</p>
+    </div>
+    <div class="footer__hours">
+      <h3>Lahtiolekuajad</h3>
+      <p>E-R 8.30 - 20.00</p>
+      <p>L-P 11.00 - 18.00</p>
+    </div>
+    <div class="footer__social">
+      <a href="https://www.facebook.com/Hingamiskeskus" aria-label="Facebook" target="_blank" rel="noopener">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/hingamiskeskus/" aria-label="Instagram" target="_blank" rel="noopener">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+      </a>
+    </div>
+    <div class="footer__legal">
+      <a href="/privaatsuspoliitika">Privaatsuspoliitika</a> | <a href="/muugitingimused">Müügitingimused</a>
+    </div>
+  </div>
+</footer>
+
+</Layout>
+
+<style>
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .header__logo img { height: 28px; width: auto; }
+  .header__right { display: flex; align-items: center; gap: 16px; }
+  .header__cart { color: #1d1e20; }
+  .header__burger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+  }
+  .header__burger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #1d1e20;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+  }
+  .hero__content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 32px 24px;
+    width: 100%;
+  }
+  .hero__title {
+    font-size: 28px;
+    font-weight: 500;
+    font-style: italic;
+    color: #fff;
+    line-height: 1.25;
+    margin-bottom: 20px;
+  }
+  .hero__event {
+    font-size: 17px;
+    color: #fff;
+    line-height: 1.35;
+    margin-bottom: 8px;
+  }
+  .hero__register {
+    display: block;
+    font-size: 12px;
+    color: #fff;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: underline;
+    margin-bottom: 24px;
+  }
+  .hero__cta-btn {
+    display: block;
+    background: #1d1e20;
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .hero__services {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .hero__service-btn {
+    flex: 1;
+    background: #1d1e20;
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 14px 8px;
+    text-align: center;
+  }
+  .hero__service-btn--center {
+    flex: none;
+    width: 50%;
+    margin: 0 auto;
+  }
+
+  /* INTRO */
+  .intro {
+    background: #fff;
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .intro__title {
+    font-size: 20px;
+    font-weight: 500;
+    color: #1d1e20;
+    line-height: 1.3;
+    margin-bottom: 16px;
+  }
+  .intro__text {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  /* ABOUT */
+  .about {
+    background: #f3fcff;
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .about__title {
+    font-size: 20px;
+    font-weight: 500;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .about__text {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  /* BENEFITS */
+  .benefits {
+    background: #f3fcff;
+    padding: 16px 24px 32px;
+    text-align: center;
+  }
+  .benefit {
+    margin-bottom: 28px;
+  }
+  .benefit:last-child { margin-bottom: 0; }
+  .benefit__icon {
+    width: 80px;
+    height: auto;
+    margin: 0 auto 10px;
+  }
+  .benefit__title {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .benefit__text {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  /* CTA RIBBON */
+  .cta-ribbon {
+    background: #1f6d85;
+    padding: 28px 24px;
+    text-align: center;
+  }
+  .cta-ribbon__title {
+    font-size: 22px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+  .cta-ribbon__btn {
+    display: inline-block;
+    border: 1.5px solid #fff;
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 32px;
+  }
+
+  /* EXPERIENCE */
+  .experience {
+    background: #fff;
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .experience__heading {
+    font-size: 20px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .experience__subheading {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  .experience__photo {
+    width: 100%;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+  .experience__text {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+  .experience__btn {
+    display: inline-block;
+    background: #1f6d85;
+    color: #fff;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 14px 32px;
+  }
+
+  /* TESTIMONIALS */
+  .testimonials {
+    background: #1f6d85;
+    padding: 32px 24px;
+    text-align: center;
+    color: #fff;
+  }
+  .testimonials__title {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+  .testimonial {
+    margin-bottom: 28px;
+  }
+  .testimonial:last-child { margin-bottom: 0; }
+  .testimonial__text {
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+  .testimonial__recommend {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  .testimonial__author {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+  }
+
+  /* PARTNERS */
+  .partners {
+    background: #fff;
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .partners__title {
+    font-size: 18px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+  }
+  .partners__grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  .partners__grid img {
+    max-width: 280px;
+    height: auto;
+  }
+
+  /* LOCATION */
+  .location {
+    background: #1f6d85;
+    padding: 20px 24px;
+    color: #fff;
+  }
+  .location__title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .location__address {
+    font-size: 14px;
+  }
+  .location__photo {
+    width: 100%;
+    display: block;
+  }
+
+  /* FOOTER */
+  .footer__main {
+    background: #1f6d85;
+    padding: 24px;
+    color: #fff;
+  }
+  .footer__logo {
+    height: 30px;
+    width: auto;
+    margin: 0 auto 20px;
+  }
+  .footer__contact h3,
+  .footer__hours h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .footer__contact p,
+  .footer__hours p {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .footer__hours {
+    margin-top: 16px;
+  }
+  .footer__social {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    color: #fff;
+  }
+  .footer__legal {
+    font-size: 11px;
+    margin-top: 16px;
+    opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 12px;
+  }
+  .footer__legal a:hover { text-decoration: underline; }
+
+  /* DESKTOP */
+  @media (min-width: 768px) {
+    .header { padding: 12px 40px; }
+    .header__logo img { height: 36px; }
+    .hero { min-height: 600px; }
+    .hero__title { font-size: 42px; }
+    .hero__content { max-width: 700px; }
+    .intro, .about, .benefits, .experience, .partners { padding: 48px 40px; }
+    .benefit__icon { width: 100px; }
+    .partners__grid {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 32px;
+    }
+    .partners__grid img { max-width: 200px; }
+  }
+</style>
