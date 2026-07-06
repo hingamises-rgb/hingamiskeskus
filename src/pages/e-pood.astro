@@ -284,20 +284,20 @@ import Layout from '../layouts/Layout.astro';
   /* CATEGORY NAV */
   .cat-nav {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 12px;
-    justify-content: center;
     padding: 24px 16px;
     background: #fff;
   }
   .cat-nav__btn {
-    display: inline-block;
+    display: block;
     background: #1d1e20;
     color: #fff;
-    font-size: 12px;
+    font-size: 14px;
     letter-spacing: 1.5px;
-    padding: 12px 20px;
+    padding: 16px 20px;
     border-radius: 10px;
+    text-align: center;
   }
 
   /* SHOP INTRO */
@@ -370,7 +370,6 @@ import Layout from '../layouts/Layout.astro';
     width: 100%;
     border-radius: 10px;
   }
-  #kinkekaardid .product-card__img,
   #paketid .product-card__img {
     aspect-ratio: 768/431;
     object-fit: cover;
@@ -399,20 +398,21 @@ import Layout from '../layouts/Layout.astro';
     margin-right: 4px;
   }
   .product-card__btn {
-    display: inline-block;
-    background: #1d1e20;
-    color: #fff;
+    display: block;
+    width: 100%;
+    background: #fff;
+    color: #1d1e20;
     font-size: 12px;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    padding: 12px 28px;
-    border-radius: 10px;
+    padding: 14px 28px;
+    border: 1px solid #1d1e20;
     cursor: pointer;
     font-family: 'DM Sans', sans-serif;
-    border: none;
   }
   .product-card__btn:hover {
-    background: #333;
+    background: #1d1e20;
+    color: #fff;
   }
 
   /* LOCATION */
@@ -485,8 +485,8 @@ import Layout from '../layouts/Layout.astro';
     .header__logo img { height: 36px; }
     .page-hero { padding: 60px 40px; }
     .page-hero__title { font-size: 42px; }
-    .cat-nav { padding: 32px 40px; gap: 16px; }
-    .cat-nav__btn { font-size: 13px; padding: 14px 28px; }
+    .cat-nav { flex-direction: row; flex-wrap: wrap; justify-content: center; padding: 32px 40px; gap: 16px; }
+    .cat-nav__btn { display: inline-block; width: auto; font-size: 13px; padding: 14px 28px; }
     .shop-intro { padding: 0 40px 40px; }
     .product-section { padding: 40px; }
     .product-grid {
