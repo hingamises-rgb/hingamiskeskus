@@ -1,0 +1,495 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="E-pood | Kinkekaardid, paketid, vitamiinid - Hingamiskeskus">
+
+<!-- HEADER -->
+<header class="header">
+  <a href="/" class="header__logo">
+    <img src="/images/logo.svg" alt="Hingamiskeskus" height="30" />
+  </a>
+  <div class="header__right">
+    <a href="/e-pood" class="header__cart" aria-label="Ostukorv">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+    </a>
+    <button class="header__burger" aria-label="Menüü">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- PAGE TITLE -->
+<section class="page-hero">
+  <h1 class="page-hero__title">E-pood</h1>
+</section>
+
+<!-- CATEGORY NAV -->
+<nav class="cat-nav">
+  <a href="#kinkekaardid" class="cat-nav__btn">KINKEKAARDID</a>
+  <a href="#paketid" class="cat-nav__btn">PAKETID</a>
+  <a href="#vitamiinid" class="cat-nav__btn">VITAMIINID</a>
+  <a href="#epsomi-sool" class="cat-nav__btn">EPSOMI SOOL</a>
+</nav>
+
+<!-- INTRO TEXT -->
+<section class="shop-intro">
+  <h2 class="shop-intro__heading">Hingamiskeskuse e-pood</h2>
+  <p>Hingamiskeskuse e-poest leiad kõik, mis toetab sinu heaolu ja lõõgastust nii kodus kui ka meie keskuses.</p>
+
+  <h3 class="shop-intro__subheading">Kinkekaardid ja paketid</h3>
+  <p>Kõiki meie kinkekaarte ja pakette saab kasutada paindlikult nii floatingu seanssideks kui ka vabastava hingamise seanssideks. Iga kord saad ise valida, millist kogemust parasjagu vajad. Korrakaarte saab kasutada ka leibkonna siseselt, mis tähendab, et ühe kaardiga saavad seansse broneerida ka teised pereliikmed.</p>
+  <p><strong>Kinkekaardid</strong> on suurepärane kingitus lähedastele. Saadame kaardi e-mailile või soovi korral saad tulla füüsilisele kaardile ise järele. Kaardid kehtivad 6 kuud.</p>
+
+  <h3 class="shop-intro__subheading">Epsomi sool</h3>
+  <p>Meie e-poes on viis erinevat Epsomi soola: puhas sool ning eeterlike õlidega variandid, mis muudavad koduvanni eriti lõõgastavaks ja meeldivalt lõhnavaks. Epsomi sool sisaldab magneesiumi, mis aitab lõdvestada lihaseid, rahustab närvisüsteemi ja toetab paremat und. Ideaalne valik igapäevaseks taastumiseks ja lõõgastumiseks ka kodus.</p>
+</section>
+
+<!-- KINKEKAARDID -->
+<section class="product-section" id="kinkekaardid">
+  <h2 class="product-section__title">Kinkekaardid</h2>
+  <div class="product-grid">
+    <div class="product-card">
+      <img src="/images/kinkekaart-40.png" alt="Hingamiskeskuse kinkekaart 40 € floating ja hingamisteraapia Tallinnas" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Hingamiskeskuse kinkekaart 40 € floating ja hingamisteraapia Tallinnas</h3>
+      <p class="product-card__price">€40.00</p>
+      <button class="product-card__btn" data-product="kinkekaart-40">LISA OSTUKORVI</button>
+    </div>
+    <div class="product-card">
+      <img src="/images/kinkekaart-80.png" alt="Hingamiskeskuse kinkekaart 80 € floating ja hingamisteraapia Tallinnas" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Hingamiskeskuse kinkekaart 80 € floating ja hingamisteraapia Tallinnas</h3>
+      <p class="product-card__price">€80.00</p>
+      <button class="product-card__btn" data-product="kinkekaart-80">LISA OSTUKORVI</button>
+    </div>
+    <div class="product-card">
+      <img src="/images/kinkekaart-120.png" alt="Hingamiskeskuse kinkekaart 120 € floating ja hingamisteraapia Tallinnas" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Hingamiskeskuse kinkekaart 120 € floating ja hingamisteraapia Tallinnas</h3>
+      <p class="product-card__price">€120.00</p>
+      <button class="product-card__btn" data-product="kinkekaart-120">LISA OSTUKORVI</button>
+    </div>
+  </div>
+</section>
+
+<!-- PAKETID -->
+<section class="product-section" id="paketid">
+  <h2 class="product-section__title">Paketid</h2>
+  <div class="product-grid">
+    <div class="product-card">
+      <img src="/images/pakett-3korda.png" alt="3 korra kaart" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">3 korra kaart</h3>
+      <p class="product-card__price"><span class="price--old">€120.00</span> €107.00</p>
+      <button class="product-card__btn" data-product="3-korra-kaart">LISA OSTUKORVI</button>
+    </div>
+    <div class="product-card">
+      <img src="/images/pakett-5korda.png" alt="5 korra kaart" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">5 korra kaart</h3>
+      <p class="product-card__price"><span class="price--old">€200.00</span> €168.00</p>
+      <button class="product-card__btn" data-product="5-korra-kaart">LISA OSTUKORVI</button>
+    </div>
+    <div class="product-card">
+      <img src="/images/pakett-10korda.png" alt="10 korra kaart" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">10 korra kaart</h3>
+      <p class="product-card__price"><span class="price--old">€400.00</span> €300.00</p>
+      <button class="product-card__btn" data-product="10-korra-kaart">LISA OSTUKORVI</button>
+    </div>
+    <div class="product-card">
+      <img src="/images/pakett-proovipakett.png" alt="Keha ja meele 3x proovipakett" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Keha ja meele 3x proovipakett</h3>
+      <p class="product-card__price"><span class="price--old">€120.00</span> €75.00</p>
+      <button class="product-card__btn" data-product="proovipakett">LISA OSTUKORVI</button>
+    </div>
+    <div class="product-card">
+      <img src="/images/pakett-syvaloogastus.png" alt="Süvalõõgastuspakett" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Süvalõõgastuspakett</h3>
+      <p class="product-card__price">Al. €150.00</p>
+      <button class="product-card__btn" data-product="syvaloogastus">LISA OSTUKORVI</button>
+    </div>
+    <div class="product-card">
+      <img src="/images/pakett-heaolu.png" alt="Heaolu pakett" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Heaolu pakett</h3>
+      <p class="product-card__price">€300.00</p>
+      <button class="product-card__btn" data-product="heaolu">LISA OSTUKORVI</button>
+    </div>
+    <div class="product-card">
+      <img src="/images/pakett-energialaeng.png" alt="Sinu hommikune energialaeng" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Sinu hommikune energialaeng</h3>
+      <p class="product-card__price"><span class="price--old">€200.00</span> €125.00</p>
+      <button class="product-card__btn" data-product="energialaeng">LISA OSTUKORVI</button>
+    </div>
+  </div>
+</section>
+
+<!-- VITAMIINID -->
+<section class="product-section" id="vitamiinid">
+  <h2 class="product-section__title">Vitamiinid</h2>
+  <div class="product-grid">
+    <div class="product-card">
+      <img src="/images/vitamiin-nac.jpg" alt="Liposoomne C-vitamiin NAC 260ml" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Liposoomne C-vitamiin | NAC 260ml</h3>
+      <p class="product-card__price">€17.00</p>
+      <button class="product-card__btn" data-product="vitamiin-nac">LISA OSTUKORVI</button>
+    </div>
+    <div class="product-card product-card--sold-out">
+      <div class="product-card__ribbon">SOLD OUT</div>
+      <img src="/images/vitamiin-original.jpg" alt="Liposoomne C-vitamiin Original 500ml" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Liposoomne C-vitamiin | Original 500ml</h3>
+      <p class="product-card__price product-card__price--sold-out">Sold out</p>
+    </div>
+    <div class="product-card product-card--sold-out">
+      <div class="product-card__ribbon">SOLD OUT</div>
+      <img src="/images/vitamiin-c.jpg" alt="Liposoomne C-vitamiin C 500ml" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Liposoomne C-vitamiin | C 500ml</h3>
+      <p class="product-card__price product-card__price--sold-out">Sold out</p>
+    </div>
+    <div class="product-card product-card--sold-out">
+      <div class="product-card__ribbon">SOLD OUT</div>
+      <img src="/images/vitamiin-red.jpg" alt="Liposoomne C-vitamiin Red 500ml" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Liposoomne C-vitamiin | Red 500ml</h3>
+      <p class="product-card__price product-card__price--sold-out">Sold out</p>
+    </div>
+    <div class="product-card product-card--sold-out">
+      <div class="product-card__ribbon">SOLD OUT</div>
+      <img src="/images/vitamiin-blue.jpg" alt="Liposoomne C-vitamiin Blue 500ml" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Liposoomne C-vitamiin | Blue 500ml</h3>
+      <p class="product-card__price product-card__price--sold-out">Sold out</p>
+    </div>
+    <div class="product-card product-card--sold-out">
+      <div class="product-card__ribbon">SOLD OUT</div>
+      <img src="/images/vitamiin-green.jpg" alt="Liposoomne C-vitamiin Green 500ml" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Liposoomne C-vitamiin | Green 500ml</h3>
+      <p class="product-card__price product-card__price--sold-out">Sold out</p>
+    </div>
+  </div>
+</section>
+
+<!-- EPSOMI SOOL -->
+<section class="product-section" id="epsomi-sool">
+  <h2 class="product-section__title">Epsomi sool</h2>
+  <div class="product-grid">
+    <div class="product-card">
+      <img src="/images/epsomi-250g.png" alt="Epsomi sool 250g" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Epsomi sool 250g</h3>
+      <p class="product-card__price">€3.00</p>
+      <button class="product-card__btn" data-product="epsomi-250g">LISA OSTUKORVI</button>
+    </div>
+    <div class="product-card">
+      <img src="/images/epsomi-750g.png" alt="Epsomi sool 750g" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Epsomi sool 750g</h3>
+      <p class="product-card__price">€7.00</p>
+      <button class="product-card__btn" data-product="epsomi-750g">LISA OSTUKORVI</button>
+    </div>
+    <div class="product-card">
+      <img src="/images/epsomi-apelsin.png" alt="Epsomi sool apelsini eeterliku õliga 250g" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Epsomi sool apelsini eeterliku õliga 250 g</h3>
+      <p class="product-card__price">€4.00</p>
+      <button class="product-card__btn" data-product="epsomi-apelsin">LISA OSTUKORVI</button>
+    </div>
+    <div class="product-card">
+      <img src="/images/epsomi-lavendel.png" alt="Epsomi sool lavendli eeterliku õliga 250g" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Epsomi sool lavendli eeterliku õliga 250 g</h3>
+      <p class="product-card__price">€4.00</p>
+      <button class="product-card__btn" data-product="epsomi-lavendel">LISA OSTUKORVI</button>
+    </div>
+    <div class="product-card">
+      <img src="/images/epsomi-sidrunhein.png" alt="Epsomi sool sidrunheina eeterliku õliga 250g" class="product-card__img" loading="lazy" />
+      <h3 class="product-card__title">Epsomi sool sidrunheina eeterliku õliga 250 g</h3>
+      <p class="product-card__price">€4.00</p>
+      <button class="product-card__btn" data-product="epsomi-sidrunhein">LISA OSTUKORVI</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="location">
+    <h3 class="location__title">Aadress</h3>
+    <p class="location__address">Söle 14c, Tallinn</p>
+    <img src="/images/hoone.jpg" alt="Hingamiskeskus Söle 14c" class="location__photo" loading="lazy" />
+  </div>
+  <div class="footer__main">
+    <img src="/images/logo-valge.png" alt="Hingamiskeskus" class="footer__logo" />
+    <div class="footer__contact">
+      <h3>Kontakt</h3>
+      <p>E-post: Info@hingamiskeskus.ee</p>
+      <p>Telefoninumber:</p>
+      <p>+372 56695898</p>
+      <p>+372 56497689</p>
+      <p>(klienditugi 10.00-17.00)</p>
+      <p>Hingamises OÜ</p>
+      <p>EE147700771009732310</p>
+    </div>
+    <div class="footer__hours">
+      <h3>Lahtiolekuajad</h3>
+      <p>E-R 8.30 - 20.00</p>
+      <p>L-P 11.00 - 18.00</p>
+    </div>
+    <div class="footer__social">
+      <a href="https://www.facebook.com/Hingamiskeskus" aria-label="Facebook" target="_blank" rel="noopener">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/hingamiskeskus/" aria-label="Instagram" target="_blank" rel="noopener">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+      </a>
+    </div>
+    <div class="footer__legal">
+      <a href="/privaatsuspoliitika">Privaatsuspoliitika</a> | <a href="/muugitingimused">Müügitingimused</a>
+    </div>
+  </div>
+</footer>
+
+</Layout>
+
+<style>
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .header__logo img { height: 28px; width: auto; }
+  .header__right { display: flex; align-items: center; gap: 16px; }
+  .header__cart { color: #1d1e20; }
+  .header__burger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+  }
+  .header__burger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #1d1e20;
+  }
+
+  /* PAGE HERO */
+  .page-hero {
+    background: #f3fcff;
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .page-hero__title {
+    font-size: 32px;
+    font-weight: 400;
+  }
+
+  /* CATEGORY NAV */
+  .cat-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    padding: 24px 16px;
+    background: #fff;
+  }
+  .cat-nav__btn {
+    display: inline-block;
+    background: #1d1e20;
+    color: #fff;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    padding: 12px 20px;
+    border-radius: 10px;
+  }
+
+  /* SHOP INTRO */
+  .shop-intro {
+    padding: 0 24px 32px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .shop-intro__heading {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .shop-intro__subheading {
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 20px;
+    margin-bottom: 6px;
+  }
+  .shop-intro p {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+
+  /* PRODUCT SECTION */
+  .product-section {
+    padding: 32px 16px;
+    scroll-margin-top: 60px;
+  }
+  .product-section:nth-child(even) {
+    background: #f3fcff;
+  }
+  .product-section__title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: 24px;
+    color: #1d1e20;
+  }
+
+  /* PRODUCT GRID */
+  .product-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* PRODUCT CARD */
+  .product-card {
+    text-align: center;
+    position: relative;
+  }
+  .product-card__ribbon {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #1d1e20;
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    z-index: 2;
+  }
+  .product-card__img {
+    width: 100%;
+    aspect-ratio: 400/431;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  .product-card--sold-out .product-card__img {
+    opacity: 0.6;
+  }
+  .product-card__title {
+    font-size: 16px;
+    font-weight: 400;
+    padding: 12px 8px 4px;
+    line-height: 1.4;
+  }
+  .product-card__price {
+    font-size: 16px;
+    color: #1d1e20;
+    padding: 4px 0 12px;
+  }
+  .product-card__price--sold-out {
+    color: #999;
+    font-style: italic;
+  }
+  .price--old {
+    text-decoration: line-through;
+    color: #999;
+    margin-right: 4px;
+  }
+  .product-card__btn {
+    display: inline-block;
+    background: #1d1e20;
+    color: #fff;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 12px 28px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    border: none;
+  }
+  .product-card__btn:hover {
+    background: #333;
+  }
+
+  /* LOCATION */
+  .location {
+    background: #1f6d85;
+    padding: 20px 24px 24px;
+    color: #fff;
+    text-align: center;
+  }
+  .location__title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .location__address {
+    font-size: 14px;
+  }
+  .location__photo {
+    width: 80%;
+    max-width: 320px;
+    margin: 12px auto 0;
+    display: block;
+    border-radius: 10px;
+  }
+
+  /* FOOTER */
+  .footer__main {
+    background: #1f6d85;
+    padding: 24px;
+    color: #fff;
+  }
+  .footer__logo {
+    height: 30px;
+    width: auto;
+    margin: 0 auto 20px;
+    display: block;
+  }
+  .footer__contact h3,
+  .footer__hours h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .footer__contact p,
+  .footer__hours p {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .footer__hours {
+    margin-top: 16px;
+  }
+  .footer__social {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    color: #fff;
+  }
+  .footer__legal {
+    font-size: 11px;
+    margin-top: 16px;
+    opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 12px;
+  }
+  .footer__legal a:hover { text-decoration: underline; }
+
+  /* DESKTOP */
+  @media (min-width: 768px) {
+    .header { padding: 12px 40px; }
+    .header__logo img { height: 36px; }
+    .page-hero { padding: 60px 40px; }
+    .page-hero__title { font-size: 42px; }
+    .cat-nav { padding: 32px 40px; gap: 16px; }
+    .cat-nav__btn { font-size: 13px; padding: 14px 28px; }
+    .shop-intro { padding: 0 40px 40px; }
+    .product-section { padding: 40px; }
+    .product-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .product-card__title { font-size: 18px; }
+  }
+</style>
