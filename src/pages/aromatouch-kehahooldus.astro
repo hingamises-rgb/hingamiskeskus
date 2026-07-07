@@ -26,10 +26,8 @@ import Layout from '../layouts/Layout.astro';
   <div class="float-hero__content">
     <div class="float-hero__text">
       <h1 class="float-hero__title">Aromatouch kehahooldus</h1>
+      <h2 class="float-hero__subtitle">Terapeutiline massaaž doTerra eeterlike õlidega</h2>
       <p>Aromatouch tehnika on õrn ja lõõgastav kehahooldus, mis ühendab doTerra eeterlike õlide kasulikud omadused spetsiifiliste puudutustehnikatega. Selle massaažilaadse tehnika on välja töötanud Dr. David Hill, kes on spetsialiseerunud eeterlike õlide ja tervikliku meditsiini valdkonnas.</p>
-    </div>
-    <div class="float-hero__media">
-      <img src="/images/teenus-hingamine.jpg" alt="Aromatouch kehahooldus Hingamiskeskuses" class="float-hero__img" loading="lazy" />
     </div>
   </div>
 </section>
@@ -52,6 +50,10 @@ import Layout from '../layouts/Layout.astro';
     <li>Lõdvestada lihaseid ja parandada vereringet.</li>
   </ul>
 
+  <div class="float-hero-img">
+    <img src="/images/aromatouch-naine.jpg" alt="Aromatouch terapeut Hingamiskeskuses" class="float-hero__img" loading="lazy" />
+  </div>
+
   <p><strong>Töö kehapunktidega:</strong> Tehnikas keskendutakse selgroo, pea ja jalataldade. Puudutustehnika stimuleerib keha energia liikumist ja aktiveerib närvisüsteemi.</p>
 
   <p><strong>Kehale ja vaimule:</strong> Aromatouch pole ainult füüsiline kogemus, vaid ka vaimse ja emotsionaalse tasakaalu saavutamise viis. Eeterlikud õlid koos õrna puudutusega loovad rahulolu ja lõõgastustunde.</p>
@@ -60,13 +62,34 @@ import Layout from '../layouts/Layout.astro';
 
   <p><strong>Seansi kestvus:</strong> 60min</p>
   <p><strong>Hind:</strong> 50€</p>
+
+  <div class="float-hero-img">
+    <img src="/images/aromatouch-kuunlad.jpg" alt="Aromatouch massaažiruum küünaldega" class="float-hero__img" loading="lazy" />
+  </div>
 </section>
 
-<!-- CTA SECTION -->
-<section class="float-cta">
-  <h2 class="float-cta__title">Terapeutiline massaaž doTerra eeterlike õlidega</h2>
-  <p class="float-cta__price">Aja broneerimiseks jäta meile oma kontaktandmed ja võtame Sinuga ise ühendust</p>
-  <a href="mailto:Info@hingamiskeskus.ee" class="float-cta__btn">Info@hingamiskeskus.ee</a>
+<!-- BOOKING FORM -->
+<section class="float-form">
+  <h2 class="float-form__title">Aja broneerimine</h2>
+  <p class="float-form__desc">Aja broneerimiseks jäta meile oma kontaktandmed ja võtame Sinuga ise ühendust</p>
+  <form class="contact-form" action="mailto:Info@hingamiskeskus.ee" method="POST" enctype="text/plain">
+    <label class="contact-form__label">Nimi
+      <input type="text" name="nimi" class="contact-form__input" />
+    </label>
+    <label class="contact-form__label">Perekonnanimi
+      <input type="text" name="perekonnanimi" class="contact-form__input" />
+    </label>
+    <label class="contact-form__label">Telefon
+      <input type="tel" name="telefon" class="contact-form__input" />
+    </label>
+    <label class="contact-form__label">Sinu email
+      <input type="email" name="email" class="contact-form__input" required />
+    </label>
+    <label class="contact-form__label">Sõnum
+      <textarea name="sonum" class="contact-form__textarea" rows="4" required></textarea>
+    </label>
+    <button type="submit" class="contact-form__btn">SAADA</button>
+  </form>
 </section>
 
 <!-- FOOTER -->
@@ -199,20 +222,71 @@ import Layout from '../layouts/Layout.astro';
     color: #1d1e20;
   }
 
-  /* CTA */
-  .float-cta {
-    background: #1f6d85;
-    color: #fff;
-    text-align: center;
-    padding: 40px 24px;
+  /* HERO IMAGE INLINE */
+  .float-hero-img {
+    margin: 16px 0;
   }
-  .float-cta__title {
-    font-size: 24px;
+
+  /* SUBTITLE */
+  .float-hero__subtitle {
+    font-size: 18px;
+    font-weight: 400;
+    color: #1d1e20;
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+
+  /* BOOKING FORM */
+  .float-form {
+    background: #fff;
+    padding: 32px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .float-form__title {
+    font-size: 20px;
     font-weight: 700;
-    margin-bottom: 20px;
-    line-height: 1.3;
+    margin-bottom: 8px;
+    color: #1d1e20;
   }
-  .float-cta__btn {
+  .float-form__desc {
+    font-size: 15px;
+    color: #555;
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .contact-form__label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1d1e20;
+    gap: 4px;
+  }
+  .contact-form__input,
+  .contact-form__textarea {
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: #1d1e20;
+    background: #f9f9f9;
+  }
+  .contact-form__input:focus,
+  .contact-form__textarea:focus {
+    outline: none;
+    border-color: #1f6d85;
+  }
+  .contact-form__textarea {
+    resize: vertical;
+  }
+  .contact-form__btn {
     display: inline-block;
     background: #1d1e20;
     color: #fff;
@@ -221,66 +295,71 @@ import Layout from '../layouts/Layout.astro';
     text-transform: uppercase;
     padding: 14px 32px;
     border-radius: 10px;
-    margin-bottom: 16px;
-  }
-  .float-cta__price {
-    font-size: 15px;
-    opacity: 0.9;
+    border: none;
+    cursor: pointer;
+    align-self: flex-start;
   }
 
   /* LOCATION */
   .location {
-    background: #f3fcff;
-    padding: 40px 24px;
+    background: #1f6d85;
+    padding: 20px 24px 24px;
+    color: #fff;
     text-align: center;
   }
   .location__title {
     font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 8px;
+    font-weight: 500;
+    margin-bottom: 4px;
   }
   .location__address {
-    margin-bottom: 16px;
+    font-size: 14px;
   }
   .location__photo {
-    width: 100%;
-    max-width: 600px;
+    width: 80%;
+    max-width: 320px;
+    margin: 12px auto 0;
+    display: block;
     border-radius: 10px;
   }
 
   /* FOOTER */
   .footer__main {
-    background: #1d1e20;
+    background: #1f6d85;
+    padding: 24px;
     color: #fff;
-    padding: 40px 24px;
-    text-align: center;
   }
   .footer__logo {
-    width: 180px;
-    margin-bottom: 24px;
-  }
-  .footer__contact, .footer__hours {
-    margin-bottom: 24px;
+    height: 30px;
+    width: auto;
+    margin: 0 auto 20px;
+    display: block;
   }
   .footer__contact h3, .footer__hours h3 {
     font-size: 16px;
+    font-weight: 500;
     margin-bottom: 8px;
   }
   .footer__contact p, .footer__hours p {
-    font-size: 14px;
-    line-height: 1.6;
-    opacity: 0.85;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .footer__hours {
+    margin-top: 16px;
   }
   .footer__social {
     display: flex;
-    justify-content: center;
     gap: 16px;
-    margin-bottom: 24px;
+    margin-top: 16px;
+    color: #fff;
   }
   .footer__social a { color: #fff; }
   .footer__legal {
-    font-size: 12px;
-    opacity: 0.6;
+    font-size: 11px;
+    margin-top: 16px;
+    opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 12px;
   }
   .footer__legal a { color: #fff; text-decoration: none; }
 
@@ -305,8 +384,7 @@ import Layout from '../layouts/Layout.astro';
     .float-hero__img { margin-top: 0; }
 
     .float-info { padding: 40px; }
-    .float-cta { padding: 56px 40px; }
-    .float-cta__title { font-size: 30px; }
+    .float-form { padding: 40px; }
   }
 
   @media (min-width: 1024px) {

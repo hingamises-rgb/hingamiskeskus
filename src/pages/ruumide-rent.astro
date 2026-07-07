@@ -29,15 +29,11 @@ import Layout from '../layouts/Layout.astro';
       <p>Hingamiskeskuses pakume hubaseid ja harmoonilisi ruume, mis on loodud toetama sügavat lõdvestumist, sisemist rahu ja ühendust iseendaga. Meie keskuse atmosfäär on ideaalne erinevate teadlikkuse ja enesearengu praktikate jaoks.</p>
       <p>Ruumide rent toimub kokkuleppel. Kui soovid ruume rentida, täida palun allolev kontaktivorm, märkides ära oma soovid ja eelistatud kuupäevad. Eelistame pikaajalisi kliente, kes soovivad ruume regulaarselt kasutada.</p>
     </div>
-    <div class="float-hero__media">
-      <img src="/images/hoone.jpg" alt="Hingamiskeskus ruumide rent" class="float-hero__img" loading="lazy" />
-    </div>
   </div>
 </section>
 
-<!-- CTA SECTION -->
-<section class="float-cta">
-  <h2 class="float-cta__title">Ruumide rent</h2>
+<!-- CTA -->
+<section class="float-info float-info--cta">
   <a href="mailto:Info@hingamiskeskus.ee" class="float-cta__btn">TÄIDA VORM</a>
 </section>
 
@@ -47,9 +43,25 @@ import Layout from '../layouts/Layout.astro';
   <p>Meie 38 m² suurune saal on ideaalne erinevateks sündmusteks, pakkudes avarust ja mugavust. Ruumis on olemas pleedid, padjad ja madratsid, et luua mugav ja lõõgastav keskkond nii istuvateks kui ka lamavateks tegevusteks. See teeb ruumi sobivaks töötubade, koolituste ja grupikohtumiste jaoks, kus on oluline mugavus ja võimalus lõõgastuda.</p>
   <p><strong>Hind: 25€/h +km.</strong></p>
 
+  <div class="room-gallery">
+    <img src="/images/ruum-suur-1.jpg" alt="Hingamiskeskuse suur saal sirmi ja kardinatega" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-suur-2.jpg" alt="Suur saal madratsitega grupitööks" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-suur-3.jpg" alt="Suur saal Hingamiskeskuse logoseinaga" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-suur-4.jpg" alt="Suur saal kardinatega ja patjariiuliga" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-suur-5.jpg" alt="Suur saal madratsid ja tekiriiul" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-suur-6.jpg" alt="Suur saal logosein ja jaapani sirm" class="room-gallery__img" loading="lazy" />
+  </div>
+
   <h2 class="float-info__heading float-info__heading--spaced">Väike tuba 11m2</h2>
   <p>Meie 11 m² suurune tuba on hubane ja privaatne koht, mis sobib ideaalselt individuaalseteks seanssideks või väiksemateks kohtumisteks. Ruumis on väike voodi, kaks tooli, laud ning riiulid. Hubane valgustus loob sooja ja meeldiva õhkkonna, mis toetab keskendumist ja rahulikku olemist.</p>
   <p><strong>Hind: 7€/h +km.</strong></p>
+
+  <div class="room-gallery">
+    <img src="/images/ruum-vaike-1.jpg" alt="Väike tuba voodiga, tugitooli ja teekandikuga" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-vaike-2.jpg" alt="Väike tuba tugitooliga ja riiuliga" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-vaike-3.jpg" alt="Väike tuba kahe tugitooliga ja mandala kunstiga" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-vaike-4.jpg" alt="Väike tuba tugitooli ja riiuliga" class="room-gallery__img" loading="lazy" />
+  </div>
 
   <p style="margin-top: 24px;">Aja broneerimiseks jäta meile oma kontaktandmed ja võtame Sinuga ise ühendust: <a href="mailto:Info@hingamiskeskus.ee" class="float-info__link">Info@hingamiskeskus.ee</a></p>
 </section>
@@ -152,17 +164,8 @@ import Layout from '../layouts/Layout.astro';
   }
 
   /* CTA */
-  .float-cta {
-    background: #1f6d85;
-    color: #fff;
+  .float-info--cta {
     text-align: center;
-    padding: 40px 24px;
-  }
-  .float-cta__title {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 20px;
-    line-height: 1.3;
   }
   .float-cta__btn {
     display: inline-block;
@@ -205,59 +208,80 @@ import Layout from '../layouts/Layout.astro';
     text-decoration: underline;
   }
 
+  /* ROOM GALLERY */
+  .room-gallery {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 16px;
+    margin-bottom: 8px;
+  }
+  .room-gallery__img {
+    width: 100%;
+    border-radius: 10px;
+    clip-path: inset(0 round 10px);
+  }
+
   /* LOCATION */
   .location {
-    background: #f3fcff;
-    padding: 40px 24px;
+    background: #1f6d85;
+    padding: 20px 24px 24px;
+    color: #fff;
     text-align: center;
   }
   .location__title {
     font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 8px;
+    font-weight: 500;
+    margin-bottom: 4px;
   }
   .location__address {
-    margin-bottom: 16px;
+    font-size: 14px;
   }
   .location__photo {
-    width: 100%;
-    max-width: 600px;
+    width: 80%;
+    max-width: 320px;
+    margin: 12px auto 0;
+    display: block;
     border-radius: 10px;
   }
 
   /* FOOTER */
   .footer__main {
-    background: #1d1e20;
+    background: #1f6d85;
+    padding: 24px;
     color: #fff;
-    padding: 40px 24px;
-    text-align: center;
   }
   .footer__logo {
-    width: 180px;
-    margin-bottom: 24px;
-  }
-  .footer__contact, .footer__hours {
-    margin-bottom: 24px;
+    height: 30px;
+    width: auto;
+    margin: 0 auto 20px;
+    display: block;
   }
   .footer__contact h3, .footer__hours h3 {
     font-size: 16px;
+    font-weight: 500;
     margin-bottom: 8px;
   }
   .footer__contact p, .footer__hours p {
-    font-size: 14px;
-    line-height: 1.6;
-    opacity: 0.85;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .footer__hours {
+    margin-top: 16px;
   }
   .footer__social {
     display: flex;
-    justify-content: center;
     gap: 16px;
-    margin-bottom: 24px;
+    margin-top: 16px;
+    color: #fff;
   }
   .footer__social a { color: #fff; }
   .footer__legal {
-    font-size: 12px;
-    opacity: 0.6;
+    font-size: 11px;
+    margin-top: 16px;
+    opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 12px;
   }
   .footer__legal a { color: #fff; text-decoration: none; }
 
@@ -282,8 +306,7 @@ import Layout from '../layouts/Layout.astro';
     .float-hero__img { margin-top: 0; }
 
     .float-info { padding: 40px; }
-    .float-cta { padding: 56px 40px; }
-    .float-cta__title { font-size: 30px; }
+    .room-gallery { grid-template-columns: 1fr 1fr; }
   }
 
   @media (min-width: 1024px) {

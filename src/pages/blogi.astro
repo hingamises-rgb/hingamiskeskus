@@ -179,6 +179,8 @@ function formatDate(dateStr: string) {
     color: #fff;
     font-family: 'DM Sans', sans-serif;
     font-size: 14px;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
     letter-spacing: 1.5px;
     padding: 16px 20px;
     border-radius: 10px;
@@ -265,55 +267,62 @@ function formatDate(dateStr: string) {
 
   /* FOOTER */
   .location {
-    background: #f3fcff;
-    padding: 40px 24px;
+    background: #1f6d85;
+    padding: 20px 24px 24px;
+    color: #fff;
     text-align: center;
   }
   .location__title {
     font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 8px;
+    font-weight: 500;
+    margin-bottom: 4px;
   }
   .location__address {
-    margin-bottom: 16px;
+    font-size: 14px;
   }
   .location__photo {
-    width: 100%;
-    max-width: 600px;
+    width: 80%;
+    max-width: 320px;
+    margin: 12px auto 0;
+    display: block;
     border-radius: 10px;
   }
   .footer__main {
-    background: #1d1e20;
+    background: #1f6d85;
+    padding: 24px;
     color: #fff;
-    padding: 40px 24px;
-    text-align: center;
   }
   .footer__logo {
-    width: 180px;
-    margin-bottom: 24px;
-  }
-  .footer__contact, .footer__hours {
-    margin-bottom: 24px;
+    height: 30px;
+    width: auto;
+    margin: 0 auto 20px;
+    display: block;
   }
   .footer__contact h3, .footer__hours h3 {
     font-size: 16px;
+    font-weight: 500;
     margin-bottom: 8px;
   }
   .footer__contact p, .footer__hours p {
-    font-size: 14px;
-    line-height: 1.6;
-    opacity: 0.85;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .footer__hours {
+    margin-top: 16px;
   }
   .footer__social {
     display: flex;
-    justify-content: center;
     gap: 16px;
-    margin-bottom: 24px;
+    margin-top: 16px;
+    color: #fff;
   }
   .footer__social a { color: #fff; }
   .footer__legal {
-    font-size: 12px;
-    opacity: 0.6;
+    font-size: 11px;
+    margin-top: 16px;
+    opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 12px;
   }
   .footer__legal a { color: #fff; text-decoration: none; }
 

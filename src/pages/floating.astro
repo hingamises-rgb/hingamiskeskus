@@ -33,7 +33,9 @@ import Layout from '../layouts/Layout.astro';
       <p>Hingamiskeskus pakub floatingu kogemust Tallinnas, hubastes ja privaatsetes ruumides. Seanss kestab 60 minutit.</p>
     </div>
     <div class="float-hero__media">
-      <img src="/images/teenus-floating.jpg" alt="Floating Hingamiskeskuses" class="float-hero__img" loading="lazy" />
+      <div class="float-hero__video">
+        <iframe src="https://www.youtube.com/embed/JiqDwhFalXI" title="Floating Hingamiskeskus" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
     </div>
   </div>
 </section>
@@ -55,11 +57,12 @@ import Layout from '../layouts/Layout.astro';
 <section class="float-cta">
   <h2 class="float-cta__title">Floating on sügava lõõgastuse kogemus Tallinnas</h2>
   <a href="/broneeri-aeg" class="float-cta__btn">BRONEERI AEG</a>
-  <p class="float-cta__price">Floatingu seansi hind on 40€, kestvus 1h.</p>
+  <a href="/e-pood" class="float-cta__promo">3X PROOVIPAKETT SOODUSHIND 75€ (120€)</a>
 </section>
 
 <!-- INFO SECTION -->
 <section class="float-info">
+  <h2 class="float-info__heading">Floatingu seansi hind on 40€, kestvus 1h.</h2>
   <p>Selleks, et Sinu floatingu seanss oleks võimalikult meeldiv ja lõõgastav, soovitame kohale tulla vähemalt 15 minutit enne seansi algust. See annab Sulle piisavalt aega, et saaksime tutvustada kuidas floatigu protsess välja näeb ja jõuaksid ennem seansi duši all käia.</p>
   <p>Meie floatingu seansid toimuvad vaikuses ja privaatsetes ruumides. Sul on võimalus valida, kas soovid floatida täiesti pimedas ruumis või kasutada hubast väikest valgust. Valik on Sinu soovime, et Sinu kogemus oleks täpselt selline, nagu sulle sobib!</p>
   <p>Ootame floatima ka liikumisraskustega inimesi. Mugava kogemuse tagamiseks soovitame enne seansile tulekut meiega ühendust võtta.</p>
@@ -67,11 +70,6 @@ import Layout from '../layouts/Layout.astro';
   <p><strong>Kellele floating sobib:</strong> Stressis ja läbipõlemise piiril olijatele, sportlastele taastumiseks, lapseootel emadele (leevendab survet seljale ja jalgadele), kroonilise seljavalu ja lihaspingete korral ning neile, kes soovivad paremat und.</p>
   <p><strong>Kellele floating ei sobi:</strong> Epilepsia korral kui hood ei ole kontrolli all, värskete haavade või kriimustuste korral, nakkushaiguse korral ning alkoholi või narkojoobes.</p>
   <p>Kui sul on veel küsimusi floatingu kohta, siis vaata meie <a href="/kkk" class="float-info__link">korduma kippuvaid küsimusi</a></p>
-</section>
-
-<!-- PROMO BANNER -->
-<section class="float-promo">
-  <a href="/e-pood" class="float-promo__btn">3X PROOVIPAKETT SOODUSHIND 75€ (120€)</a>
 </section>
 
 <!-- REVIEWS -->
@@ -176,6 +174,7 @@ import Layout from '../layouts/Layout.astro';
 
 <!-- SEO TEXT -->
 <section class="float-seo">
+  <h2 class="float-seo__heading">Floatingu ajalugu</h2>
   <p>Floating on keskkond lõõgastumiseks, hõljudes väga soolases vees. Protsess toimub spetsiaalses kambris või vannis, mis on täidetud veega ja Epsomi soolaga. Epsomi sool võimaldab inimesel lihtsasti hõljuda vee pinnal. Vann või kamber on tavaliselt pimedas (vastavalt soovile) ja ümbritsetud vaikusega. Selles keskkonnas saad puhata ning see soodustab meele avardumist ja uute perspektiivide avastamist. Kehatemperatuuriga sarnane temperatuur kambris ja vees kaotab piiri vee ja õhu vahel ning laseb segamatult lõõgastuda.</p>
 
   <p>Floating kambri leiutas doktor John C. Lilly 1954. aastal. Tema katsetas ja kasutas kambrit isiklikult ja on kirjutanud sellel teemal ka mitmeid raamatuid.</p>
@@ -198,7 +197,6 @@ import Layout from '../layouts/Layout.astro';
 
   <p>Floatingu mõju on kinnitatud teadusuuringutes. Loe lähemalt: uuring 1 (süstemaatiline ülevaade 63 uuringust, 2025), uuring 2 (ärevuse ja depressiooni uuring, 2024), uuring 3 (teadvuse seisundid floatingu ajal, 2024)</p>
 
-  <h3 class="float-seo__heading">Floatingu ajalugu</h3>
 </section>
 
 <!-- FOOTER -->
@@ -320,6 +318,22 @@ import Layout from '../layouts/Layout.astro';
     border-radius: 10px;
     margin-top: 24px;
   }
+  .float-hero__video {
+    position: relative;
+    width: 100%;
+    padding-bottom: 177.78%;
+    margin-top: 24px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .float-hero__video iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+  }
 
   /* BENEFITS */
   .float-benefits {
@@ -368,12 +382,25 @@ import Layout from '../layouts/Layout.astro';
     border-radius: 10px;
     margin-bottom: 16px;
   }
-  .float-cta__price {
-    font-size: 15px;
-    opacity: 0.9;
+  .float-cta__promo {
+    display: block;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: 1px;
+    padding: 14px 24px;
+    border-radius: 10px;
+    margin-top: 16px;
+    border: 1px solid rgba(255,255,255,0.3);
   }
 
   /* INFO */
+  .float-info__heading {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #1d1e20;
+  }
   .float-info {
     background: #f3fcff;
     padding: 32px 24px;
@@ -392,23 +419,6 @@ import Layout from '../layouts/Layout.astro';
   .float-info__link {
     color: #1f6d85;
     text-decoration: underline;
-  }
-
-  /* PROMO */
-  .float-promo {
-    background: #fff;
-    padding: 32px 24px;
-    text-align: center;
-  }
-  .float-promo__btn {
-    display: inline-block;
-    background: #1f6d85;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    padding: 16px 32px;
-    border-radius: 10px;
   }
 
   /* REVIEWS */
@@ -530,59 +540,67 @@ import Layout from '../layouts/Layout.astro';
 
   /* LOCATION */
   .location {
-    background: #f3fcff;
-    padding: 40px 24px;
+    background: #1f6d85;
+    padding: 20px 24px 24px;
+    color: #fff;
     text-align: center;
   }
   .location__title {
     font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 8px;
+    font-weight: 500;
+    margin-bottom: 4px;
   }
   .location__address {
-    margin-bottom: 16px;
+    font-size: 14px;
   }
   .location__photo {
-    width: 100%;
-    max-width: 600px;
+    width: 80%;
+    max-width: 320px;
+    margin: 12px auto 0;
+    display: block;
     border-radius: 10px;
   }
 
   /* FOOTER */
   .footer__main {
-    background: #1d1e20;
+    background: #1f6d85;
+    padding: 24px;
     color: #fff;
-    padding: 40px 24px;
-    text-align: center;
   }
   .footer__logo {
-    width: 180px;
-    margin-bottom: 24px;
+    height: 30px;
+    width: auto;
+    margin: 0 auto 20px;
+    display: block;
   }
-  .footer__contact, .footer__hours {
-    margin-bottom: 24px;
-  }
-  .footer__contact h3, .footer__hours h3 {
+  .footer__contact h3,
+  .footer__hours h3 {
     font-size: 16px;
+    font-weight: 500;
     margin-bottom: 8px;
   }
-  .footer__contact p, .footer__hours p {
-    font-size: 14px;
-    line-height: 1.6;
-    opacity: 0.85;
+  .footer__contact p,
+  .footer__hours p {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .footer__hours {
+    margin-top: 16px;
   }
   .footer__social {
     display: flex;
-    justify-content: center;
     gap: 16px;
-    margin-bottom: 24px;
+    margin-top: 16px;
+    color: #fff;
   }
-  .footer__social a { color: #fff; }
   .footer__legal {
-    font-size: 12px;
-    opacity: 0.6;
+    font-size: 11px;
+    margin-top: 16px;
+    opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 12px;
   }
-  .footer__legal a { color: #fff; text-decoration: none; }
+  .footer__legal a:hover { text-decoration: underline; }
 
   /* DESKTOP */
   @media (min-width: 768px) {
@@ -604,12 +622,12 @@ import Layout from '../layouts/Layout.astro';
     .float-hero__title { font-size: 36px; }
     .float-hero__subtitle { font-size: 20px; }
     .float-hero__img { margin-top: 0; }
+    .float-hero__video { padding-bottom: 56.25%; }
 
     .float-benefits { padding: 40px; }
     .float-cta { padding: 56px 40px; }
     .float-cta__title { font-size: 30px; }
     .float-info { padding: 40px; }
-    .float-promo { padding: 40px; }
     .float-reviews { padding: 40px; }
     .float-faq { padding: 40px; }
     .float-seo { padding: 40px; }

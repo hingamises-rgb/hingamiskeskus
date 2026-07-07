@@ -298,6 +298,8 @@ import Layout from '../layouts/Layout.astro';
     padding: 16px 20px;
     border-radius: 10px;
     text-align: center;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* SHOP INTRO */
@@ -354,6 +356,7 @@ import Layout from '../layouts/Layout.astro';
   .product-card {
     text-align: center;
     position: relative;
+    overflow: hidden;
   }
   .product-card__ribbon {
     position: absolute;
@@ -369,7 +372,9 @@ import Layout from '../layouts/Layout.astro';
   }
   .product-card__img {
     width: 100%;
-    border-radius: 10px;
+    display: block;
+    border-radius: 0;
+    clip-path: inset(0 round 10px);
   }
   #paketid .product-card__img {
     aspect-ratio: 768/431;
