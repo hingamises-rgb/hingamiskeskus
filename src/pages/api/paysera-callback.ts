@@ -2,8 +2,26 @@ export const prerender = false;
 
 import type { APIRoute } from 'astro';
 import { createHash } from 'crypto';
+import nodemailer from 'nodemailer';
 
 const SIGN_PASSWORD = import.meta.env.PAYSERA_SIGN_PASSWORD;
+const SMAILY_USER = import.meta.env.SMAILY_API_USER || '';
+const SMAILY_KEY = import.meta.env.SMAILY_API_KEY || '';
+const NOTIFY_EMAIL = 'hingamises@gmail.com';
+
+const transporter = nodemailer.createTransport({
+  host: 'pecatdf6.sendsmaily.net',
+  port: 587,
+  secure: false,
+  auth: { user: SMAILY_USER, pass: SMAILY_KEY },
+});
+
+function shippingLabel(val: string) {
+  if (val === 'pickup') return 'Tule ise järgi (Söle 14C, Tallinn)';
+  if (val === 'dpd') return 'DPD pakiautomaat';
+  if (val === 'omniva') return 'Omniva pakiautomaat';
+  return val;
+}
 
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
@@ -20,10 +38,65 @@ export const GET: APIRoute = async ({ request }) => {
   const params = new URLSearchParams(decoded);
 
   const status = params.get('status');
-  const orderid = params.get('orderid');
+  const orderid = params.get('orderid') || '';
+  const amount = parseInt(params.get('amount') || '0', 10) / 100;
+  const email = params.get('p_email') || '';
+  const name = params.get('p_firstname') || '';
+  const phone = params.get('p_phone') || '';
+  const address = params.get('p_address') || '';
+  const shipping = params.get('p_shipping') || '';
+  const parcel = params.get('p_parcel') || '';
+  const items = params.get('p_items') || '';
 
   if (status === '1') {
-    console.log(`Makse õnnestus: tellimus ${orderid}`);
+    const shippingText = shippingLabel(shipping);
+    const parcelText = parcel ? `<br/>Pakiautomaat: ${parcel}` : '';
+
+    const shippingPrice = shipping === 'dpd' ? 3.10 : shipping === 'omniva' ? 3.46 : 0;
+    const subtotal = amount - shippingPrice;
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="font-size: 24px;">New Order ${orderid}</h1>
+        <p style="color: #666;">${new Date().toLocaleDateString('et-EE')} | ${new Date().toLocaleTimeString('et-EE', { hour: '2-digit', minute: '2-digit' })}</p>
+        <p>Hingamises OÜ received a new order from ${name}.</p>
+
+        <div style="background: #f9f9f9; border: 1px solid #eee; border-radius: 8px; padding: 24px; margin: 20px 0;">
+          <h2 style="font-size: 18px; margin-top: 0;">Order ${orderid} summary</h2>
+          <hr style="border: none; border-top: 1px solid #eee;" />
+          <p>${items}</p>
+          <hr style="border: none; border-top: 1px solid #eee;" />
+          <table style="width: 100%; font-size: 14px;">
+            <tr><td>Subtotal</td><td style="text-align: right;">€${subtotal.toFixed(2)}</td></tr>
+            <tr><td>Shipping</td><td style="text-align: right;">€${shippingPrice.toFixed(2)}</td></tr>
+            <tr><td><strong>Total</strong></td><td style="text-align: right;"><strong>€${amount.toFixed(2)}</strong></td></tr>
+          </table>
+          <hr style="border: none; border-top: 1px solid #eee;" />
+          <p style="font-size: 14px;">Payment method: <strong>Paysera</strong></p>
+        </div>
+
+        <div style="background: #f9f9f9; border: 1px solid #eee; border-radius: 8px; padding: 24px; margin: 20px 0;">
+          <h2 style="font-size: 18px; margin-top: 0;">Customer information</h2>
+          <hr style="border: none; border-top: 1px solid #eee;" />
+          <p>${name}<br/>
+          <a href="mailto:${email}">${email}</a><br/>
+          ${phone}</p>
+          <p><strong>Saatmine:</strong> ${shippingText}${parcelText}</p>
+          ${address ? `<p><strong>Aadress:</strong> ${address}</p>` : ''}
+        </div>
+      </div>
+    `;
+
+    try {
+      await transporter.sendMail({
+        from: `"Hingamiskeskus" <info@hingamiskeskus.ee>`,
+        to: NOTIFY_EMAIL,
+        subject: `New Order ${orderid}`,
+        html,
+      });
+    } catch (err) {
+      console.error('Email sending failed:', err);
+    }
   }
 
   return new Response('OK');

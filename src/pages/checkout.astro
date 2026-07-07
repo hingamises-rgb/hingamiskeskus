@@ -60,11 +60,25 @@ import Layout from '../layouts/Layout.astro';
           <span class="checkout-option__text">DPD pakiautomaat</span>
           <span class="checkout-option__price">€3.10</span>
         </label>
+        <div class="parcel-select" id="dpd-select" style="display:none;">
+          <div class="parcel-search-wrap">
+            <input type="text" class="checkout-input parcel-search" id="dpd-search" placeholder="Otsi pakiautomaati..." />
+          </div>
+          <div class="parcel-list" id="dpd-list"></div>
+          <input type="hidden" id="dpd-machine" />
+        </div>
         <label class="checkout-option">
           <input type="radio" name="shipping" value="omniva" />
           <span class="checkout-option__text">Omniva pakiautomaat</span>
           <span class="checkout-option__price">€3.46</span>
         </label>
+        <div class="parcel-select" id="omniva-select" style="display:none;">
+          <div class="parcel-search-wrap">
+            <input type="text" class="checkout-input parcel-search" id="omniva-search" placeholder="Otsi pakiautomaati..." />
+          </div>
+          <div class="parcel-list" id="omniva-list"></div>
+          <input type="hidden" id="omniva-machine" />
+        </div>
       </div>
 
       <!-- PAYMENT -->
@@ -74,48 +88,57 @@ import Layout from '../layouts/Layout.astro';
           <input type="radio" name="payment" value="popular" checked />
           <span class="checkout-option__text">Kaardimakse</span>
           <span class="checkout-option__logos">
-            <img src="https://bank.paysera.com/assets/image/payment_types/visa.png" alt="Visa" height="20" />
-            <img src="https://bank.paysera.com/assets/image/payment_types/mastercard.png" alt="MasterCard" height="20" />
+            <img src="/images/payments/cards.svg" alt="Visa / MasterCard" height="20" />
           </span>
         </label>
         <label class="checkout-option">
           <input type="radio" name="payment" value="swedbank" />
           <span class="checkout-option__text">Swedbank</span>
           <span class="checkout-option__logos">
-            <img src="https://bank.paysera.com/assets/image/payment_types/hanzabankas.png" alt="Swedbank" height="20" />
+            <img src="/images/payments/hanzaee.png" alt="Swedbank" height="20" />
           </span>
         </label>
         <label class="checkout-option">
           <input type="radio" name="payment" value="seb" />
           <span class="checkout-option__text">SEB</span>
           <span class="checkout-option__logos">
-            <img src="https://bank.paysera.com/assets/image/payment_types/sebbankas.png" alt="SEB" height="20" />
+            <img src="/images/payments/sebee.png" alt="SEB" height="20" />
           </span>
         </label>
         <label class="checkout-option">
           <input type="radio" name="payment" value="luminor" />
           <span class="checkout-option__text">Luminor</span>
           <span class="checkout-option__logos">
-            <img src="https://bank.paysera.com/assets/image/payment_types/nordea.png" alt="Luminor" height="20" />
+            <img src="/images/payments/nordeaee.png" alt="Luminor" height="20" />
+          </span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="citadele" />
+          <span class="checkout-option__text">Citadele</span>
+          <span class="checkout-option__logos">
+            <img src="/images/payments/citadele_ee.png" alt="Citadele" height="20" />
           </span>
         </label>
         <label class="checkout-option">
           <input type="radio" name="payment" value="coop" />
           <span class="checkout-option__text">Coop Pank</span>
           <span class="checkout-option__logos">
-            <img src="https://bank.paysera.com/assets/image/payment_types/krediidipank.png" alt="Coop Pank" height="20" />
+            <img src="/images/payments/krediidi_ee.png" alt="Coop Pank" height="20" />
           </span>
         </label>
         <label class="checkout-option">
           <input type="radio" name="payment" value="lhv" />
           <span class="checkout-option__text">LHV</span>
           <span class="checkout-option__logos">
-            <img src="https://bank.paysera.com/assets/image/payment_types/lhv.png" alt="LHV" height="20" />
+            <img src="/images/payments/lhv_ee.png" alt="LHV" height="20" />
           </span>
         </label>
         <label class="checkout-option">
           <input type="radio" name="payment" value="revolut" />
           <span class="checkout-option__text">Revolut</span>
+          <span class="checkout-option__logos">
+            <img src="/images/payments/revolut.png" alt="Revolut" height="20" />
+          </span>
         </label>
         <label class="checkout-option">
           <input type="radio" name="payment" value="transfer" />
@@ -229,7 +252,71 @@ import Layout from '../layouts/Layout.astro';
   renderCheckout();
 
   document.querySelectorAll('input[name="shipping"]').forEach(function(radio) {
-    radio.addEventListener('change', updateTotals);
+    radio.addEventListener('change', function() {
+      updateTotals();
+      toggleParcelSelect();
+    });
+  });
+
+  var parcelData = { dpd: null, omniva: null };
+
+  function toggleParcelSelect() {
+    var selected = document.querySelector('input[name="shipping"]:checked');
+    var val = selected ? selected.value : 'pickup';
+    document.getElementById('dpd-select').style.display = val === 'dpd' ? 'block' : 'none';
+    document.getElementById('omniva-select').style.display = val === 'omniva' ? 'block' : 'none';
+    if (val === 'dpd' && !parcelData.dpd) loadParcelData('dpd');
+    if (val === 'omniva' && !parcelData.omniva) loadParcelData('omniva');
+  }
+
+  function loadParcelData(type) {
+    fetch('/data/' + type + '.json')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        parcelData[type] = data;
+        renderParcelList(type, '');
+      });
+  }
+
+  function renderParcelList(type, query) {
+    var list = document.getElementById(type + '-list');
+    var data = parcelData[type] || [];
+    var q = query.toLowerCase();
+    var filtered = q ? data.filter(function(d) {
+      var searchStr = (d.name || '') + ' ' + (d.address || '') + ' ' + (d.city || '');
+      return searchStr.toLowerCase().indexOf(q) !== -1;
+    }) : data;
+    var shown = filtered.slice(0, 50);
+    var html = '';
+    shown.forEach(function(d) {
+      var label = d.name + ', ' + d.address + ', ' + d.city;
+      html += '<div class="parcel-item" data-value="' + label.replace(/"/g, '&quot;') + '">' + label + '</div>';
+    });
+    if (filtered.length > 50) html += '<div class="parcel-more">Veel ' + (filtered.length - 50) + ' tulemust — täpsusta otsingut</div>';
+    if (!filtered.length) html = '<div class="parcel-more">Tulemusi ei leitud</div>';
+    list.innerHTML = html;
+
+    list.querySelectorAll('.parcel-item').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var val = this.getAttribute('data-value');
+        document.getElementById(type + '-machine').value = val;
+        document.getElementById(type + '-search').value = val;
+        list.innerHTML = '';
+      });
+    });
+  }
+
+  document.getElementById('dpd-search').addEventListener('input', function() {
+    renderParcelList('dpd', this.value);
+  });
+  document.getElementById('omniva-search').addEventListener('input', function() {
+    renderParcelList('omniva', this.value);
+  });
+  document.getElementById('dpd-search').addEventListener('focus', function() {
+    if (parcelData.dpd) renderParcelList('dpd', this.value);
+  });
+  document.getElementById('omniva-search').addEventListener('focus', function() {
+    if (parcelData.omniva) renderParcelList('omniva', this.value);
   });
 
   document.getElementById('pay-btn').addEventListener('click', async function() {
@@ -239,6 +326,15 @@ import Layout from '../layouts/Layout.astro';
 
     if (!email) { alert('Palun sisesta e-posti aadress'); return; }
     if (!fullname) { alert('Palun sisesta nimi'); return; }
+
+    var shippingVal = document.querySelector('input[name="shipping"]:checked').value;
+    if (shippingVal === 'dpd' && !document.getElementById('dpd-machine').value) {
+      alert('Palun vali DPD pakiautomaat'); return;
+    }
+    if (shippingVal === 'omniva' && !document.getElementById('omniva-machine').value) {
+      alert('Palun vali Omniva pakiautomaat'); return;
+    }
+
     if (!terms) { alert('Palun nõustu müügitingimustega'); return; }
 
     var btn = this;
@@ -254,6 +350,14 @@ import Layout from '../layouts/Layout.astro';
     var description = cart.map(function(i) { return i.name + ' x' + i.qty; }).join(', ');
     var orderid = 'HK-' + Date.now();
 
+    var phone = document.getElementById('f-phone').value;
+    var address = document.getElementById('f-address').value;
+    var city = document.getElementById('f-city').value;
+    var postal = document.getElementById('f-postal').value;
+    var parcelMachine = '';
+    if (shippingVal === 'dpd') parcelMachine = document.getElementById('dpd-machine').value;
+    if (shippingVal === 'omniva') parcelMachine = document.getElementById('omniva-machine').value;
+
     try {
       var res = await fetch('/api/paysera-create', {
         method: 'POST',
@@ -263,7 +367,14 @@ import Layout from '../layouts/Layout.astro';
           amount: total,
           email: email,
           description: description,
-          payment: payment
+          payment: payment,
+          fullname: fullname,
+          phone: phone,
+          address: address,
+          city: city,
+          postal: postal,
+          shipping: shippingVal,
+          parcel: parcelMachine
         })
       });
 
@@ -410,6 +521,41 @@ import Layout from '../layouts/Layout.astro';
     height: 20px;
     width: auto;
     display: inline-block;
+  }
+
+  /* PARCEL SELECT */
+  .parcel-select {
+    padding: 0 16px 14px;
+    border-bottom: 1px solid #eee;
+  }
+  .parcel-search-wrap {
+    margin-bottom: 0;
+  }
+  .parcel-search {
+    font-size: 14px !important;
+    padding: 10px 12px !important;
+  }
+  .parcel-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+  }
+  .parcel-item {
+    padding: 10px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  .parcel-item:hover {
+    background: #f0f8ff;
+  }
+  .parcel-more {
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #999;
+    text-align: center;
   }
 
   /* TERMS */

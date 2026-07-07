@@ -8,7 +8,7 @@ const SIGN_PASSWORD = import.meta.env.PAYSERA_SIGN_PASSWORD;
 
 export const POST: APIRoute = async ({ request }) => {
   const body = await request.json();
-  const { orderid, amount, email, description, payment } = body;
+  const { orderid, amount, email, description, payment, fullname, phone, address, city, postal, shipping, parcel } = body;
 
   if (!orderid || !amount || !email) {
     return new Response(JSON.stringify({ error: 'Puuduvad andmed' }), { status: 400 });
@@ -27,6 +27,12 @@ export const POST: APIRoute = async ({ request }) => {
     country: 'EE',
     paytext: description || `Hingamiskeskus tellimus ${orderid}`,
     p_email: email,
+    p_firstname: fullname || '',
+    p_phone: phone || '',
+    p_address: [address, city, postal].filter(Boolean).join(', '),
+    p_shipping: shipping || '',
+    p_parcel: parcel || '',
+    p_items: description || '',
     test: '0',
     version: '1.6',
   };
@@ -36,6 +42,7 @@ export const POST: APIRoute = async ({ request }) => {
     swedbank: 'hanzabankas',
     seb: 'sebbankas',
     luminor: 'nordea',
+    citadele: 'citadele_ee',
     coop: 'krediidipank',
     lhv: 'lhv',
     revolut: 'revolut',
