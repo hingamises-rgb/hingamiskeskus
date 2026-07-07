@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { blogPosts } from '../data/blog-posts.ts';
+import { blogPosts, blogCategories } from '../data/blog-posts.ts';
 
 function formatDate(dateStr: string) {
   const d = new Date(dateStr);
@@ -32,6 +32,14 @@ function formatDate(dateStr: string) {
   <h1 class="page-hero__title">Blogi</h1>
 </section>
 
+<!-- CATEGORY NAV -->
+<nav class="cat-nav">
+  <button class="cat-nav__btn cat-nav__btn--active" data-cat="all">KÕIK</button>
+  {blogCategories.map((cat) => (
+    <button class="cat-nav__btn" data-cat={cat}>{cat.toUpperCase()}</button>
+  ))}
+</nav>
+
 <!-- BLOG INTRO -->
 <section class="blog-intro">
   <h2 class="blog-intro__heading">Tere tulemast Hingamiskeskuse blogisse!</h2>
@@ -46,7 +54,7 @@ function formatDate(dateStr: string) {
 <section class="blog-grid-section">
   <div class="blog-grid">
     {blogPosts.map((post) => (
-      <article class="blog-card">
+      <article class="blog-card" data-cats={JSON.stringify(post.cats)}>
         <h3 class="blog-card__title">{post.title}</h3>
         <p class="blog-card__desc">{post.desc}</p>
         <div class="blog-card__meta">
@@ -98,6 +106,25 @@ function formatDate(dateStr: string) {
 
 </Layout>
 
+<script>
+  document.querySelectorAll('.cat-nav__btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cat = (btn as HTMLElement).dataset.cat!;
+      document.querySelectorAll('.cat-nav__btn').forEach(b => b.classList.remove('cat-nav__btn--active'));
+      btn.classList.add('cat-nav__btn--active');
+      document.querySelectorAll('.blog-card').forEach(card => {
+        const el = card as HTMLElement;
+        if (cat === 'all') {
+          el.classList.remove('blog-card--hidden');
+        } else {
+          const cats: string[] = JSON.parse(el.dataset.cats || '[]');
+          el.classList.toggle('blog-card--hidden', !cats.includes(cat));
+        }
+      });
+    });
+  });
+</script>
+
 <style>
   /* HEADER */
   .header {
@@ -136,6 +163,32 @@ function formatDate(dateStr: string) {
   .page-hero__title {
     font-size: 32px;
     font-weight: 400;
+  }
+
+  /* CATEGORY NAV */
+  .cat-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px 16px;
+    background: #fff;
+  }
+  .cat-nav__btn {
+    display: block;
+    background: #1d1e20;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    padding: 16px 20px;
+    border-radius: 10px;
+    border: none;
+    text-align: center;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .cat-nav__btn:hover {
+    opacity: 0.85;
   }
 
   /* BLOG INTRO */
@@ -260,9 +313,29 @@ function formatDate(dateStr: string) {
   }
   .footer__legal a { color: #fff; text-decoration: none; }
 
+  :global(.cat-nav__btn--active) {
+    background: #1f6d85 !important;
+  }
+  :global(.blog-card--hidden) {
+    display: none !important;
+  }
+
   /* DESKTOP */
   @media (min-width: 768px) {
     .header__burger { display: none; }
+    .cat-nav {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 32px 40px;
+      gap: 16px;
+    }
+    .cat-nav__btn {
+      display: inline-block;
+      width: auto;
+      font-size: 13px;
+      padding: 14px 28px;
+    }
     .blog-intro {
       padding: 0 40px 48px;
     }
