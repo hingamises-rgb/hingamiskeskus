@@ -1,0 +1,251 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Hingamiskeskuse liikmelisus | Hingamiskeskus">
+
+<header class="header">
+  <a href="/" class="header__logo">
+    <img src="/images/logo.svg" alt="Hingamiskeskus" height="30" />
+  </a>
+  <nav class="header__nav">
+    <a href="/">Avaleht</a>
+    <a href="/teenused">Teenused</a>
+    <a href="/broneeri-aeg">Broneeri aeg</a>
+    <a href="/e-pood">E-pood</a>
+    <a href="/hakka-liikmeks" class="active">Hakka liikmeks</a>
+    <a href="/paketid">Paketid</a>
+    <a href="/blogi">Blogi</a>
+    <a href="/kkk">KKK</a>
+  </nav>
+  <div class="header__right">
+    <a href="/e-pood" class="header__cart" aria-label="Ostukorv">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+    </a>
+    <button class="header__burger" aria-label="Menüü">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<section class="membership">
+  <div class="membership__layout">
+    <div class="membership__content">
+      <h1>Hingamiskeskuse liikmelisus</h1>
+
+      <h2>Mida liikmelisus sisaldab?</h2>
+      <p>Liikmelisuse kuutasu on <strong>59 €</strong>, mis sisaldab <strong>kahte seanssi kuus</strong>. Üks floatingu seanss ja üks grupihingamisseanss <strong>(tavahind kokku 80 €)</strong>.</p>
+
+      <p>Lisaks:</p>
+      <div class="membership__benefits">
+        <p>Piiramatu arv floatingu seansse 30€ kord</p>
+        <p>Piiramatu arv grupihingamisseansse 30€ kord</p>
+        <p>Kinkekaardid liikmetele 15% soodustus</p>
+        <p>Kasutamata floatingud kehtivad 1 aasta</p>
+        <p>Sõbra kaasavõtmine 30€</p>
+        <p>3-kuuline siduvus, 1-kuuline ülesütlemise aeg</p>
+        <p>Võimalus liikmelisus ajutiselt peatada (kuni 3 kuud aastas)</p>
+      </div>
+
+      <a href="#" class="membership__btn" id="hakka-btn">HAKKA LIIKMEKS</a>
+    </div>
+
+    <div class="membership__side">
+      <img src="/images/dscf6099.jpg" alt="Hingamiskeskus floating" class="membership__image" />
+    </div>
+  </div>
+
+  <div class="membership__terms">
+    <h2>Tingimused</h2>
+    <ul>
+      <li>Liikmelisus on <strong>isiklik</strong> ega ole edasiantav ilma Hingamiskeskuse loata.</li>
+      <li>Kasutamata floatingud kehtivad 1 <strong>aastat</strong>, kuid neid ei kompenseerita rahaliselt.</li>
+      <li>Hingamiskeskusel on õigus hindu muuta, teavitades sellest aegsasti.</li>
+      <li>Kui keskus peab remondi tõttu olema suletud kuni <strong>7 päeva</strong>, ei mõjuta see liikmemaksu. Pikema sulgemise korral pakutakse liikmetele võimalust kohene liikmelisuse tühistamine.</li>
+      <li>Liikmelisust saab peatada kuni <strong>3 kuuks aastas</strong>, teavitades sellest kirjalikult (<a href="mailto:info@hingamiskeskus.ee">info@hingamiskeskus.ee</a>).</li>
+      <li>Kehtib tähtajatult, ülesütlemise tähtaeg <strong>1 kalendrikuu</strong>.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer__main">
+    <img src="/images/logo-valge.png" alt="Hingamiskeskus" class="footer__logo" />
+    <div class="footer__contact">
+      <h3>Kontakt</h3>
+      <p>E-post: Info@hingamiskeskus.ee</p>
+      <p>Telefoninumber:</p>
+      <p>+372 56695898</p>
+      <p>+372 56497689</p>
+    </div>
+    <div class="footer__legal">
+      <a href="/privaatsuspoliitika">Privaatsuspoliitika</a> | <a href="/muugitingimused">Müügitingimused</a>
+    </div>
+  </div>
+</footer>
+
+</Layout>
+
+<style>
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; background: #fff; position: sticky; top: 0; z-index: 100;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .header__logo img { height: 28px; width: auto; }
+  .header__nav {
+    display: none;
+    gap: 24px;
+  }
+  .header__nav a {
+    font-size: 14px;
+    color: #1d1e20;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .header__nav a.active {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .header__right { display: flex; align-items: center; gap: 16px; }
+  .header__cart { color: #1d1e20; }
+  .header__burger { display: flex; flex-direction: column; gap: 5px; padding: 4px; background: none; border: none; cursor: pointer; }
+  .header__burger span { display: block; width: 22px; height: 2px; background: #1d1e20; }
+
+  @media (min-width: 768px) {
+    .header__nav { display: flex; }
+    .header__burger { display: none; }
+  }
+
+  .membership {
+    padding: 40px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .membership__layout {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  @media (min-width: 768px) {
+    .membership__layout {
+      flex-direction: row;
+      gap: 60px;
+    }
+    .membership__content { flex: 3; }
+    .membership__side { flex: 2; }
+  }
+
+  .membership h1 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 32px;
+    color: #1d1e20;
+  }
+
+  .membership h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 28px;
+    margin-bottom: 12px;
+    color: #1d1e20;
+  }
+
+  .membership p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #333;
+    margin-bottom: 12px;
+  }
+
+  .membership ul {
+    padding-left: 20px;
+    margin-bottom: 16px;
+  }
+
+  .membership li {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #333;
+    margin-bottom: 6px;
+  }
+
+  .membership a {
+    color: #1f6d85;
+  }
+
+  .membership__benefits p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #333;
+    margin-bottom: 4px;
+  }
+
+  .membership__terms {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 40px;
+  }
+
+  .membership__terms h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #1d1e20;
+  }
+
+  .membership__terms ul {
+    padding-left: 20px;
+    margin-bottom: 16px;
+  }
+
+  .membership__terms li {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #333;
+    margin-bottom: 6px;
+  }
+
+  .membership__terms a {
+    color: #1f6d85;
+  }
+
+  .membership__image {
+    width: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+    max-height: 500px;
+  }
+
+  .membership__btn {
+    display: block;
+    text-align: center;
+    background: #1d1e20;
+    color: #fff;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    padding: 16px 32px;
+    border-radius: 10px;
+    text-decoration: none;
+    margin-top: 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+  }
+
+  .footer__main {
+    background: #1f6d85; padding: 24px; color: #fff;
+  }
+  .footer__logo { height: 30px; width: auto; margin: 0 auto 20px; display: block; }
+  .footer__contact h3 { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+  .footer__contact p { font-size: 13px; line-height: 1.8; }
+  .footer__legal {
+    font-size: 11px; margin-top: 16px; opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px;
+  }
+  .footer__legal a { color: #fff; text-decoration: none; }
+</style>
