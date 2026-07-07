@@ -1,0 +1,49 @@
+export const prerender = false;
+
+import type { APIRoute } from 'astro';
+import { createHash } from 'crypto';
+
+const PROJECT_ID = '253930';
+const SIGN_PASSWORD = import.meta.env.PAYSERA_SIGN_PASSWORD;
+
+export const POST: APIRoute = async ({ request }) => {
+  const body = await request.json();
+  const { orderid, amount, email, description } = body;
+
+  if (!orderid || !amount || !email) {
+    return new Response(JSON.stringify({ error: 'Puuduvad andmed' }), { status: 400 });
+  }
+
+  const origin = new URL(request.url).origin;
+
+  const params: Record<string, string> = {
+    projectid: PROJECT_ID,
+    orderid: String(orderid),
+    accepturl: `${origin}/makse-tehtud`,
+    cancelurl: `${origin}/makse-ebaonnestus`,
+    callbackurl: `${origin}/api/paysera-callback`,
+    amount: String(Math.round(amount * 100)),
+    currency: 'EUR',
+    country: 'EE',
+    paytext: description || `Hingamiskeskus tellimus ${orderid}`,
+    p_email: email,
+    test: '0',
+    version: '1.6',
+  };
+
+  const query = Object.entries(params)
+    .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+    .join('&');
+
+  const data = Buffer.from(query).toString('base64');
+  const sign = createHash('md5').update(data + SIGN_PASSWORD).digest('hex');
+
+  return new Response(
+    JSON.stringify({
+      url: 'https://www.paysera.com/pay/',
+      data,
+      sign,
+    }),
+    { status: 200, headers: { 'Content-Type': 'application/json' } }
+  );
+};

@@ -10,7 +10,7 @@ import Layout from '../layouts/Layout.astro';
     <img src="/images/logo.svg" alt="Hingamiskeskus" height="30" />
   </a>
   <div class="header__right">
-    <a href="/e-pood" class="header__cart" aria-label="Ostukorv">
+    <a href="/checkout" class="header__cart" aria-label="Ostukorv">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
       </svg>
@@ -241,6 +241,78 @@ import Layout from '../layouts/Layout.astro';
 
 </Layout>
 
+<script is:inline>
+  const PRODUCTS = {
+    'kinkekaart-40': { name: 'Kinkekaart 40€', price: 40 },
+    'kinkekaart-80': { name: 'Kinkekaart 80€', price: 80 },
+    'kinkekaart-120': { name: 'Kinkekaart 120€', price: 120 },
+    '3-korra-kaart': { name: '3 korra kaart', price: 107 },
+    '5-korra-kaart': { name: '5 korra kaart', price: 168 },
+    '10-korra-kaart': { name: '10 korra kaart', price: 300 },
+    'proovipakett': { name: 'Keha ja meele 3x proovipakett', price: 75 },
+    'syvaloogastus': { name: 'Süvalõõgastuspakett', price: 150 },
+    'heaolu': { name: 'Heaolu pakett', price: 300 },
+    'energialaeng': { name: 'Sinu hommikune energialaeng', price: 125 },
+    'vitamiin-nac': { name: 'Liposoomne C-vitamiin NAC 260ml', price: 17 },
+    'epsomi-250g': { name: 'Epsomi sool 250g', price: 3 },
+    'epsomi-750g': { name: 'Epsomi sool 750g', price: 7 },
+    'epsomi-apelsin': { name: 'Epsomi sool apelsini õliga 250g', price: 4 },
+    'epsomi-lavendel': { name: 'Epsomi sool lavendli õliga 250g', price: 4 },
+    'epsomi-sidrunhein': { name: 'Epsomi sool sidrunheina õliga 250g', price: 4 },
+  };
+
+  function getCart() {
+    try { return JSON.parse(localStorage.getItem('hk_cart') || '[]'); }
+    catch { return []; }
+  }
+
+  function saveCart(cart) {
+    localStorage.setItem('hk_cart', JSON.stringify(cart));
+    updateBadge();
+  }
+
+  function updateBadge() {
+    const cart = getCart();
+    const count = cart.reduce(function(s, i) { return s + i.qty; }, 0);
+    let badge = document.querySelector('.cart-badge');
+    if (count > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'cart-badge';
+        document.querySelector('.header__cart').appendChild(badge);
+      }
+      badge.textContent = count;
+    } else if (badge) {
+      badge.remove();
+    }
+  }
+
+  function addToCart(productId) {
+    const product = PRODUCTS[productId];
+    if (!product) return;
+    const cart = getCart();
+    const existing = cart.find(function(item) { return item.id === productId; });
+    if (existing) {
+      existing.qty += 1;
+    } else {
+      cart.push({ id: productId, name: product.name, price: product.price, qty: 1 });
+    }
+    saveCart(cart);
+  }
+
+  document.querySelectorAll('.product-card__btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var productId = this.getAttribute('data-product');
+      addToCart(productId);
+      this.textContent = 'LISATUD ✓';
+      var self = this;
+      setTimeout(function() { self.textContent = 'LISA OSTUKORVI'; }, 1500);
+    });
+  });
+
+  updateBadge();
+</script>
+
 <style>
   /* HEADER */
   .header {
@@ -256,7 +328,22 @@ import Layout from '../layouts/Layout.astro';
   }
   .header__logo img { height: 28px; width: auto; }
   .header__right { display: flex; align-items: center; gap: 16px; }
-  .header__cart { color: #1d1e20; }
+  .header__cart { color: #1d1e20; position: relative; }
+  :global(.cart-badge) {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: #1f6d85;
+    color: #fff;
+    font-size: 10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
   .header__burger {
     display: flex;
     flex-direction: column;

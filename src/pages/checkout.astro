@@ -1,0 +1,285 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Checkout | Hingamiskeskus">
+
+<header class="header">
+  <a href="/" class="header__logo">
+    <img src="/images/logo.svg" alt="Hingamiskeskus" height="30" />
+  </a>
+  <div class="header__right">
+    <a href="/e-pood" class="header__cart" aria-label="Ostukorv">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+    </a>
+    <button class="header__burger" aria-label="Menüü">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<section class="checkout">
+  <h1>Tellimuse ülevaade</h1>
+
+  <div id="cart-items" class="cart-items">
+    <p class="cart-empty">Ostukorv on tühi</p>
+  </div>
+
+  <div id="cart-total" class="cart-total" style="display:none;">
+    <strong>Kokku: <span id="total-price">€0.00</span></strong>
+  </div>
+
+  <form id="checkout-form" class="checkout-form" style="display:none;">
+    <h2>Sinu andmed</h2>
+    <label class="checkout-form__label">Eesnimi
+      <input type="text" name="firstname" class="checkout-form__input" required />
+    </label>
+    <label class="checkout-form__label">Perekonnanimi
+      <input type="text" name="lastname" class="checkout-form__input" required />
+    </label>
+    <label class="checkout-form__label">E-post
+      <input type="email" name="email" class="checkout-form__input" required />
+    </label>
+    <label class="checkout-form__label">Telefon
+      <input type="tel" name="phone" class="checkout-form__input" />
+    </label>
+    <button type="submit" class="checkout-form__btn" id="pay-btn">MAKSMA</button>
+  </form>
+
+  <form id="paysera-form" method="POST" action="https://www.paysera.com/pay/" style="display:none;">
+    <input type="hidden" name="data" id="paysera-data" />
+    <input type="hidden" name="sign" id="paysera-sign" />
+  </form>
+</section>
+
+<footer class="footer">
+  <div class="footer__main">
+    <img src="/images/logo-valge.png" alt="Hingamiskeskus" class="footer__logo" />
+    <div class="footer__contact">
+      <h3>Kontakt</h3>
+      <p>E-post: Info@hingamiskeskus.ee</p>
+      <p>Telefoninumber:</p>
+      <p>+372 56695898</p>
+      <p>+372 56497689</p>
+    </div>
+    <div class="footer__legal">
+      <a href="/privaatsuspoliitika">Privaatsuspoliitika</a> | <a href="/muugitingimused">Müügitingimused</a>
+    </div>
+  </div>
+</footer>
+
+</Layout>
+
+<script is:inline>
+  function getCart() {
+    try { return JSON.parse(localStorage.getItem('hk_cart') || '[]'); }
+    catch { return []; }
+  }
+
+  function renderCheckout() {
+    const cart = getCart();
+    const container = document.getElementById('cart-items');
+    const totalEl = document.getElementById('cart-total');
+    const form = document.getElementById('checkout-form');
+
+    if (!cart.length) {
+      container.innerHTML = '<p class="cart-empty">Ostukorv on tühi. <a href="/e-pood">Tagasi e-poodi</a></p>';
+      return;
+    }
+
+    let total = 0;
+    let html = '';
+    cart.forEach(function(item, i) {
+      total += item.price * item.qty;
+      html += '<div class="cart-item">' +
+        '<span class="cart-item__name">' + item.name + ' × ' + item.qty + '</span>' +
+        '<span class="cart-item__price">€' + (item.price * item.qty).toFixed(2) + '</span>' +
+        '<button class="cart-item__remove" data-index="' + i + '">✕</button>' +
+        '</div>';
+    });
+
+    container.innerHTML = html;
+    document.getElementById('total-price').textContent = '€' + total.toFixed(2);
+    totalEl.style.display = 'block';
+    form.style.display = 'flex';
+
+    container.querySelectorAll('.cart-item__remove').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const idx = parseInt(this.getAttribute('data-index'));
+        const c = getCart();
+        c.splice(idx, 1);
+        localStorage.setItem('hk_cart', JSON.stringify(c));
+        renderCheckout();
+      });
+    });
+  }
+
+  renderCheckout();
+
+  document.getElementById('checkout-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('pay-btn');
+    btn.textContent = 'PALUN OOTA...';
+    btn.disabled = true;
+
+    const cart = getCart();
+    const total = cart.reduce(function(sum, item) { return sum + item.price * item.qty; }, 0);
+    const email = this.email.value;
+    const firstname = this.firstname.value;
+    const lastname = this.lastname.value;
+
+    const description = cart.map(function(item) { return item.name + ' x' + item.qty; }).join(', ');
+    const orderid = 'HK-' + Date.now();
+
+    try {
+      const res = await fetch('/api/paysera-create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderid: orderid, amount: total, email: email, description: description })
+      });
+
+      const result = await res.json();
+      if (result.error) {
+        alert('Viga: ' + result.error);
+        btn.textContent = 'MAKSMA';
+        btn.disabled = false;
+        return;
+      }
+
+      localStorage.removeItem('hk_cart');
+
+      document.getElementById('paysera-data').value = result.data;
+      document.getElementById('paysera-sign').value = result.sign;
+      document.getElementById('paysera-form').submit();
+    } catch (err) {
+      alert('Viga ühenduses. Palun proovi uuesti.');
+      btn.textContent = 'MAKSMA';
+      btn.disabled = false;
+    }
+  });
+</script>
+
+<style>
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; background: #fff; position: sticky; top: 0; z-index: 100;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .header__logo img { height: 28px; width: auto; }
+  .header__right { display: flex; align-items: center; gap: 16px; }
+  .header__cart { color: #1d1e20; }
+  .header__burger { display: flex; flex-direction: column; gap: 5px; padding: 4px; }
+  .header__burger span { display: block; width: 22px; height: 2px; background: #1d1e20; }
+
+  .checkout {
+    padding: 40px 24px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .checkout h1 {
+    font-size: 28px;
+    margin-bottom: 24px;
+    color: #1d1e20;
+  }
+
+  .cart-empty {
+    color: #555;
+    font-size: 16px;
+  }
+  .cart-empty a {
+    color: #1f6d85;
+    text-decoration: underline;
+  }
+
+  .cart-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    gap: 12px;
+  }
+  .cart-item__name {
+    flex: 1;
+    font-size: 15px;
+  }
+  .cart-item__price {
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .cart-item__remove {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+
+  .cart-total {
+    padding: 16px 0;
+    font-size: 18px;
+    text-align: right;
+    border-bottom: 2px solid #1d1e20;
+    margin-bottom: 32px;
+  }
+
+  .checkout-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .checkout-form h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .checkout-form__label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1d1e20;
+    gap: 4px;
+  }
+  .checkout-form__input {
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: #1d1e20;
+    background: #f9f9f9;
+  }
+  .checkout-form__input:focus {
+    outline: none;
+    border-color: #1f6d85;
+  }
+  .checkout-form__btn {
+    display: inline-block;
+    background: #1d1e20;
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 16px 32px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 8px;
+  }
+
+  .footer__main {
+    background: #1f6d85; padding: 24px; color: #fff;
+  }
+  .footer__logo { height: 30px; width: auto; margin: 0 auto 20px; display: block; }
+  .footer__contact h3 { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+  .footer__contact p { font-size: 13px; line-height: 1.8; }
+  .footer__legal {
+    font-size: 11px; margin-top: 16px; opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px;
+  }
+  .footer__legal a { color: #fff; text-decoration: none; }
+</style>
