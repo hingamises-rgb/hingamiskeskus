@@ -8,7 +8,7 @@ const SIGN_PASSWORD = import.meta.env.PAYSERA_SIGN_PASSWORD;
 
 export const POST: APIRoute = async ({ request }) => {
   const body = await request.json();
-  const { orderid, amount, email, description } = body;
+  const { orderid, amount, email, description, payment } = body;
 
   if (!orderid || !amount || !email) {
     return new Response(JSON.stringify({ error: 'Puuduvad andmed' }), { status: 400 });
@@ -30,6 +30,20 @@ export const POST: APIRoute = async ({ request }) => {
     test: '0',
     version: '1.6',
   };
+
+  const PAYMENT_MAP: Record<string, string> = {
+    popular: 'card',
+    swedbank: 'hanzabankas',
+    seb: 'sebbankas',
+    luminor: 'nordea',
+    coop: 'krediidipank',
+    lhv: 'lhv',
+    revolut: 'revolut',
+    transfer: 'transfer',
+  };
+  if (payment && PAYMENT_MAP[payment]) {
+    params.payment = PAYMENT_MAP[payment];
+  }
 
   const query = Object.entries(params)
     .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)

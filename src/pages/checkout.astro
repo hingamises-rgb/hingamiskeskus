@@ -4,111 +4,221 @@ import Layout from '../layouts/Layout.astro';
 
 <Layout title="Checkout | Hingamiskeskus">
 
-<header class="header">
-  <a href="/" class="header__logo">
-    <img src="/images/logo.svg" alt="Hingamiskeskus" height="30" />
-  </a>
-  <div class="header__right">
-    <a href="/e-pood" class="header__cart" aria-label="Ostukorv">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
-      </svg>
+<div class="checkout-page">
+  <header class="checkout-header">
+    <a href="/">
+      <img src="/images/logo.svg" alt="Hingamiskeskus" height="36" />
     </a>
-    <button class="header__burger" aria-label="Menüü">
-      <span></span><span></span><span></span>
-    </button>
+  </header>
+
+  <div class="checkout-layout">
+    <!-- LEFT: FORM -->
+    <div class="checkout-left">
+      <a href="/e-pood" class="checkout-back">← Tagasi e-poodi</a>
+
+      <!-- CONTACT -->
+      <h2 class="checkout-section__title">Kontakt</h2>
+      <div class="checkout-field">
+        <input type="email" id="f-email" class="checkout-input" placeholder="E-post" required />
+      </div>
+
+      <!-- DELIVERY -->
+      <h2 class="checkout-section__title">Kohaletoimetamine</h2>
+      <div class="checkout-field">
+        <input type="text" id="f-fullname" class="checkout-input" placeholder="Täisnimi" required />
+      </div>
+      <div class="checkout-field">
+        <select id="f-country" class="checkout-input">
+          <option value="EE" selected>Estonia</option>
+        </select>
+      </div>
+      <div class="checkout-field">
+        <input type="text" id="f-address" class="checkout-input" placeholder="Aadress" />
+      </div>
+      <div class="checkout-row">
+        <div class="checkout-field checkout-field--half">
+          <input type="text" id="f-city" class="checkout-input" placeholder="Linn" />
+        </div>
+        <div class="checkout-field checkout-field--half">
+          <input type="text" id="f-postal" class="checkout-input" placeholder="Postiindeks" />
+        </div>
+      </div>
+      <div class="checkout-field">
+        <input type="tel" id="f-phone" class="checkout-input" placeholder="Telefoninumber" />
+      </div>
+
+      <!-- SHIPPING METHOD -->
+      <h2 class="checkout-section__title">Saatmisviis</h2>
+      <div class="checkout-options">
+        <label class="checkout-option">
+          <input type="radio" name="shipping" value="pickup" checked />
+          <span class="checkout-option__text">Tule ise järgi (Söle 14C, Tallinn)</span>
+          <span class="checkout-option__price">Tasuta</span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="shipping" value="dpd" />
+          <span class="checkout-option__text">DPD pakiautomaat</span>
+          <span class="checkout-option__price">€3.10</span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="shipping" value="omniva" />
+          <span class="checkout-option__text">Omniva pakiautomaat</span>
+          <span class="checkout-option__price">€3.46</span>
+        </label>
+      </div>
+
+      <!-- PAYMENT -->
+      <h2 class="checkout-section__title">Makseviis</h2>
+      <div class="checkout-options">
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="popular" checked />
+          <span class="checkout-option__text">Kaardimakse</span>
+          <span class="checkout-option__logos">
+            <img src="https://bank.paysera.com/assets/image/payment_types/visa.png" alt="Visa" height="20" />
+            <img src="https://bank.paysera.com/assets/image/payment_types/mastercard.png" alt="MasterCard" height="20" />
+          </span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="swedbank" />
+          <span class="checkout-option__text">Swedbank</span>
+          <span class="checkout-option__logos">
+            <img src="https://bank.paysera.com/assets/image/payment_types/hanzabankas.png" alt="Swedbank" height="20" />
+          </span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="seb" />
+          <span class="checkout-option__text">SEB</span>
+          <span class="checkout-option__logos">
+            <img src="https://bank.paysera.com/assets/image/payment_types/sebbankas.png" alt="SEB" height="20" />
+          </span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="luminor" />
+          <span class="checkout-option__text">Luminor</span>
+          <span class="checkout-option__logos">
+            <img src="https://bank.paysera.com/assets/image/payment_types/nordea.png" alt="Luminor" height="20" />
+          </span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="coop" />
+          <span class="checkout-option__text">Coop Pank</span>
+          <span class="checkout-option__logos">
+            <img src="https://bank.paysera.com/assets/image/payment_types/krediidipank.png" alt="Coop Pank" height="20" />
+          </span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="lhv" />
+          <span class="checkout-option__text">LHV</span>
+          <span class="checkout-option__logos">
+            <img src="https://bank.paysera.com/assets/image/payment_types/lhv.png" alt="LHV" height="20" />
+          </span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="revolut" />
+          <span class="checkout-option__text">Revolut</span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="transfer" />
+          <span class="checkout-option__text">Pangaülekanne</span>
+        </label>
+      </div>
+
+      <!-- TERMS -->
+      <label class="checkout-terms">
+        <input type="checkbox" id="f-terms" required />
+        <span>Nõustun <a href="/muugitingimused">müügitingimuste</a> ja <a href="/privaatsuspoliitika">privaatsuspoliitikaga</a></span>
+      </label>
+
+      <button type="button" class="checkout-btn" id="pay-btn">MAKSMA</button>
+    </div>
+
+    <!-- RIGHT: ORDER SUMMARY -->
+    <div class="checkout-right">
+      <div id="cart-items" class="order-items"></div>
+
+      <div class="order-discount">
+        <input type="text" id="f-discount" class="checkout-input" placeholder="Sooduskood" />
+        <button type="button" class="discount-btn">Rakenda</button>
+      </div>
+
+      <div class="order-totals">
+        <div class="order-totals__row">
+          <span>Vahesumma</span>
+          <span id="subtotal-price">€0.00</span>
+        </div>
+        <div class="order-totals__row">
+          <span>Saatmine</span>
+          <span id="shipping-price">Tasuta</span>
+        </div>
+        <div class="order-totals__row order-totals__row--total">
+          <strong>Kokku</strong>
+          <strong id="total-price">€0.00</strong>
+        </div>
+      </div>
+    </div>
   </div>
-</header>
-
-<section class="checkout">
-  <h1>Tellimuse ülevaade</h1>
-
-  <div id="cart-items" class="cart-items">
-    <p class="cart-empty">Ostukorv on tühi</p>
-  </div>
-
-  <div id="cart-total" class="cart-total" style="display:none;">
-    <strong>Kokku: <span id="total-price">€0.00</span></strong>
-  </div>
-
-  <form id="checkout-form" class="checkout-form" style="display:none;">
-    <h2>Sinu andmed</h2>
-    <label class="checkout-form__label">Eesnimi
-      <input type="text" name="firstname" class="checkout-form__input" required />
-    </label>
-    <label class="checkout-form__label">Perekonnanimi
-      <input type="text" name="lastname" class="checkout-form__input" required />
-    </label>
-    <label class="checkout-form__label">E-post
-      <input type="email" name="email" class="checkout-form__input" required />
-    </label>
-    <label class="checkout-form__label">Telefon
-      <input type="tel" name="phone" class="checkout-form__input" />
-    </label>
-    <button type="submit" class="checkout-form__btn" id="pay-btn">MAKSMA</button>
-  </form>
 
   <form id="paysera-form" method="POST" action="https://www.paysera.com/pay/" style="display:none;">
     <input type="hidden" name="data" id="paysera-data" />
     <input type="hidden" name="sign" id="paysera-sign" />
   </form>
-</section>
-
-<footer class="footer">
-  <div class="footer__main">
-    <img src="/images/logo-valge.png" alt="Hingamiskeskus" class="footer__logo" />
-    <div class="footer__contact">
-      <h3>Kontakt</h3>
-      <p>E-post: Info@hingamiskeskus.ee</p>
-      <p>Telefoninumber:</p>
-      <p>+372 56695898</p>
-      <p>+372 56497689</p>
-    </div>
-    <div class="footer__legal">
-      <a href="/privaatsuspoliitika">Privaatsuspoliitika</a> | <a href="/muugitingimused">Müügitingimused</a>
-    </div>
-  </div>
-</footer>
+</div>
 
 </Layout>
 
 <script is:inline>
+  var SHIPPING_PRICES = { pickup: 0, dpd: 3.10, omniva: 3.46 };
+
   function getCart() {
     try { return JSON.parse(localStorage.getItem('hk_cart') || '[]'); }
     catch { return []; }
   }
 
+  function getShippingPrice() {
+    var selected = document.querySelector('input[name="shipping"]:checked');
+    return selected ? (SHIPPING_PRICES[selected.value] || 0) : 0;
+  }
+
+  function updateTotals() {
+    var cart = getCart();
+    var subtotal = cart.reduce(function(s, i) { return s + i.price * i.qty; }, 0);
+    var shipping = getShippingPrice();
+    var total = subtotal + shipping;
+
+    document.getElementById('subtotal-price').textContent = '€' + subtotal.toFixed(2);
+    document.getElementById('shipping-price').textContent = shipping === 0 ? 'Tasuta' : '€' + shipping.toFixed(2);
+    document.getElementById('total-price').textContent = '€' + total.toFixed(2);
+  }
+
   function renderCheckout() {
-    const cart = getCart();
-    const container = document.getElementById('cart-items');
-    const totalEl = document.getElementById('cart-total');
-    const form = document.getElementById('checkout-form');
+    var cart = getCart();
+    var container = document.getElementById('cart-items');
 
     if (!cart.length) {
       container.innerHTML = '<p class="cart-empty">Ostukorv on tühi. <a href="/e-pood">Tagasi e-poodi</a></p>';
+      document.querySelector('.checkout-left').style.display = 'none';
       return;
     }
 
-    let total = 0;
-    let html = '';
+    var html = '';
     cart.forEach(function(item, i) {
-      total += item.price * item.qty;
-      html += '<div class="cart-item">' +
-        '<span class="cart-item__name">' + item.name + ' × ' + item.qty + '</span>' +
-        '<span class="cart-item__price">€' + (item.price * item.qty).toFixed(2) + '</span>' +
-        '<button class="cart-item__remove" data-index="' + i + '">✕</button>' +
+      html += '<div class="order-item">' +
+        '<div class="order-item__info">' +
+          '<span class="order-item__name">' + item.name + '</span>' +
+          '<span class="order-item__qty">× ' + item.qty + '</span>' +
+        '</div>' +
+        '<span class="order-item__price">€' + (item.price * item.qty).toFixed(2) + '</span>' +
+        '<button class="order-item__remove" data-index="' + i + '">✕</button>' +
         '</div>';
     });
 
     container.innerHTML = html;
-    document.getElementById('total-price').textContent = '€' + total.toFixed(2);
-    totalEl.style.display = 'block';
-    form.style.display = 'flex';
+    updateTotals();
 
-    container.querySelectorAll('.cart-item__remove').forEach(function(btn) {
+    container.querySelectorAll('.order-item__remove').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        const idx = parseInt(this.getAttribute('data-index'));
-        const c = getCart();
+        var idx = parseInt(this.getAttribute('data-index'));
+        var c = getCart();
         c.splice(idx, 1);
         localStorage.setItem('hk_cart', JSON.stringify(c));
         renderCheckout();
@@ -118,29 +228,46 @@ import Layout from '../layouts/Layout.astro';
 
   renderCheckout();
 
-  document.getElementById('checkout-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const btn = document.getElementById('pay-btn');
+  document.querySelectorAll('input[name="shipping"]').forEach(function(radio) {
+    radio.addEventListener('change', updateTotals);
+  });
+
+  document.getElementById('pay-btn').addEventListener('click', async function() {
+    var email = document.getElementById('f-email').value;
+    var fullname = document.getElementById('f-fullname').value;
+    var terms = document.getElementById('f-terms').checked;
+
+    if (!email) { alert('Palun sisesta e-posti aadress'); return; }
+    if (!fullname) { alert('Palun sisesta nimi'); return; }
+    if (!terms) { alert('Palun nõustu müügitingimustega'); return; }
+
+    var btn = this;
     btn.textContent = 'PALUN OOTA...';
     btn.disabled = true;
 
-    const cart = getCart();
-    const total = cart.reduce(function(sum, item) { return sum + item.price * item.qty; }, 0);
-    const email = this.email.value;
-    const firstname = this.firstname.value;
-    const lastname = this.lastname.value;
+    var cart = getCart();
+    var subtotal = cart.reduce(function(s, i) { return s + i.price * i.qty; }, 0);
+    var shipping = getShippingPrice();
+    var total = subtotal + shipping;
 
-    const description = cart.map(function(item) { return item.name + ' x' + item.qty; }).join(', ');
-    const orderid = 'HK-' + Date.now();
+    var payment = document.querySelector('input[name="payment"]:checked').value;
+    var description = cart.map(function(i) { return i.name + ' x' + i.qty; }).join(', ');
+    var orderid = 'HK-' + Date.now();
 
     try {
-      const res = await fetch('/api/paysera-create', {
+      var res = await fetch('/api/paysera-create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderid: orderid, amount: total, email: email, description: description })
+        body: JSON.stringify({
+          orderid: orderid,
+          amount: total,
+          email: email,
+          description: description,
+          payment: payment
+        })
       });
 
-      const result = await res.json();
+      var result = await res.json();
       if (result.error) {
         alert('Viga: ' + result.error);
         btn.textContent = 'MAKSMA';
@@ -162,102 +289,154 @@ import Layout from '../layouts/Layout.astro';
 </script>
 
 <style>
-  .header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 16px; background: #fff; position: sticky; top: 0; z-index: 100;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+  .checkout-page {
+    min-height: 100vh;
+    background: #fff;
   }
-  .header__logo img { height: 28px; width: auto; }
-  .header__right { display: flex; align-items: center; gap: 16px; }
-  .header__cart { color: #1d1e20; }
-  .header__burger { display: flex; flex-direction: column; gap: 5px; padding: 4px; }
-  .header__burger span { display: block; width: 22px; height: 2px; background: #1d1e20; }
 
-  .checkout {
-    padding: 40px 24px;
-    max-width: 600px;
+  .checkout-header {
+    text-align: center;
+    padding: 24px;
+    border-bottom: 1px solid #eee;
+  }
+  .checkout-header img { height: 36px; display: inline-block; }
+
+  .checkout-layout {
+    max-width: 1100px;
     margin: 0 auto;
-  }
-  .checkout h1 {
-    font-size: 28px;
-    margin-bottom: 24px;
-    color: #1d1e20;
+    display: flex;
+    flex-direction: column;
   }
 
-  .cart-empty {
-    color: #555;
-    font-size: 16px;
+  .checkout-left {
+    padding: 24px;
+    flex: 1;
   }
-  .cart-empty a {
+
+  .checkout-right {
+    padding: 24px;
+    background: #f9f9f9;
+    flex: 1;
+  }
+
+  .checkout-back {
+    display: inline-block;
+    font-size: 14px;
+    color: #1f6d85;
+    margin-bottom: 24px;
+  }
+
+  .checkout-section__title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 28px;
+    margin-bottom: 12px;
+    text-align: left;
+  }
+
+  .checkout-field {
+    margin-bottom: 12px;
+  }
+  .checkout-field--half {
+    flex: 1;
+  }
+
+  .checkout-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .checkout-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: #1d1e20;
+    background: #fff;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .checkout-input:focus {
+    outline: none;
+    border-color: #1d1e20;
+  }
+  select.checkout-input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23333' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+  }
+
+  /* SHIPPING & PAYMENT OPTIONS */
+  .checkout-options {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .checkout-option {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    gap: 12px;
+    font-size: 15px;
+  }
+  .checkout-option:last-child {
+    border-bottom: none;
+  }
+  .checkout-option input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #1d1e20;
+    flex-shrink: 0;
+  }
+  .checkout-option__text {
+    flex: 1;
+  }
+  .checkout-option__price {
+    font-size: 14px;
+    color: #555;
+  }
+  .checkout-option__logos {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .checkout-option__logos img {
+    height: 20px;
+    width: auto;
+    display: inline-block;
+  }
+
+  /* TERMS */
+  .checkout-terms {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 24px;
+    font-size: 14px;
+    color: #555;
+    cursor: pointer;
+  }
+  .checkout-terms input {
+    margin-top: 2px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .checkout-terms a {
     color: #1f6d85;
     text-decoration: underline;
   }
 
-  .cart-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid #eee;
-    gap: 12px;
-  }
-  .cart-item__name {
-    flex: 1;
-    font-size: 15px;
-  }
-  .cart-item__price {
-    font-size: 15px;
-    font-weight: 700;
-  }
-  .cart-item__remove {
-    background: none;
-    border: none;
-    color: #999;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 4px 8px;
-  }
-
-  .cart-total {
-    padding: 16px 0;
-    font-size: 18px;
-    text-align: right;
-    border-bottom: 2px solid #1d1e20;
-    margin-bottom: 32px;
-  }
-
-  .checkout-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .checkout-form h2 {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 8px;
-  }
-  .checkout-form__label {
-    display: flex;
-    flex-direction: column;
-    font-size: 14px;
-    font-weight: 500;
-    color: #1d1e20;
-    gap: 4px;
-  }
-  .checkout-form__input {
-    padding: 12px 14px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    color: #1d1e20;
-    background: #f9f9f9;
-  }
-  .checkout-form__input:focus {
-    outline: none;
-    border-color: #1f6d85;
-  }
-  .checkout-form__btn {
-    display: inline-block;
+  /* PAY BUTTON */
+  .checkout-btn {
+    display: block;
+    width: 100%;
     background: #1d1e20;
     color: #fff;
     font-size: 14px;
@@ -268,18 +447,105 @@ import Layout from '../layouts/Layout.astro';
     border: none;
     cursor: pointer;
     font-family: 'DM Sans', sans-serif;
-    margin-top: 8px;
+    margin-top: 20px;
+  }
+  .checkout-btn:disabled {
+    background: #999;
+    cursor: not-allowed;
   }
 
-  .footer__main {
-    background: #1f6d85; padding: 24px; color: #fff;
+  /* ORDER SUMMARY */
+  .order-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    gap: 12px;
   }
-  .footer__logo { height: 30px; width: auto; margin: 0 auto 20px; display: block; }
-  .footer__contact h3 { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
-  .footer__contact p { font-size: 13px; line-height: 1.8; }
-  .footer__legal {
-    font-size: 11px; margin-top: 16px; opacity: 0.7;
-    border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px;
+  .order-item__info {
+    flex: 1;
   }
-  .footer__legal a { color: #fff; text-decoration: none; }
+  .order-item__name {
+    font-size: 14px;
+    display: block;
+  }
+  .order-item__qty {
+    font-size: 13px;
+    color: #888;
+  }
+  .order-item__price {
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .order-item__remove {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .cart-empty {
+    color: #555;
+    font-size: 15px;
+    padding: 20px 0;
+  }
+  .cart-empty a {
+    color: #1f6d85;
+    text-decoration: underline;
+  }
+
+  .order-discount {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .order-discount .checkout-input {
+    flex: 1;
+  }
+  .discount-btn {
+    padding: 12px 20px;
+    background: #eee;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: #555;
+    cursor: pointer;
+  }
+
+  .order-totals {
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 16px;
+  }
+  .order-totals__row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 15px;
+  }
+  .order-totals__row--total {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #ddd;
+    font-size: 17px;
+  }
+
+  /* DESKTOP */
+  @media (min-width: 768px) {
+    .checkout-layout {
+      flex-direction: row;
+    }
+    .checkout-left {
+      padding: 32px 48px;
+      flex: 3;
+    }
+    .checkout-right {
+      padding: 32px;
+      flex: 2;
+      border-left: 1px solid #eee;
+    }
+  }
 </style>
