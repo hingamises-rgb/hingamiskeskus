@@ -48,6 +48,7 @@ function fmtDate(d: string | Date) {
       <button type="submit" class="btn">OTSI</button>
       <a href="/admin/tellimused" class={`toolbar__tab ${filter === 'all' && !q ? 'toolbar__tab--active' : ''}`}>Kõik</a>
       <a href="/admin/tellimused?filter=unfulfilled" class={`toolbar__tab ${filter === 'unfulfilled' ? 'toolbar__tab--active' : ''}`}>Täitmata</a>
+      <a href="/api/admin/orders-csv" class="btn btn--outline">EKSPORDI CSV</a>
     </form>
 
     {orders.length === 0 ? (

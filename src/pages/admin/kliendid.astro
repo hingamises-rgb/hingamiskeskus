@@ -49,7 +49,7 @@ function fmtDate(d: string | Date) {
         <tbody>
           {customers.map(c => (
             <tr>
-              <td><a href={`/admin/tellimused?q=${encodeURIComponent(c.email)}`}>{c.email}</a></td>
+              <td><a href={`/admin/kliendid/${encodeURIComponent(c.email)}`}>{c.email}</a></td>
               <td>{c.name}</td>
               <td>{c.orders}</td>
               <td>€{Number(c.total).toFixed(2)}</td>

@@ -41,6 +41,38 @@ const recent = await sql`
   FROM orders ORDER BY created_at DESC LIMIT 8
 `;
 
+// Viimase 30 päeva käive päevade lõikes
+const daily = await sql`
+  SELECT date_trunc('day', created_at AT TIME ZONE 'Europe/Tallinn')::date AS day, SUM(amount) AS total
+  FROM orders WHERE created_at >= now() - interval '30 days'
+  GROUP BY 1 ORDER BY 1
+`;
+
+// Uued kliendid (esimese tellimuse kuupäeva järgi) viimase 30 päeva jooksul
+const newCustomers = await sql`
+  SELECT date_trunc('day', first_order AT TIME ZONE 'Europe/Tallinn')::date AS day, COUNT(*) AS cnt
+  FROM (SELECT email, MIN(created_at) AS first_order FROM orders GROUP BY email) t
+  WHERE first_order >= now() - interval '30 days'
+  GROUP BY 1 ORDER BY 1
+`;
+
+// SVG graafikute andmed
+const W = 600, H = 140, PAD = 8;
+function buildSeries(rows: { day: string | Date }[], key: string): { date: string; val: number }[] {
+  const map = new Map(rows.map((r: any) => [new Date(r.day).toISOString().slice(0, 10), Number(r[key])]));
+  const out = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 86400_000).toISOString().slice(0, 10);
+    out.push({ date: d, val: map.get(d) || 0 });
+  }
+  return out;
+}
+const revSeries = buildSeries(daily, 'total');
+const custSeries = buildSeries(newCustomers, 'cnt');
+const revMax = Math.max(...revSeries.map(s => s.val), 1);
+const custMax = Math.max(...custSeries.map(s => s.val), 1);
+const barW = (W - PAD * 2) / 30;
+
 function fmtDate(d: string | Date) {
   return new Date(d).toLocaleString('et-EE', {
     day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
@@ -67,6 +99,35 @@ function fmtDate(d: string | Date) {
       <p class="tile__label">Keskmine tellimus</p>
       <p class="tile__value">€{aov.toFixed(2)}</p>
       <p class={`tile__sub ${aovDelta.cls}`}>{aovDelta.text}</p>
+    </div>
+  </div>
+
+  <div class="charts">
+    <div class="panel">
+      <h2>Käive · viimased 30 päeva</h2>
+      <svg viewBox={`0 0 ${W} ${H}`} style="width:100%; height:auto;" role="img" aria-label="Käibe graafik">
+        {revSeries.map((s, i) => {
+          const h = (s.val / revMax) * (H - PAD * 2);
+          return (
+            <rect x={PAD + i * barW + 1} y={H - PAD - h} width={Math.max(barW - 2, 1)} height={Math.max(h, 0.5)} fill="#1f6d85" rx="2">
+              <title>{s.date}: €{s.val.toFixed(2)}</title>
+            </rect>
+          );
+        })}
+      </svg>
+    </div>
+    <div class="panel">
+      <h2>Uued kliendid · viimased 30 päeva</h2>
+      <svg viewBox={`0 0 ${W} ${H}`} style="width:100%; height:auto;" role="img" aria-label="Uute klientide graafik">
+        {custSeries.map((s, i) => {
+          const h = (s.val / custMax) * (H - PAD * 2);
+          return (
+            <rect x={PAD + i * barW + 1} y={H - PAD - h} width={Math.max(barW - 2, 1)} height={Math.max(h, 0.5)} fill="#7fb3c3" rx="2">
+              <title>{s.date}: {s.val} uut klienti</title>
+            </rect>
+          );
+        })}
+      </svg>
     </div>
   </div>
 
@@ -98,3 +159,8 @@ function fmtDate(d: string | Date) {
     )}
   </div>
 </AdminLayout>
+
+<style>
+  .charts { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px; }
+  @media (min-width: 900px) { .charts { grid-template-columns: 1fr 1fr; } }
+</style>

@@ -21,12 +21,26 @@ const daily = await sql`
   GROUP BY 1 ORDER BY 1
 `;
 
-const topItems = await sql`
-  SELECT items, COUNT(*) AS cnt, SUM(amount) AS total
-  FROM orders
+// Toodete lõikes: parsi tellimuste sisu ("Toode x2, Teine x1") toodeteks
+const orderItems = await sql`
+  SELECT items FROM orders
   WHERE created_at >= now() - make_interval(days => ${days}) AND items IS NOT NULL AND items != ''
-  GROUP BY items ORDER BY COUNT(*) DESC LIMIT 10
 `;
+const productMap = new Map<string, number>();
+for (const row of orderItems) {
+  for (const part of String(row.items).split(', ')) {
+    const m = part.match(/^(.+?)\s+x(\d+)$/);
+    const name = m ? m[1].trim() : part.trim();
+    const qty = m ? parseInt(m[2], 10) : 1;
+    if (!name) continue;
+    productMap.set(name, (productMap.get(name) || 0) + qty);
+  }
+}
+const topProducts = [...productMap.entries()]
+  .map(([name, qty]) => ({ name, qty }))
+  .sort((a, b) => b.qty - a.qty)
+  .slice(0, 15);
+const topQty = Math.max(...topProducts.map(p => p.qty), 1);
 
 // SVG tulpdiagramm
 const W = 800, H = 220, PAD = 30;
@@ -102,22 +116,21 @@ const periods = [
   </div>
 
   <div class="panel">
-    <h2>Enim tellitud (tellimuse sisu järgi)</h2>
-    {topItems.length === 0 ? (
+    <h2>Populaarseimad tooted</h2>
+    {topProducts.length === 0 ? (
       <p style="color:#888; font-size:14px;">Andmeid pole veel.</p>
     ) : (
-      <table class="admin-table">
-        <thead><tr><th>Tooted</th><th>Tellimusi</th><th>Käive</th></tr></thead>
-        <tbody>
-          {topItems.map(t => (
-            <tr>
-              <td>{t.items}</td>
-              <td>{t.cnt}</td>
-              <td>€{Number(t.total).toFixed(2)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div class="product-bars">
+        {topProducts.map(p => (
+          <div class="product-bar">
+            <span class="product-bar__name">{p.name}</span>
+            <div class="product-bar__track">
+              <div class="product-bar__fill" style={`width:${(p.qty / topQty) * 100}%`}></div>
+            </div>
+            <span class="product-bar__qty">{p.qty} tk</span>
+          </div>
+        ))}
+      </div>
     )}
   </div>
 </AdminLayout>
@@ -132,4 +145,12 @@ const periods = [
     color: #1f6d85;
   }
   .period--active { background: #1f6d85; color: #fff; }
+
+  .product-bars { display: flex; flex-direction: column; gap: 10px; }
+  .product-bar { display: grid; grid-template-columns: 260px 1fr 60px; align-items: center; gap: 12px; font-size: 13px; }
+  .product-bar__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .product-bar__track { background: #eef4f6; border-radius: 999px; height: 10px; overflow: hidden; }
+  .product-bar__fill { background: #1f6d85; height: 100%; border-radius: 999px; }
+  .product-bar__qty { color: #888; text-align: right; }
+  @media (max-width: 700px) { .product-bar { grid-template-columns: 1fr; gap: 4px; } }
 </style>
