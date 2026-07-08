@@ -1,0 +1,144 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { requireDb } from '../../../lib/db';
+
+const sql = requireDb();
+const { slug } = Astro.params;
+
+const rows = await sql`SELECT * FROM products WHERE slug = ${slug}`;
+if (rows.length === 0) {
+  return new Response('Toodet ei leitud', { status: 404 });
+}
+const p = rows[0];
+
+const CATEGORIES = [
+  { id: 'kinkekaardid', title: 'Kinkekaardid' },
+  { id: 'paketid', title: 'Paketid' },
+  { id: 'vitamiinid', title: 'Vitamiinid' },
+  { id: 'epsomi-sool', title: 'Epsomi sool' },
+];
+---
+
+<AdminLayout title={p.title} active="products">
+  <a href="/admin/tooted" style="font-size:13px; color:#1f6d85;">← Kõik tooted</a>
+  <h1 style="margin-top:12px;">{p.title}</h1>
+
+  <div class="edit-grid">
+    <div class="panel">
+      <h2>Toote andmed</h2>
+      <form id="product-form">
+        <label>Pealkiri (e-poe kaardil)</label>
+        <input type="text" name="title" value={p.title} required />
+
+        <label>Nimi ostukorvis (lühem)</label>
+        <input type="text" name="cart_name" value={p.cart_name} required />
+
+        <div class="row">
+          <div>
+            <label>Hind (€)</label>
+            <input type="number" name="price" step="0.01" min="0" value={Number(p.price)} required />
+          </div>
+          <div>
+            <label>Vana hind (€, valikuline)</label>
+            <input type="number" name="old_price" step="0.01" min="0" value={p.old_price ? Number(p.old_price) : ''} />
+          </div>
+          <div>
+            <label>Hinna eesliide (nt "Al.")</label>
+            <input type="text" name="price_prefix" value={p.price_prefix || ''} />
+          </div>
+        </div>
+
+        <label>Kategooria</label>
+        <select name="category">
+          {CATEGORIES.map(c => (
+            <option value={c.id} selected={p.category === c.id}>{c.title}</option>
+          ))}
+        </select>
+
+        <div class="row">
+          <div>
+            <label>Pildi asukoht</label>
+            <input type="text" name="image" value={p.image} />
+          </div>
+          <div>
+            <label>Järjekord kategoorias</label>
+            <input type="number" name="sort" value={p.sort} />
+          </div>
+        </div>
+
+        <label>Pildi alt-tekst (SEO)</label>
+        <input type="text" name="alt" value={p.alt} />
+
+        <div class="checks">
+          <label class="check"><input type="checkbox" name="sold_out" checked={p.sold_out} /> Sold out (läbi müüdud)</label>
+          <label class="check"><input type="checkbox" name="active" checked={p.active} /> Nähtav e-poes</label>
+        </div>
+
+        <button type="submit" class="btn">SALVESTA</button>
+        <span id="save-status" style="font-size:13px; color:#1a7f37; margin-left:10px;"></span>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h2>Eelvaade</h2>
+      <img src={p.image} alt={p.alt} style="width:100%; max-width:280px; border-radius:10px;" />
+      <p style="font-size:13px; color:#888; margin-top:12px;">
+        Slug: <code>{p.slug}</code><br />
+        Muudatused jõustuvad e-poes järgmise deploy'ga.
+      </p>
+    </div>
+  </div>
+</AdminLayout>
+
+<script define:vars={{ slug: p.slug }}>
+  document.getElementById('product-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.target;
+    const body = {
+      slug,
+      title: f.title.value,
+      cart_name: f.cart_name.value,
+      price: parseFloat(f.price.value),
+      old_price: f.old_price.value ? parseFloat(f.old_price.value) : null,
+      price_prefix: f.price_prefix.value || null,
+      category: f.category.value,
+      image: f.image.value,
+      alt: f.alt.value,
+      sort: parseInt(f.sort.value || '0', 10),
+      sold_out: f.sold_out.checked,
+      active: f.active.checked,
+    };
+    const res = await fetch('/api/admin/update-product', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const s = document.getElementById('save-status');
+    s.textContent = res.ok ? 'Salvestatud ✓' : 'Viga salvestamisel';
+    setTimeout(() => (s.textContent = ''), 2500);
+  });
+</script>
+
+<style>
+  .edit-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+  @media (min-width: 900px) { .edit-grid { grid-template-columns: 2fr 1fr; } }
+
+  form label { display: block; font-size: 13px; font-weight: 500; margin: 14px 0 6px; }
+  form input[type="text"], form input[type="number"], form select {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+  }
+  form input:focus, form select:focus { border-color: #1f6d85; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .checks { margin: 18px 0; display: flex; flex-direction: column; gap: 8px; }
+  .check { display: flex; align-items: center; gap: 8px; font-size: 14px; margin: 0; }
+  .check input { width: auto; }
+</style>

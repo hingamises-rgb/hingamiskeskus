@@ -1,5 +1,36 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { requireDb } from '../lib/db';
+
+// Tooted loetakse build'i ajal andmebaasist — admin paneelis tehtud
+// muudatused jõustuvad e-poes järgmise deploy'ga.
+const sql = requireDb();
+const allProducts = await sql`
+  SELECT slug, title, alt, image, cart_name, price, old_price, price_prefix, category, sold_out
+  FROM products WHERE active = true ORDER BY sort, slug
+`;
+
+const CATEGORIES = [
+  { id: 'kinkekaardid', title: 'Kinkekaardid' },
+  { id: 'paketid', title: 'Paketid' },
+  { id: 'vitamiinid', title: 'Vitamiinid' },
+  { id: 'epsomi-sool', title: 'Epsomi sool' },
+];
+
+const byCategory = new Map(CATEGORIES.map(c => [c.id, []]));
+for (const p of allProducts) {
+  if (byCategory.has(p.category)) byCategory.get(p.category).push(p);
+}
+
+function fmtPrice(v: unknown) {
+  return `€${Number(v).toFixed(2)}`;
+}
+
+// Ostukorvi jaoks: slug -> { name, price }
+const PRODUCTS_DATA: Record<string, { name: string; price: number }> = {};
+for (const p of allProducts) {
+  if (!p.sold_out) PRODUCTS_DATA[p.slug] = { name: p.cart_name, price: Number(p.price) };
+}
 ---
 
 <Layout title="E-pood | Kinkekaardid, paketid, vitamiinid - Hingamiskeskus">
@@ -47,159 +78,31 @@ import Layout from '../layouts/Layout.astro';
   <p>Meie e-poes on viis erinevat Epsomi soola: puhas sool ning eeterlike õlidega variandid, mis muudavad koduvanni eriti lõõgastavaks ja meeldivalt lõhnavaks. Epsomi sool sisaldab magneesiumi, mis aitab lõdvestada lihaseid, rahustab närvisüsteemi ja toetab paremat und. Ideaalne valik igapäevaseks taastumiseks ja lõõgastumiseks ka kodus.</p>
 </section>
 
-<!-- KINKEKAARDID -->
-<section class="product-section" id="kinkekaardid">
-  <h2 class="product-section__title">Kinkekaardid</h2>
-  <div class="product-grid">
-    <div class="product-card">
-      <img src="/images/kinkekaart-40.png" alt="Hingamiskeskuse kinkekaart 40 € floating ja hingamisteraapia Tallinnas" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Hingamiskeskuse kinkekaart 40 € floating ja hingamisteraapia Tallinnas</h3>
-      <p class="product-card__price">€40.00</p>
-      <button class="product-card__btn" data-product="kinkekaart-40">LISA OSTUKORVI</button>
+<!-- TOOTED (andmebaasist, kategooriate kaupa) -->
+{CATEGORIES.map(cat => (
+  <section class="product-section" id={cat.id}>
+    <h2 class="product-section__title">{cat.title}</h2>
+    <div class="product-grid">
+      {byCategory.get(cat.id).map(p => (
+        p.sold_out ? (
+          <div class="product-card product-card--sold-out">
+            <div class="product-card__ribbon">SOLD OUT</div>
+            <img src={p.image} alt={p.alt} class="product-card__img" loading="lazy" />
+            <h3 class="product-card__title">{p.title}</h3>
+            <p class="product-card__price product-card__price--sold-out">Sold out</p>
+          </div>
+        ) : (
+          <div class="product-card">
+            <img src={p.image} alt={p.alt} class="product-card__img" loading="lazy" />
+            <h3 class="product-card__title">{p.title}</h3>
+            <p class="product-card__price">{p.price_prefix ? p.price_prefix + ' ' : ''}{p.old_price && <><span class="price--old">{fmtPrice(p.old_price)}</span>{' '}</>}{fmtPrice(p.price)}</p>
+            <button class="product-card__btn" data-product={p.slug}>LISA OSTUKORVI</button>
+          </div>
+        )
+      ))}
     </div>
-    <div class="product-card">
-      <img src="/images/kinkekaart-80.png" alt="Hingamiskeskuse kinkekaart 80 € floating ja hingamisteraapia Tallinnas" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Hingamiskeskuse kinkekaart 80 € floating ja hingamisteraapia Tallinnas</h3>
-      <p class="product-card__price">€80.00</p>
-      <button class="product-card__btn" data-product="kinkekaart-80">LISA OSTUKORVI</button>
-    </div>
-    <div class="product-card">
-      <img src="/images/kinkekaart-120.png" alt="Hingamiskeskuse kinkekaart 120 € floating ja hingamisteraapia Tallinnas" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Hingamiskeskuse kinkekaart 120 € floating ja hingamisteraapia Tallinnas</h3>
-      <p class="product-card__price">€120.00</p>
-      <button class="product-card__btn" data-product="kinkekaart-120">LISA OSTUKORVI</button>
-    </div>
-  </div>
-</section>
-
-<!-- PAKETID -->
-<section class="product-section" id="paketid">
-  <h2 class="product-section__title">Paketid</h2>
-  <div class="product-grid">
-    <div class="product-card">
-      <img src="/images/pakett-3korda.png" alt="3 korra kaart" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">3 korra kaart</h3>
-      <p class="product-card__price"><span class="price--old">€120.00</span> €107.00</p>
-      <button class="product-card__btn" data-product="3-korra-kaart">LISA OSTUKORVI</button>
-    </div>
-    <div class="product-card">
-      <img src="/images/pakett-5korda.png" alt="5 korra kaart" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">5 korra kaart</h3>
-      <p class="product-card__price"><span class="price--old">€200.00</span> €168.00</p>
-      <button class="product-card__btn" data-product="5-korra-kaart">LISA OSTUKORVI</button>
-    </div>
-    <div class="product-card">
-      <img src="/images/pakett-10korda.png" alt="10 korra kaart" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">10 korra kaart</h3>
-      <p class="product-card__price"><span class="price--old">€400.00</span> €300.00</p>
-      <button class="product-card__btn" data-product="10-korra-kaart">LISA OSTUKORVI</button>
-    </div>
-    <div class="product-card">
-      <img src="/images/pakett-proovipakett.png" alt="Keha ja meele 3x proovipakett" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Keha ja meele 3x proovipakett</h3>
-      <p class="product-card__price"><span class="price--old">€120.00</span> €75.00</p>
-      <button class="product-card__btn" data-product="proovipakett">LISA OSTUKORVI</button>
-    </div>
-    <div class="product-card">
-      <img src="/images/pakett-syvaloogastus.png" alt="Süvalõõgastuspakett" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Süvalõõgastuspakett</h3>
-      <p class="product-card__price">Al. €150.00</p>
-      <button class="product-card__btn" data-product="syvaloogastus">LISA OSTUKORVI</button>
-    </div>
-    <div class="product-card">
-      <img src="/images/pakett-heaolu.png" alt="Heaolu pakett" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Heaolu pakett</h3>
-      <p class="product-card__price">€300.00</p>
-      <button class="product-card__btn" data-product="heaolu">LISA OSTUKORVI</button>
-    </div>
-    <div class="product-card">
-      <img src="/images/pakett-energialaeng.png" alt="Sinu hommikune energialaeng" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Sinu hommikune energialaeng</h3>
-      <p class="product-card__price"><span class="price--old">€200.00</span> €125.00</p>
-      <button class="product-card__btn" data-product="energialaeng">LISA OSTUKORVI</button>
-    </div>
-  </div>
-</section>
-
-<!-- VITAMIINID -->
-<section class="product-section" id="vitamiinid">
-  <h2 class="product-section__title">Vitamiinid</h2>
-  <div class="product-grid">
-    <div class="product-card">
-      <img src="/images/vitamiin-nac.jpg" alt="Liposoomne C-vitamiin NAC 260ml" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Liposoomne C-vitamiin | NAC 260ml</h3>
-      <p class="product-card__price">€17.00</p>
-      <button class="product-card__btn" data-product="vitamiin-nac">LISA OSTUKORVI</button>
-    </div>
-    <div class="product-card product-card--sold-out">
-      <div class="product-card__ribbon">SOLD OUT</div>
-      <img src="/images/vitamiin-original.jpg" alt="Liposoomne C-vitamiin Original 500ml" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Liposoomne C-vitamiin | Original 500ml</h3>
-      <p class="product-card__price product-card__price--sold-out">Sold out</p>
-    </div>
-    <div class="product-card product-card--sold-out">
-      <div class="product-card__ribbon">SOLD OUT</div>
-      <img src="/images/vitamiin-c.jpg" alt="Liposoomne C-vitamiin C 500ml" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Liposoomne C-vitamiin | C 500ml</h3>
-      <p class="product-card__price product-card__price--sold-out">Sold out</p>
-    </div>
-    <div class="product-card product-card--sold-out">
-      <div class="product-card__ribbon">SOLD OUT</div>
-      <img src="/images/vitamiin-red.jpg" alt="Liposoomne C-vitamiin Red 500ml" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Liposoomne C-vitamiin | Red 500ml</h3>
-      <p class="product-card__price product-card__price--sold-out">Sold out</p>
-    </div>
-    <div class="product-card product-card--sold-out">
-      <div class="product-card__ribbon">SOLD OUT</div>
-      <img src="/images/vitamiin-blue.jpg" alt="Liposoomne C-vitamiin Blue 500ml" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Liposoomne C-vitamiin | Blue 500ml</h3>
-      <p class="product-card__price product-card__price--sold-out">Sold out</p>
-    </div>
-    <div class="product-card product-card--sold-out">
-      <div class="product-card__ribbon">SOLD OUT</div>
-      <img src="/images/vitamiin-green.jpg" alt="Liposoomne C-vitamiin Green 500ml" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Liposoomne C-vitamiin | Green 500ml</h3>
-      <p class="product-card__price product-card__price--sold-out">Sold out</p>
-    </div>
-  </div>
-</section>
-
-<!-- EPSOMI SOOL -->
-<section class="product-section" id="epsomi-sool">
-  <h2 class="product-section__title">Epsomi sool</h2>
-  <div class="product-grid">
-    <div class="product-card">
-      <img src="/images/epsomi-250g.png" alt="Epsomi sool 250g" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Epsomi sool 250g</h3>
-      <p class="product-card__price">€3.00</p>
-      <button class="product-card__btn" data-product="epsomi-250g">LISA OSTUKORVI</button>
-    </div>
-    <div class="product-card">
-      <img src="/images/epsomi-750g.png" alt="Epsomi sool 750g" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Epsomi sool 750g</h3>
-      <p class="product-card__price">€7.00</p>
-      <button class="product-card__btn" data-product="epsomi-750g">LISA OSTUKORVI</button>
-    </div>
-    <div class="product-card">
-      <img src="/images/epsomi-apelsin.png" alt="Epsomi sool apelsini eeterliku õliga 250g" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Epsomi sool apelsini eeterliku õliga 250g</h3>
-      <p class="product-card__price">€4.00</p>
-      <button class="product-card__btn" data-product="epsomi-apelsin">LISA OSTUKORVI</button>
-    </div>
-    <div class="product-card">
-      <img src="/images/epsomi-lavendel.png" alt="Epsomi sool lavendli eeterliku õliga 250g" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Epsomi sool lavendli eeterliku õliga 250g</h3>
-      <p class="product-card__price">€4.00</p>
-      <button class="product-card__btn" data-product="epsomi-lavendel">LISA OSTUKORVI</button>
-    </div>
-    <div class="product-card">
-      <img src="/images/epsomi-sidrunhein.png" alt="Epsomi sool sidrunheina eeterliku õliga 250g" class="product-card__img" loading="lazy" />
-      <h3 class="product-card__title">Epsomi sool sidrunheina eeterliku õliga 250g</h3>
-      <p class="product-card__price">€4.00</p>
-      <button class="product-card__btn" data-product="epsomi-sidrunhein">LISA OSTUKORVI</button>
-    </div>
-  </div>
-</section>
+  </section>
+))}
 
 <!-- FOOTER -->
 <footer class="footer">
@@ -241,25 +144,8 @@ import Layout from '../layouts/Layout.astro';
 
 </Layout>
 
-<script is:inline>
-  const PRODUCTS = {
-    'kinkekaart-40': { name: 'Kinkekaart 40€', price: 40 },
-    'kinkekaart-80': { name: 'Kinkekaart 80€', price: 80 },
-    'kinkekaart-120': { name: 'Kinkekaart 120€', price: 120 },
-    '3-korra-kaart': { name: '3 korra kaart', price: 107 },
-    '5-korra-kaart': { name: '5 korra kaart', price: 168 },
-    '10-korra-kaart': { name: '10 korra kaart', price: 300 },
-    'proovipakett': { name: 'Keha ja meele 3x proovipakett', price: 75 },
-    'syvaloogastus': { name: 'Süvalõõgastuspakett', price: 150 },
-    'heaolu': { name: 'Heaolu pakett', price: 300 },
-    'energialaeng': { name: 'Sinu hommikune energialaeng', price: 125 },
-    'vitamiin-nac': { name: 'Liposoomne C-vitamiin NAC 260ml', price: 17 },
-    'epsomi-250g': { name: 'Epsomi sool 250g', price: 3 },
-    'epsomi-750g': { name: 'Epsomi sool 750g', price: 7 },
-    'epsomi-apelsin': { name: 'Epsomi sool apelsini õliga 250g', price: 4 },
-    'epsomi-lavendel': { name: 'Epsomi sool lavendli õliga 250g', price: 4 },
-    'epsomi-sidrunhein': { name: 'Epsomi sool sidrunheina õliga 250g', price: 4 },
-  };
+<script is:inline define:vars={{ PRODUCTS_DATA }}>
+  const PRODUCTS = PRODUCTS_DATA;
 
   function getCart() {
     try { return JSON.parse(localStorage.getItem('hk_cart') || '[]'); }

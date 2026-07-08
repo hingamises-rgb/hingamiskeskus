@@ -1,0 +1,71 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireDb } from '../../lib/db';
+
+const sql = requireDb();
+const products = await sql`
+  SELECT slug, title, cart_name, price, old_price, price_prefix, category, image, sold_out, active, sort
+  FROM products ORDER BY category, sort, slug
+`;
+
+const CATEGORY_NAMES: Record<string, string> = {
+  'kinkekaardid': 'Kinkekaardid',
+  'paketid': 'Paketid',
+  'vitamiinid': 'Vitamiinid',
+  'epsomi-sool': 'Epsomi sool',
+};
+const hasDeployHook = !!(import.meta.env.VERCEL_DEPLOY_HOOK_URL || process.env.VERCEL_DEPLOY_HOOK_URL);
+---
+
+<AdminLayout title="Tooted" active="products">
+  <h1>Tooted</h1>
+
+  <div class="panel" style="background:#fffbe8; border-color:#e8d48a;">
+    <p style="font-size:13px; color:#7a6410; line-height:1.6;">
+      Toote muudatused salvestuvad kohe andmebaasi, aga e-poe lehel jõustuvad need järgmise deploy'ga.
+      {hasDeployHook
+        ? <button class="btn" id="publish-btn" style="margin-left:8px;">AVALDA E-POES</button>
+        : <span> Deploy käivitub automaatselt järgmise git push'iga (või küsi Claude'ilt "avalda e-pood").</span>}
+      <span id="publish-status" style="margin-left:8px; color:#1a7f37;"></span>
+    </p>
+  </div>
+
+  <div class="panel">
+    <table class="admin-table">
+      <thead>
+        <tr><th></th><th>Toode</th><th>Kategooria</th><th>Hind</th><th>Vana hind</th><th>Staatus</th></tr>
+      </thead>
+      <tbody>
+        {products.map(p => (
+          <tr>
+            <td style="width:52px;"><img src={p.image} alt="" style="width:40px; height:40px; object-fit:cover; border-radius:6px;" /></td>
+            <td><a href={`/admin/tooted/${p.slug}`}>{p.title}</a></td>
+            <td>{CATEGORY_NAMES[p.category] || p.category}</td>
+            <td style="white-space:nowrap;">{p.price_prefix ? `${p.price_prefix} ` : ''}€{Number(p.price).toFixed(2)}</td>
+            <td>{p.old_price ? `€${Number(p.old_price).toFixed(2)}` : '—'}</td>
+            <td>
+              {!p.active
+                ? <span class="badge" style="background:#eee; color:#777;">Peidetud</span>
+                : p.sold_out
+                  ? <span class="badge badge--unfulfilled">Sold out</span>
+                  : <span class="badge badge--paid">Müügil</span>}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>
+
+<script>
+  document.getElementById('publish-btn')?.addEventListener('click', async (e) => {
+    const btn = e.target as HTMLButtonElement;
+    btn.disabled = true;
+    const res = await fetch('/api/admin/publish', { method: 'POST' });
+    const s = document.getElementById('publish-status')!;
+    s.textContent = res.ok ? 'Deploy käivitatud, e-pood uueneb ~1 min pärast ✓' : 'Viga avaldamisel';
+    btn.disabled = false;
+  });
+</script>
