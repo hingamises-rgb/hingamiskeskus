@@ -13,6 +13,10 @@ for (const f of files) {
 
 articles.sort((a, b) => (b.publishedTime || '').localeCompare(a.publishedTime || ''));
 
+const featured = articles[0];
+const rest = articles.slice(1);
+const PAGE_SIZE = 12;
+
 const allCats = new Set();
 articles.forEach(a => (a.categories || []).forEach(c => allCats.add(c)));
 const blogCategories = [...allCats].sort();
@@ -31,6 +35,16 @@ function formatDate(dateStr) {
   <a href="/" class="header__logo">
     <img src="/images/logo.svg" alt="Hingamiskeskus" height="30" />
   </a>
+  <nav class="header__nav">
+    <a href="/">Avaleht</a>
+    <a href="/teenused">Teenused</a>
+    <a href="/broneeri-aeg">Broneeri aeg</a>
+    <a href="/e-pood">E-pood</a>
+    <a href="/hakka-liikmeks">Hakka liikmeks</a>
+    <a href="/paketid">Paketid</a>
+    <a href="/blogi" class="active">Blogi</a>
+    <a href="/kkk">KKK</a>
+  </nav>
   <div class="header__right">
     <a href="/e-pood" class="header__cart" aria-label="Ostukorv">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -47,6 +61,11 @@ function formatDate(dateStr) {
 <section class="page-hero">
   <h1 class="page-hero__title">Blogi</h1>
 </section>
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <input type="text" id="blog-search" placeholder="Otsi artiklit..." class="search-input" />
+</div>
 
 <!-- CATEGORY NAV -->
 <nav class="cat-nav">
@@ -66,11 +85,30 @@ function formatDate(dateStr) {
   <p>Oled sa sportlane, lapseootel ema, ületöötanud või lihtsalt otsid vaikust, siis Hingamiskeskuse blogi aitab sul liikuda tasakaalu, rahu ja taastumise suunas. Loe, jaga, katseta ja leia enda tee parema enesetundeni.</p>
 </section>
 
+<!-- FEATURED POST -->
+{featured && (
+  <section class="featured-section">
+    <a href={featured.path} class="featured" data-cats={JSON.stringify(featured.categories || [])}>
+      <div class="featured__image-wrap">
+        {featured.image && (
+          <img src={featured.image} alt={featured.imageAlt || featured.title} class="featured__image" />
+        )}
+      </div>
+      <div class="featured__content">
+        <p class="featured__badge">Uusim artikkel</p>
+        <h2 class="featured__title">{featured.title}</h2>
+        <p class="featured__desc">{featured.description}</p>
+        <p class="featured__meta">{formatDate(featured.publishedTime)}</p>
+      </div>
+    </a>
+  </section>
+)}
+
 <!-- BLOG GRID -->
 <section class="blog-grid-section">
   <div class="blog-grid">
-    {articles.map((post) => (
-      <a href={post.path} class="blog-card" data-cats={JSON.stringify(post.categories || [])}>
+    {rest.map((post, i) => (
+      <a href={post.path} class={`blog-card ${i >= PAGE_SIZE ? 'blog-card--paged' : ''}`} data-cats={JSON.stringify(post.categories || [])} data-title={post.title.toLowerCase()} data-desc={(post.description || '').toLowerCase()}>
         <div class="blog-card__image-wrap">
           {post.image && (
             <img src={post.image} alt={post.imageAlt || post.title} class="blog-card__image" loading="lazy" />
@@ -84,6 +122,10 @@ function formatDate(dateStr) {
       </a>
     ))}
   </div>
+  <div class="load-more-wrap">
+    <button class="load-more-btn" id="load-more">Näita rohkem</button>
+  </div>
+  <p class="no-results" id="no-results">Ühtki artiklit ei leitud.</p>
 </section>
 
 <!-- FOOTER -->
@@ -127,22 +169,69 @@ function formatDate(dateStr) {
 </Layout>
 
 <script>
+  const PAGE_SIZE = 12;
+  let currentCat = 'all';
+  let currentSearch = '';
+  let visibleCount = PAGE_SIZE;
+
+  function applyFilters() {
+    const cards = document.querySelectorAll('.blog-card');
+    let matched = 0;
+    let shown = 0;
+    cards.forEach(card => {
+      const el = card as HTMLElement;
+      const cats: string[] = JSON.parse(el.dataset.cats || '[]');
+      const title = el.dataset.title || '';
+      const desc = el.dataset.desc || '';
+      const matchesCat = currentCat === 'all' || cats.includes(currentCat);
+      const matchesSearch = !currentSearch || title.includes(currentSearch) || desc.includes(currentSearch);
+      const matches = matchesCat && matchesSearch;
+      if (matches) {
+        matched++;
+        if (shown < visibleCount) {
+          el.classList.remove('blog-card--hidden');
+          shown++;
+        } else {
+          el.classList.add('blog-card--hidden');
+        }
+      } else {
+        el.classList.add('blog-card--hidden');
+      }
+    });
+    const loadBtn = document.getElementById('load-more');
+    if (loadBtn) loadBtn.style.display = matched > visibleCount ? 'inline-block' : 'none';
+    const noResults = document.getElementById('no-results');
+    if (noResults) noResults.style.display = matched === 0 ? 'block' : 'none';
+  }
+
   document.querySelectorAll('.cat-nav__btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const cat = (btn as HTMLElement).dataset.cat!;
+      currentCat = (btn as HTMLElement).dataset.cat!;
+      visibleCount = PAGE_SIZE;
       document.querySelectorAll('.cat-nav__btn').forEach(b => b.classList.remove('cat-nav__btn--active'));
       btn.classList.add('cat-nav__btn--active');
-      document.querySelectorAll('.blog-card').forEach(card => {
-        const el = card as HTMLElement;
-        if (cat === 'all') {
-          el.classList.remove('blog-card--hidden');
-        } else {
-          const cats: string[] = JSON.parse(el.dataset.cats || '[]');
-          el.classList.toggle('blog-card--hidden', !cats.includes(cat));
-        }
-      });
+      applyFilters();
     });
   });
+
+  const searchInput = document.getElementById('blog-search') as HTMLInputElement | null;
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      currentSearch = searchInput.value.trim().toLowerCase();
+      visibleCount = PAGE_SIZE;
+      applyFilters();
+    });
+  }
+
+  const loadMoreBtn = document.getElementById('load-more');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', () => {
+      visibleCount += PAGE_SIZE;
+      applyFilters();
+    });
+  }
+
+  applyFilters();
 </script>
 
 <style>
@@ -159,6 +248,9 @@ function formatDate(dateStr) {
     border-bottom: 1px solid rgba(0,0,0,0.05);
   }
   .header__logo img { height: 28px; width: auto; }
+  .header__nav { display: none; gap: 24px; }
+  .header__nav a { font-size: 14px; color: #1d1e20; text-decoration: none; font-weight: 500; }
+  .header__nav a.active { text-decoration: underline; text-underline-offset: 4px; }
   .header__right { display: flex; align-items: center; gap: 16px; }
   .header__cart { color: #1d1e20; }
   .header__burger {
@@ -185,12 +277,33 @@ function formatDate(dateStr) {
     font-weight: 400;
   }
 
+  /* SEARCH */
+  .search-wrap {
+    padding: 24px 16px 0;
+    background: #fff;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .search-input {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    padding: 12px 18px;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    border-radius: 999px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus {
+    border-color: #1f6d85;
+  }
+
   /* CATEGORY NAV */
   .cat-nav {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    padding: 24px 16px 8px;
+    padding: 16px 16px 8px;
     background: #fff;
     justify-content: center;
   }
@@ -253,6 +366,93 @@ function formatDate(dateStr) {
     gap: 24px;
     max-width: 1200px;
     margin: 0 auto;
+  }
+
+  /* FEATURED */
+  .featured-section {
+    padding: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .featured {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: #f3fcff;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .featured__image-wrap {
+    overflow: hidden;
+  }
+  .featured__image {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+  }
+  .featured:hover .featured__image {
+    transform: scale(1.03);
+  }
+  .featured__content {
+    padding: 24px;
+  }
+  .featured__badge {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: #1f6d85;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .featured__title {
+    font-family: 'Libre Caslon Display', serif;
+    font-size: 26px;
+    line-height: 1.2;
+    color: #1d1e20;
+    margin-bottom: 12px;
+    text-align: left;
+  }
+  .featured__desc {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 16px;
+  }
+  .featured__meta {
+    font-size: 12px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* LOAD MORE */
+  .load-more-wrap {
+    text-align: center;
+    padding: 24px 0 0;
+  }
+  .load-more-btn {
+    display: inline-block;
+    background: #1d1e20;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 14px 32px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .load-more-btn:hover { opacity: 0.85; }
+  .no-results {
+    display: none;
+    text-align: center;
+    font-size: 15px;
+    color: #888;
+    padding: 40px 0;
   }
 
   /* BLOG CARD */
@@ -396,11 +596,18 @@ function formatDate(dateStr) {
 
   /* DESKTOP */
   @media (min-width: 768px) {
+    .header__nav { display: flex; }
     .header__burger { display: none; }
+    .search-wrap { padding-top: 32px; }
     .cat-nav {
-      padding: 32px 40px 16px;
+      padding: 20px 40px 16px;
       gap: 10px;
     }
+    .featured-section { padding: 24px 40px; }
+    .featured { display: grid; grid-template-columns: 1.2fr 1fr; align-items: center; }
+    .featured__image { height: 380px; }
+    .featured__content { padding: 40px; }
+    .featured__title { font-size: 34px; }
     .cat-nav__btn {
       font-size: 12px;
       padding: 11px 20px;
