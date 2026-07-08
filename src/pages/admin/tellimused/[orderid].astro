@@ -45,7 +45,9 @@ const created = new Date(order.created_at).toLocaleString('et-EE', {
       <table style="width:100%; font-size:14px;">
         <tr><td>Kokku</td><td style="text-align:right; font-weight:700;">€{Number(order.amount).toFixed(2)}</td></tr>
       </table>
-      <p style="font-size:13px; color:#888; margin-top:12px;">Makseviis: Paysera</p>
+      <p style="font-size:13px; color:#888; margin-top:12px;">Makseviis: {
+        { paysera: 'Paysera', sularaha: 'Sularaha', ulekanne: 'Pangaülekanne', kaart: 'Kaardimakse kohapeal', muu: 'Muu' }[order.payment] || order.payment
+      }</p>
     </div>
 
     <div class="panel">

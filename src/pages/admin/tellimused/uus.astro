@@ -1,0 +1,174 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { requireDb } from '../../../lib/db';
+
+const sql = requireDb();
+const products = await sql`
+  SELECT cart_name, price FROM products WHERE active = true AND sold_out = false ORDER BY category, sort
+`;
+
+const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Tallinn' });
+---
+
+<AdminLayout title="Lisa tellimus" active="orders">
+  <a href="/admin/tellimused" style="font-size:13px; color:#1f6d85;">← Kõik tellimused</a>
+  <h1 style="margin-top:12px;">Lisa tellimus käsitsi</h1>
+  <p style="color:#888; font-size:14px; margin-bottom:24px;">
+    Sularaha- või ülekandemüügi kirja panemiseks, et käive ja analüütika oleksid täpsed.
+  </p>
+
+  <div class="panel" style="max-width:640px;">
+    <form id="order-form">
+      <label>Tooted *</label>
+      <div id="lines"></div>
+      <button type="button" class="btn btn--outline" id="add-line" style="margin-bottom:16px;">+ LISA TOODE</button>
+
+      <div class="row">
+        <div>
+          <label>Summa kokku (€) *</label>
+          <input type="number" name="amount" step="0.01" min="0" required />
+        </div>
+        <div>
+          <label>Kuupäev</label>
+          <input type="date" name="date" value={today} />
+        </div>
+        <div>
+          <label>Makseviis</label>
+          <select name="payment">
+            <option value="sularaha">Sularaha</option>
+            <option value="ulekanne">Pangaülekanne</option>
+            <option value="kaart">Kaardimakse kohapeal</option>
+            <option value="muu">Muu</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Kliendi nimi</label>
+          <input type="text" name="name" />
+        </div>
+        <div>
+          <label>E-post</label>
+          <input type="email" name="email" />
+        </div>
+        <div>
+          <label>Telefon</label>
+          <input type="text" name="phone" />
+        </div>
+      </div>
+
+      <label>Märkmed</label>
+      <input type="text" name="note" />
+
+      <button type="submit" class="btn" style="margin-top:18px;">SALVESTA TELLIMUS</button>
+      <span id="save-status" style="font-size:13px; margin-left:10px;"></span>
+    </form>
+  </div>
+</AdminLayout>
+
+<script define:vars={{ products }}>
+  const linesEl = document.getElementById('lines');
+  const amountInput = document.querySelector('input[name="amount"]');
+
+  function productOptions() {
+    return '<option value="">— vali toode või kirjuta ise —</option>' +
+      products.map(p => `<option value="${p.cart_name.replace(/"/g, '&quot;')}" data-price="${p.price}">${p.cart_name} (€${Number(p.price).toFixed(2)})</option>`).join('');
+  }
+
+  function addLine() {
+    const div = document.createElement('div');
+    div.className = 'line';
+    div.innerHTML = `
+      <select class="line-product">${productOptions()}</select>
+      <input type="text" class="line-name" placeholder="või vaba tekst" />
+      <input type="number" class="line-qty" value="1" min="1" style="width:64px;" />
+      <button type="button" class="line-remove">×</button>
+    `;
+    div.querySelector('.line-product').addEventListener('change', (e) => {
+      const sel = e.target;
+      if (sel.value) div.querySelector('.line-name').value = sel.value;
+      recalc();
+    });
+    div.querySelector('.line-qty').addEventListener('input', recalc);
+    div.querySelector('.line-remove').addEventListener('click', () => { div.remove(); recalc(); });
+    linesEl.appendChild(div);
+  }
+
+  function recalc() {
+    let total = 0;
+    let allKnown = true;
+    document.querySelectorAll('.line').forEach(line => {
+      const sel = line.querySelector('.line-product');
+      const qty = parseInt(line.querySelector('.line-qty').value || '1', 10);
+      const opt = sel.selectedOptions[0];
+      if (opt && opt.dataset.price) total += parseFloat(opt.dataset.price) * qty;
+      else allKnown = false;
+    });
+    if (allKnown && total > 0) amountInput.value = total.toFixed(2);
+  }
+
+  document.getElementById('add-line').addEventListener('click', addLine);
+  addLine();
+
+  document.getElementById('order-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.target;
+    const items = [...document.querySelectorAll('.line')].map(line => {
+      const name = line.querySelector('.line-name').value.trim();
+      const qty = parseInt(line.querySelector('.line-qty').value || '1', 10);
+      return name ? `${name} x${qty}` : null;
+    }).filter(Boolean).join(', ');
+
+    const s = document.getElementById('save-status');
+    if (!items) { s.textContent = 'Lisa vähemalt üks toode'; s.style.color = '#b3261e'; return; }
+
+    const res = await fetch('/api/admin/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items,
+        amount: parseFloat(f.amount.value),
+        date: f.date.value,
+        payment: f.payment.value,
+        name: f.name.value.trim(),
+        email: f.email.value.trim(),
+        phone: f.phone.value.trim(),
+        note: f.note.value.trim(),
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      window.location.href = '/admin/tellimused/' + data.orderid;
+    } else {
+      s.textContent = 'Viga salvestamisel';
+      s.style.color = '#b3261e';
+    }
+  });
+</script>
+
+<style>
+  form label { display: block; font-size: 13px; font-weight: 500; margin: 14px 0 6px; }
+  form input, form select {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+  }
+  form input:focus, form select:focus { border-color: #1f6d85; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  :global(.line) { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+  :global(.line select) { flex: 1.2; }
+  :global(.line input.line-name) { flex: 1; }
+  :global(.line-remove) {
+    background: none; border: 1px solid rgba(0,0,0,0.15); border-radius: 6px;
+    width: 32px; height: 32px; font-size: 16px; color: #888; flex-shrink: 0;
+  }
+  :global(.line-remove:hover) { border-color: #b3261e; color: #b3261e; }
+</style>
