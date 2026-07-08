@@ -75,11 +75,6 @@ function formatDate(dateStr) {
           {post.image && (
             <img src={post.image} alt={post.imageAlt || post.title} class="blog-card__image" loading="lazy" />
           )}
-          {post.categories && post.categories.length > 0 && (
-            <div class="blog-card__pills">
-              {post.categories.map((c) => <span class="blog-card__pill">{c}</span>)}
-            </div>
-          )}
         </div>
         <h3 class="blog-card__title">{post.title}</h3>
         <p class="blog-card__desc">{post.description}</p>
