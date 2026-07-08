@@ -2,11 +2,14 @@
 import Layout from '../layouts/Layout.astro';
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { requireDb } from '../lib/db';
 
 export async function getStaticPaths() {
+  const paths = [];
+
+  // Blogiartiklid
   const dir = join(process.cwd(), 'src', 'content', 'blogi');
   const files = await readdir(dir);
-  const paths = [];
   for (const file of files) {
     if (!file.endsWith('.json')) continue;
     const article = JSON.parse(await readFile(join(dir, file), 'utf8'));
@@ -15,16 +18,42 @@ export async function getStaticPaths() {
       props: { article },
     });
   }
+
+  // Tooted (vanad URL-id säilivad page_slug kaudu)
+  const sql = requireDb();
+  const products = await sql`
+    SELECT slug, page_slug, title, subtitle, description, ribbon, alt, image, cart_name,
+           price, old_price, price_prefix, category, sold_out
+    FROM products WHERE page_slug IS NOT NULL AND active = true
+  `;
+  for (const product of products) {
+    paths.push({
+      params: { slug: product.page_slug },
+      props: { product },
+    });
+  }
+
   return paths;
 }
 
-const { article } = Astro.props;
-const publishedDate = article.publishedTime
+const { article, product } = Astro.props;
+const publishedDate = article?.publishedTime
   ? new Date(article.publishedTime).toLocaleDateString('et-EE', { year: 'numeric', month: 'long', day: 'numeric' })
   : '';
+
+const pageTitle = article ? `${article.title} | Hingamiskeskus` : `${product.title} | Hingamiskeskus`;
+const pageDesc = article ? (article.description || article.title) : (product.subtitle || product.title);
+
+const cartProduct = product && !product.sold_out
+  ? { id: product.slug, name: product.cart_name, price: Number(product.price) }
+  : null;
+
+function fmtPrice(v: unknown) {
+  return `€${Number(v).toFixed(2)}`;
+}
 ---
 
-<Layout title={`${article.title} | Hingamiskeskus`} description={article.description || article.title}>
+<Layout title={pageTitle} description={pageDesc}>
 
 <header class="header">
   <a href="/" class="header__logo">
@@ -37,7 +66,7 @@ const publishedDate = article.publishedTime
     <a href="/e-pood">E-pood</a>
     <a href="/hakka-liikmeks">Hakka liikmeks</a>
     <a href="/paketid">Paketid</a>
-    <a href="/blogi" class="active">Blogi</a>
+    <a href="/blogi" class={article ? 'active' : ''}>Blogi</a>
     <a href="/kkk">KKK</a>
   </nav>
   <div class="header__right">
@@ -52,6 +81,7 @@ const publishedDate = article.publishedTime
   </div>
 </header>
 
+{article && (
 <article class="article">
   <div class="article__hero">
     <h1 class="article__title">{article.title}</h1>
@@ -74,6 +104,42 @@ const publishedDate = article.publishedTime
     <a href="/blogi" class="article__cta-link">← Tagasi blogisse</a>
   </div>
 </article>
+)}
+
+{product && (
+<section class="product">
+  <div class="product__grid">
+    <div class="product__image-wrap">
+      {product.ribbon && <div class="product__ribbon">{product.ribbon}</div>}
+      <img src={product.image} alt={product.alt || product.title} class="product__image" />
+    </div>
+    <div class="product__info">
+      <h1 class="product__title">{product.title}</h1>
+      {product.subtitle && <p class="product__subtitle">{product.subtitle}</p>}
+      <p class="product__price">
+        {product.price_prefix ? product.price_prefix + ' ' : ''}{product.old_price && <><span class="product__price--old">{fmtPrice(product.old_price)}</span>{' '}</>}{product.sold_out ? 'Sold out' : fmtPrice(product.price)}
+      </p>
+
+      {!product.sold_out && (
+        <div class="product__buy">
+          <div class="product__qty">
+            <button type="button" class="product__qty-btn" id="qty-minus" aria-label="Vähenda kogust">−</button>
+            <span class="product__qty-value" id="qty-value">1</span>
+            <button type="button" class="product__qty-btn" id="qty-plus" aria-label="Suurenda kogust">+</button>
+          </div>
+          <button type="button" class="product__add" id="add-to-cart">LISA OSTUKORVI</button>
+        </div>
+      )}
+
+      {product.description && (
+        <div class="product__desc" set:html={product.description}></div>
+      )}
+
+      <a href="/e-pood" class="product__back">← Tagasi e-poodi</a>
+    </div>
+  </div>
+</section>
+)}
 
 <footer class="footer">
   <div class="location">
@@ -113,6 +179,56 @@ const publishedDate = article.publishedTime
 </footer>
 
 </Layout>
+
+{cartProduct && (
+<script is:inline define:vars={{ cartProduct }}>
+  function getCart() {
+    try { return JSON.parse(localStorage.getItem('hk_cart') || '[]'); }
+    catch { return []; }
+  }
+  function saveCart(cart) {
+    localStorage.setItem('hk_cart', JSON.stringify(cart));
+    updateBadge();
+  }
+  function updateBadge() {
+    const cart = getCart();
+    const count = cart.reduce(function(s, i) { return s + i.qty; }, 0);
+    let badge = document.querySelector('.cart-badge');
+    if (count > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'cart-badge';
+        document.querySelector('.header__cart').appendChild(badge);
+      }
+      badge.textContent = count;
+    } else if (badge) {
+      badge.remove();
+    }
+  }
+
+  let qty = 1;
+  const qtyValue = document.getElementById('qty-value');
+  document.getElementById('qty-minus').addEventListener('click', function() {
+    if (qty > 1) { qty--; qtyValue.textContent = qty; }
+  });
+  document.getElementById('qty-plus').addEventListener('click', function() {
+    qty++; qtyValue.textContent = qty;
+  });
+
+  const addBtn = document.getElementById('add-to-cart');
+  addBtn.addEventListener('click', function() {
+    const cart = getCart();
+    const existing = cart.find(function(item) { return item.id === cartProduct.id; });
+    if (existing) existing.qty += qty;
+    else cart.push({ id: cartProduct.id, name: cartProduct.name, price: cartProduct.price, qty: qty });
+    saveCart(cart);
+    addBtn.textContent = 'LISATUD ✓';
+    setTimeout(function() { addBtn.textContent = 'LISA OSTUKORVI'; }, 1500);
+  });
+
+  updateBadge();
+</script>
+)}
 
 <style>
   .header {
@@ -331,6 +447,139 @@ const publishedDate = article.publishedTime
     .article__title { font-size: 42px; }
     .article { padding: 60px 40px; }
   }
+
+  /* TOOTELEHT */
+  .product {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+  .product__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  @media (min-width: 768px) {
+    .product__grid { grid-template-columns: 1fr 1fr; gap: 56px; }
+    .product { padding: 60px 40px 80px; }
+  }
+  .product__image-wrap { position: relative; }
+  .product__image {
+    width: 100%;
+    border-radius: 10px;
+  }
+  .product__ribbon {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #1d1e20;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 999px;
+    z-index: 1;
+  }
+  .product__title {
+    font-family: 'Libre Caslon Display', serif;
+    font-size: 34px;
+    font-weight: 400;
+    line-height: 1.15;
+    color: #1d1e20;
+    text-align: left;
+    margin-bottom: 12px;
+  }
+  .product__subtitle {
+    font-family: 'Libre Caslon Display', serif;
+    font-size: 20px;
+    line-height: 1.4;
+    color: #1d1e20;
+    margin-bottom: 20px;
+  }
+  .product__price {
+    font-size: 18px;
+    color: #1d1e20;
+    margin-bottom: 24px;
+  }
+  .product__price--old {
+    text-decoration: line-through;
+    color: #999;
+    margin-right: 6px;
+  }
+  .product__buy {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+  .product__qty {
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .product__qty-btn {
+    width: 44px;
+    height: 48px;
+    font-size: 18px;
+    background: #fff;
+    border: none;
+    color: #1d1e20;
+    cursor: pointer;
+  }
+  .product__qty-btn:hover { background: #f3fcff; }
+  .product__qty-value {
+    min-width: 40px;
+    text-align: center;
+    font-size: 15px;
+  }
+  .product__add {
+    background: #1d1e20;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 16px 36px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  .product__add:hover { opacity: 0.88; }
+  .product__desc { font-size: 15px; line-height: 1.7; color: #333; }
+  .product__desc :global(p) { margin-bottom: 14px; font-size: 15px; }
+  .product__desc :global(a) { color: #1f6d85; text-decoration: underline; }
+  .product__desc :global(strong) { font-weight: 700; }
+  .product__desc :global(ul), .product__desc :global(ol) { padding-left: 20px; margin-bottom: 14px; }
+  .product__desc :global(li) { font-size: 15px; margin-bottom: 6px; list-style: disc; }
+  .product__back {
+    display: inline-block;
+    margin-top: 24px;
+    color: #1f6d85;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  :global(.cart-badge) {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: #1f6d85;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+  }
+  .header__cart { position: relative; }
 
   .location {
     background: #1f6d85;

@@ -35,6 +35,15 @@ const CATEGORIES = [
         <label>Nimi ostukorvis (lühem)</label>
         <input type="text" name="cart_name" value={p.cart_name} required />
 
+        <label>Alapealkiri (tootelehel)</label>
+        <input type="text" name="subtitle" value={p.subtitle || ''} />
+
+        <label>Ribbon (nt "best seller", tühi = pole)</label>
+        <input type="text" name="ribbon" value={p.ribbon || ''} />
+
+        <label>Kirjeldus (tootelehel, HTML)</label>
+        <textarea name="description" rows="10" style="width:100%; font-family:monospace; font-size:13px; padding:12px; border:1.5px solid rgba(0,0,0,0.12); border-radius:8px; outline:none; resize:vertical;">{p.description || ''}</textarea>
+
         <div class="row">
           <div>
             <label>Hind (€)</label>
@@ -100,6 +109,9 @@ const CATEGORIES = [
       slug,
       title: f.title.value,
       cart_name: f.cart_name.value,
+      subtitle: f.subtitle.value,
+      ribbon: f.ribbon.value,
+      description: f.description.value,
       price: parseFloat(f.price.value),
       old_price: f.old_price.value ? parseFloat(f.old_price.value) : null,
       price_prefix: f.price_prefix.value || null,

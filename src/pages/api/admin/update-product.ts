@@ -32,6 +32,9 @@ export const POST: APIRoute = async ({ request }) => {
       UPDATE products SET
         title = ${title},
         cart_name = ${cartName},
+        subtitle = ${b.subtitle ? String(b.subtitle).trim() : null},
+        ribbon = ${b.ribbon ? String(b.ribbon).trim() : null},
+        description = ${b.description ? String(b.description).trim() : null},
         price = ${price},
         old_price = ${oldPrice},
         price_prefix = ${b.price_prefix ? String(b.price_prefix).trim() : null},

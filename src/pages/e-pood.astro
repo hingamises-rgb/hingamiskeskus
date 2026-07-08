@@ -6,7 +6,7 @@ import { requireDb } from '../lib/db';
 // muudatused jõustuvad e-poes järgmise deploy'ga.
 const sql = requireDb();
 const allProducts = await sql`
-  SELECT slug, title, alt, image, cart_name, price, old_price, price_prefix, category, sold_out
+  SELECT slug, page_slug, title, alt, image, cart_name, price, old_price, price_prefix, category, sold_out
   FROM products WHERE active = true ORDER BY sort, slug
 `;
 
@@ -87,14 +87,18 @@ for (const p of allProducts) {
         p.sold_out ? (
           <div class="product-card product-card--sold-out">
             <div class="product-card__ribbon">SOLD OUT</div>
-            <img src={p.image} alt={p.alt} class="product-card__img" loading="lazy" />
-            <h3 class="product-card__title">{p.title}</h3>
+            <a href={p.page_slug ? `/${p.page_slug}` : '/e-pood'} class="product-card__link">
+              <img src={p.image} alt={p.alt} class="product-card__img" loading="lazy" />
+              <h3 class="product-card__title">{p.title}</h3>
+            </a>
             <p class="product-card__price product-card__price--sold-out">Sold out</p>
           </div>
         ) : (
           <div class="product-card">
-            <img src={p.image} alt={p.alt} class="product-card__img" loading="lazy" />
-            <h3 class="product-card__title">{p.title}</h3>
+            <a href={p.page_slug ? `/${p.page_slug}` : '/e-pood'} class="product-card__link">
+              <img src={p.image} alt={p.alt} class="product-card__img" loading="lazy" />
+              <h3 class="product-card__title">{p.title}</h3>
+            </a>
             <p class="product-card__price">{p.price_prefix ? p.price_prefix + ' ' : ''}{p.old_price && <><span class="price--old">{fmtPrice(p.old_price)}</span>{' '}</>}{fmtPrice(p.price)}</p>
             <button class="product-card__btn" data-product={p.slug}>LISA OSTUKORVI</button>
           </div>
