@@ -1,0 +1,102 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireDb } from '../../lib/db';
+
+const sql = requireDb();
+
+const q = Astro.url.searchParams.get('q')?.trim() || '';
+const filter = Astro.url.searchParams.get('filter') || 'all';
+
+let orders;
+if (q) {
+  const like = `%${q}%`;
+  orders = await sql`
+    SELECT orderid, name, email, amount, fulfillment, created_at
+    FROM orders
+    WHERE (orderid ILIKE ${like} OR name ILIKE ${like} OR email ILIKE ${like})
+    ORDER BY created_at DESC LIMIT 200
+  `;
+} else if (filter === 'unfulfilled') {
+  orders = await sql`
+    SELECT orderid, name, email, amount, fulfillment, created_at
+    FROM orders WHERE fulfillment = 'unfulfilled'
+    ORDER BY created_at DESC LIMIT 200
+  `;
+} else {
+  orders = await sql`
+    SELECT orderid, name, email, amount, fulfillment, created_at
+    FROM orders ORDER BY created_at DESC LIMIT 200
+  `;
+}
+
+function fmtDate(d: string | Date) {
+  return new Date(d).toLocaleString('et-EE', {
+    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+    timeZone: 'Europe/Tallinn',
+  });
+}
+---
+
+<AdminLayout title="Tellimused" active="orders">
+  <h1>Tellimused</h1>
+
+  <div class="panel">
+    <form class="toolbar" method="get">
+      <input type="text" name="q" value={q} placeholder="Otsi tellimust, nime või e-posti..." class="toolbar__search" />
+      <button type="submit" class="btn">OTSI</button>
+      <a href="/admin/tellimused" class={`toolbar__tab ${filter === 'all' && !q ? 'toolbar__tab--active' : ''}`}>Kõik</a>
+      <a href="/admin/tellimused?filter=unfulfilled" class={`toolbar__tab ${filter === 'unfulfilled' ? 'toolbar__tab--active' : ''}`}>Täitmata</a>
+    </form>
+
+    {orders.length === 0 ? (
+      <p style="color:#888; font-size:14px;">Tellimusi ei leitud.</p>
+    ) : (
+      <table class="admin-table">
+        <thead>
+          <tr><th>Tellimus</th><th>Aeg</th><th>Klient</th><th>E-post</th><th>Summa</th><th>Staatus</th></tr>
+        </thead>
+        <tbody>
+          {orders.map(o => (
+            <tr>
+              <td><a href={`/admin/tellimused/${o.orderid}`}>#{o.orderid}</a></td>
+              <td>{fmtDate(o.created_at)}</td>
+              <td>{o.name}</td>
+              <td>{o.email}</td>
+              <td>€{Number(o.amount).toFixed(2)}</td>
+              <td>
+                <span class={`badge ${o.fulfillment === 'fulfilled' ? 'badge--fulfilled' : 'badge--unfulfilled'}`}>
+                  {o.fulfillment === 'fulfilled' ? 'Täidetud' : 'Täitmata'}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+</AdminLayout>
+
+<style>
+  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+  .toolbar__search {
+    flex: 1;
+    min-width: 220px;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 10px 14px;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    border-radius: 8px;
+    outline: none;
+  }
+  .toolbar__search:focus { border-color: #1f6d85; }
+  .toolbar__tab {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 8px;
+    color: #666;
+  }
+  .toolbar__tab--active { background: #e7f4f8; color: #1f6d85; font-weight: 700; }
+</style>

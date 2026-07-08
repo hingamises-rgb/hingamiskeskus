@@ -1,0 +1,182 @@
+---
+interface Props {
+  title: string;
+  active: string;
+}
+const { title, active } = Astro.props;
+const user = Astro.locals.adminUser || '';
+
+const nav = [
+  { href: '/admin', key: 'overview', label: 'Ülevaade' },
+  { href: '/admin/tellimused', key: 'orders', label: 'Tellimused' },
+  { href: '/admin/kliendid', key: 'customers', label: 'Kliendid' },
+  { href: '/admin/analuutika', key: 'analytics', label: 'Analüütika' },
+];
+---
+
+<!doctype html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="/images/logo.svg" />
+  <title>{title} | Hingamiskeskus admin</title>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <a href="/admin" class="sidebar__logo">
+        <img src="/images/logo.svg" alt="Hingamiskeskus" />
+      </a>
+      <nav class="sidebar__nav">
+        {nav.map(item => (
+          <a href={item.href} class={`sidebar__link ${active === item.key ? 'sidebar__link--active' : ''}`}>
+            {item.label}
+          </a>
+        ))}
+      </nav>
+      <div class="sidebar__bottom">
+        <a href="/" class="sidebar__link sidebar__link--muted" target="_blank">Vaata saiti ↗</a>
+        <button class="sidebar__logout" id="logout-btn">Logi välja ({user})</button>
+      </div>
+    </aside>
+    <main class="main">
+      <slot />
+    </main>
+  </div>
+
+  <script>
+    document.getElementById('logout-btn')?.addEventListener('click', async () => {
+      await fetch('/api/admin/logout', { method: 'POST' });
+      window.location.href = '/admin/login';
+    });
+  </script>
+</body>
+</html>
+
+<style is:global>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f7fafb;
+    color: #1d1e20;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+
+  .shell { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 220px;
+    background: #fff;
+    border-right: 1px solid rgba(0,0,0,0.06);
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    flex-shrink: 0;
+  }
+  .sidebar__logo img { height: 26px; }
+  .sidebar__nav { display: flex; flex-direction: column; gap: 4px; }
+  .sidebar__link {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 14px;
+    border-radius: 8px;
+    color: #444;
+  }
+  .sidebar__link:hover { background: #f3fcff; }
+  .sidebar__link--active { background: #e7f4f8; color: #1f6d85; font-weight: 700; }
+  .sidebar__link--muted { color: #888; font-size: 13px; }
+  .sidebar__bottom { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+  .sidebar__logout {
+    background: none;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 8px;
+    font-size: 12px;
+    color: #666;
+    padding: 8px 12px;
+  }
+  .sidebar__logout:hover { border-color: #b3261e; color: #b3261e; }
+
+  .main { flex: 1; padding: 32px; min-width: 0; }
+  .main h1 { font-size: 24px; font-weight: 700; margin-bottom: 24px; }
+
+  /* Ühised admin komponendid */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .tile {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .tile__label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .tile__value { font-size: 26px; font-weight: 700; }
+  .tile__sub { font-size: 12px; color: #888; margin-top: 4px; }
+  .tile__sub--up { color: #1a7f37; }
+  .tile__sub--down { color: #b3261e; }
+
+  .panel {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .panel h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+
+  table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .admin-table th {
+    text-align: left;
+    font-size: 12px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .admin-table td { padding: 12px; border-bottom: 1px solid rgba(0,0,0,0.04); }
+  .admin-table tr:hover td { background: #fafdfe; }
+  .admin-table a { color: #1f6d85; font-weight: 500; }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .badge--paid { background: #e6f4ea; color: #1a7f37; }
+  .badge--fulfilled { background: #e7f4f8; color: #1f6d85; }
+  .badge--unfulfilled { background: #fff3e0; color: #b26a00; }
+
+  .btn {
+    display: inline-block;
+    background: #1f6d85;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+  }
+  .btn:hover { opacity: 0.9; }
+  .btn--outline { background: transparent; color: #1f6d85; border: 1.5px solid #1f6d85; }
+
+  @media (max-width: 768px) {
+    .shell { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; flex-direction: row; align-items: center; overflow-x: auto; }
+    .sidebar__nav { flex-direction: row; }
+    .sidebar__bottom { margin-top: 0; flex-direction: row; margin-left: auto; }
+    .main { padding: 20px 16px; }
+  }
+</style>

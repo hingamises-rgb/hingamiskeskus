@@ -1,0 +1,78 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireDb } from '../../lib/db';
+
+const sql = requireDb();
+const q = Astro.url.searchParams.get('q')?.trim() || '';
+
+let customers;
+if (q) {
+  const like = `%${q}%`;
+  customers = await sql`
+    SELECT email, MAX(name) AS name, COUNT(*) AS orders, SUM(amount) AS total, MAX(created_at) AS last_order
+    FROM orders
+    WHERE email ILIKE ${like} OR name ILIKE ${like}
+    GROUP BY email ORDER BY SUM(amount) DESC LIMIT 300
+  `;
+} else {
+  customers = await sql`
+    SELECT email, MAX(name) AS name, COUNT(*) AS orders, SUM(amount) AS total, MAX(created_at) AS last_order
+    FROM orders
+    GROUP BY email ORDER BY SUM(amount) DESC LIMIT 300
+  `;
+}
+
+function fmtDate(d: string | Date) {
+  return new Date(d).toLocaleDateString('et-EE', { timeZone: 'Europe/Tallinn' });
+}
+---
+
+<AdminLayout title="Kliendid" active="customers">
+  <h1>Kliendid</h1>
+
+  <div class="panel">
+    <form class="toolbar" method="get">
+      <input type="text" name="q" value={q} placeholder="Otsi e-posti või nime..." class="toolbar__search" />
+      <button type="submit" class="btn">OTSI</button>
+      <a href="/api/admin/customers-csv" class="btn btn--outline">EKSPORDI CSV</a>
+    </form>
+
+    {customers.length === 0 ? (
+      <p style="color:#888; font-size:14px;">Kliente ei leitud.</p>
+    ) : (
+      <table class="admin-table">
+        <thead>
+          <tr><th>E-post</th><th>Nimi</th><th>Tellimusi</th><th>Kokku ostnud</th><th>Viimane tellimus</th></tr>
+        </thead>
+        <tbody>
+          {customers.map(c => (
+            <tr>
+              <td><a href={`/admin/tellimused?q=${encodeURIComponent(c.email)}`}>{c.email}</a></td>
+              <td>{c.name}</td>
+              <td>{c.orders}</td>
+              <td>€{Number(c.total).toFixed(2)}</td>
+              <td>{fmtDate(c.last_order)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+</AdminLayout>
+
+<style>
+  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+  .toolbar__search {
+    flex: 1;
+    min-width: 220px;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 10px 14px;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    border-radius: 8px;
+    outline: none;
+  }
+  .toolbar__search:focus { border-color: #1f6d85; }
+</style>

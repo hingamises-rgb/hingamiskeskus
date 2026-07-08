@@ -3,6 +3,7 @@ export const prerender = false;
 import type { APIRoute } from 'astro';
 import { createHash } from 'crypto';
 import nodemailer from 'nodemailer';
+import { sql } from '../../lib/db';
 
 const SIGN_PASSWORD = import.meta.env.PAYSERA_SIGN_PASSWORD;
 const SMAILY_USER = import.meta.env.SMAILY_API_USER || '';
@@ -49,6 +50,19 @@ export const GET: APIRoute = async ({ request }) => {
   const items = params.get('p_items') || '';
 
   if (status === '1') {
+    // Salvesta tellimus andmebaasi (idempotentne — sama orderid ei duplitseeru)
+    if (sql) {
+      try {
+        await sql`
+          INSERT INTO orders (orderid, amount, name, email, phone, address, shipping, parcel, items)
+          VALUES (${orderid}, ${amount}, ${name}, ${email}, ${phone}, ${address}, ${shipping}, ${parcel}, ${items})
+          ON CONFLICT (orderid) DO NOTHING
+        `;
+      } catch (err) {
+        console.error('Tellimuse salvestamine ebaõnnestus:', err);
+      }
+    }
+
     const shippingText = shippingLabel(shipping);
     const parcelText = parcel ? `<br/>Pakiautomaat: ${parcel}` : '';
 

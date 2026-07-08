@@ -1,0 +1,100 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireDb } from '../../lib/db';
+
+const sql = requireDb();
+
+const [stats] = await sql`
+  SELECT
+    COALESCE(SUM(amount) FILTER (WHERE created_at >= date_trunc('month', now())), 0) AS month_sales,
+    COUNT(*) FILTER (WHERE created_at >= date_trunc('month', now())) AS month_orders,
+    COALESCE(SUM(amount) FILTER (WHERE created_at >= date_trunc('month', now() - interval '1 month') AND created_at < date_trunc('month', now())), 0) AS prev_sales,
+    COUNT(*) FILTER (WHERE created_at >= date_trunc('month', now() - interval '1 month') AND created_at < date_trunc('month', now())) AS prev_orders
+  FROM orders
+`;
+
+const monthSales = Number(stats.month_sales);
+const monthOrders = Number(stats.month_orders);
+const prevSales = Number(stats.prev_sales);
+const prevOrders = Number(stats.prev_orders);
+const aov = monthOrders > 0 ? monthSales / monthOrders : 0;
+const prevAov = prevOrders > 0 ? prevSales / prevOrders : 0;
+
+function delta(cur: number, prev: number): { text: string; cls: string } {
+  if (prev === 0) return { text: '—', cls: '' };
+  const pct = ((cur - prev) / prev) * 100;
+  const sign = pct >= 0 ? '+' : '';
+  return {
+    text: `${sign}${pct.toFixed(1)}% vs eelmine kuu`,
+    cls: pct >= 0 ? 'tile__sub--up' : 'tile__sub--down',
+  };
+}
+
+const salesDelta = delta(monthSales, prevSales);
+const ordersDelta = delta(monthOrders, prevOrders);
+const aovDelta = delta(aov, prevAov);
+
+const recent = await sql`
+  SELECT orderid, name, email, amount, fulfillment, created_at
+  FROM orders ORDER BY created_at DESC LIMIT 8
+`;
+
+function fmtDate(d: string | Date) {
+  return new Date(d).toLocaleString('et-EE', {
+    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+    timeZone: 'Europe/Tallinn',
+  });
+}
+---
+
+<AdminLayout title="Ülevaade" active="overview">
+  <h1>Tere tulemast!</h1>
+
+  <div class="tiles">
+    <div class="tile">
+      <p class="tile__label">Müük sel kuul</p>
+      <p class="tile__value">€{monthSales.toFixed(2)}</p>
+      <p class={`tile__sub ${salesDelta.cls}`}>{salesDelta.text}</p>
+    </div>
+    <div class="tile">
+      <p class="tile__label">Tellimusi sel kuul</p>
+      <p class="tile__value">{monthOrders}</p>
+      <p class={`tile__sub ${ordersDelta.cls}`}>{ordersDelta.text}</p>
+    </div>
+    <div class="tile">
+      <p class="tile__label">Keskmine tellimus</p>
+      <p class="tile__value">€{aov.toFixed(2)}</p>
+      <p class={`tile__sub ${aovDelta.cls}`}>{aovDelta.text}</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Viimased tellimused</h2>
+    {recent.length === 0 ? (
+      <p style="color:#888; font-size:14px;">Tellimusi pole veel. Uued tellimused ilmuvad siia automaatselt.</p>
+    ) : (
+      <table class="admin-table">
+        <thead>
+          <tr><th>Tellimus</th><th>Aeg</th><th>Klient</th><th>Summa</th><th>Staatus</th></tr>
+        </thead>
+        <tbody>
+          {recent.map(o => (
+            <tr>
+              <td><a href={`/admin/tellimused/${o.orderid}`}>#{o.orderid}</a></td>
+              <td>{fmtDate(o.created_at)}</td>
+              <td>{o.email}</td>
+              <td>€{Number(o.amount).toFixed(2)}</td>
+              <td>
+                <span class={`badge ${o.fulfillment === 'fulfilled' ? 'badge--fulfilled' : 'badge--unfulfilled'}`}>
+                  {o.fulfillment === 'fulfilled' ? 'Täidetud' : 'Täitmata'}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+</AdminLayout>

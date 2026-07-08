@@ -1,0 +1,109 @@
+---
+export const prerender = false;
+---
+
+<!doctype html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="/images/logo.svg" />
+  <title>Sisselogimine | Hingamiskeskus</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f3fcff;
+      color: #1d1e20;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .login {
+      background: #fff;
+      border-radius: 14px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 4px 24px rgba(31, 109, 133, 0.08);
+    }
+    .login__logo { height: 32px; margin: 0 auto 24px; display: block; }
+    .login h1 { font-size: 20px; text-align: center; margin-bottom: 24px; font-weight: 700; }
+    .login label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+    .login input {
+      width: 100%;
+      font-family: inherit;
+      font-size: 15px;
+      padding: 12px 14px;
+      border: 1.5px solid rgba(0,0,0,0.12);
+      border-radius: 10px;
+      margin-bottom: 16px;
+      outline: none;
+    }
+    .login input:focus { border-color: #1f6d85; }
+    .login button {
+      width: 100%;
+      background: #1f6d85;
+      color: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .login button:hover { opacity: 0.9; }
+    .login__error {
+      display: none;
+      background: #fdecec;
+      color: #b3261e;
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <form class="login" id="login-form">
+    <img src="/images/logo.svg" alt="Hingamiskeskus" class="login__logo" />
+    <h1>Halduspaneel</h1>
+    <p class="login__error" id="error"></p>
+    <label for="username">Kasutajanimi</label>
+    <input type="text" id="username" name="username" autocomplete="username" required />
+    <label for="password">Parool</label>
+    <input type="password" id="password" name="password" autocomplete="current-password" required />
+    <button type="submit">LOGI SISSE</button>
+  </form>
+
+  <script>
+    const form = document.getElementById('login-form') as HTMLFormElement;
+    const errorEl = document.getElementById('error') as HTMLElement;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorEl.style.display = 'none';
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: (document.getElementById('username') as HTMLInputElement).value,
+          password: (document.getElementById('password') as HTMLInputElement).value,
+        }),
+      });
+      if (res.ok) {
+        window.location.href = '/admin';
+      } else {
+        const data = await res.json().catch(() => ({}));
+        errorEl.textContent = data.error || 'Sisselogimine ebaõnnestus';
+        errorEl.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
