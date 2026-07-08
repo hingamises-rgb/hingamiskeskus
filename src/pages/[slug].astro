@@ -24,7 +24,7 @@ const publishedDate = article.publishedTime
   : '';
 ---
 
-<Layout title={`${article.title} | Hingamiskeskus`}>
+<Layout title={`${article.title} | Hingamiskeskus`} description={article.description || article.title}>
 
 <header class="header">
   <a href="/" class="header__logo">
