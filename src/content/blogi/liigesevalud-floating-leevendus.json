@@ -5,6 +5,9 @@
   "description": "Liigesevalu teeb liikumise raskeks. Uuri, kuidas floating magneesiumivees aitab liigestelt koormust vähendada ja pinget leevendada Hingamiskeskuses. Broneeri seanss täna!",
   "image": "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1440,h=756,fit=crop,f=jpeg/mnl6bgXbRMt7xGpW/liigesevalu-leevendus-kus-poilved-puusad-oilad-ja-kael-on-oirnalt-esile-toistetud-ivfAUZqVQUcQXW1v.jpg",
   "imageAlt": "liigesevalu leevendus, kus põlved, puusad, õlad ja kael on õrnalt esile tõstetud",
+  "categories": [
+    "TERVIS"
+  ],
   "publishedTime": "2026-03-02T06:44:01.514Z",
   "modifiedTime": "2026-03-02T06:44:01.514Z",
   "inLanguage": "et",

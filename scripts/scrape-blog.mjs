@@ -119,12 +119,16 @@ function cleanContent(html) {
 }
 
 function extractHeroImageAlt(html) {
-  // Find the first <img alt="..."> after block-blog-header
   const headerIdx = html.indexOf('block-blog-header');
   if (headerIdx === -1) return '';
   const searchArea = html.substring(headerIdx, headerIdx + 20000);
   const m = searchArea.match(/<img\s+alt="([^"]*)"/);
   return m ? m[1] : '';
+}
+
+function extractCategories(html) {
+  const matches = [...html.matchAll(/<span[^>]+class="categories__item"[^>]*>([^<]+)<\/span>/g)];
+  return matches.map(m => m[1].trim());
 }
 
 async function scrapeArticle(path) {
@@ -134,6 +138,7 @@ async function scrapeArticle(path) {
   const jsonLd = extractJsonLd(html);
   const boxes = extractGridTextBoxes(html);
   const imageAlt = extractHeroImageAlt(html);
+  const categories = extractCategories(html);
 
   // Find article body: the longest decoded text block
   let bodyRaw = '';
@@ -155,6 +160,7 @@ async function scrapeArticle(path) {
     description: jsonLd?.description || '',
     image: jsonLd?.image || '',
     imageAlt,
+    categories,
     publishedTime: jsonLd?.datePublished || '',
     modifiedTime: jsonLd?.dateModified || '',
     inLanguage: jsonLd?.inLanguage || 'et',

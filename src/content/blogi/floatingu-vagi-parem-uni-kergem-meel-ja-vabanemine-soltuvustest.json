@@ -5,6 +5,10 @@
   "description": "Avasta, kuidas floating parandab unekvaliteeti, teravdab mälu, toetab sportlasi ja aitab sõltuvustest taastuda. Proovi Hingamiskeskuses Tallinnas!",
   "image": "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1440,h=756,fit=crop,f=jpeg/mnl6bgXbRMt7xGpW/pildil-alkoholi-pudel-ja-tabletid-soiltuvus.-hingamiskeksus-KYnVRQtzo69LQVzY.png",
   "imageAlt": "alkoholi pudel ja tabletid sõltuvuse sümbolina",
+  "categories": [
+    "VAIMULE",
+    "FLOATING"
+  ],
   "publishedTime": "2026-04-27T09:00:00.000Z",
   "modifiedTime": "2026-04-27T09:00:00.000Z",
   "inLanguage": "et",

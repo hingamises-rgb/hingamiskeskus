@@ -5,6 +5,9 @@
   "description": "Raske depressioon on tõsine seisund. Õpi ära tundma sümptomeid ja saa teada, kuidas leida abi ning toetada taastumist floatingu ja vabastava hingamisega Tallinnas.",
   "image": "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1440,h=756,fit=crop,f=jpeg/mnl6bgXbRMt7xGpW/pilt-tugecast-depressioonis-inimesest-VW0skhPCeaqxX2Vm.jpg",
   "imageAlt": "Raske depressiooni sümptomid, kurb ja üksi istuv inimene",
+  "categories": [
+    "STRESS, ÄREVUS, UNETUS, DEPRESSIOON, PTSD, ATH"
+  ],
   "publishedTime": "2026-02-11T11:45:12.063Z",
   "modifiedTime": "2026-02-11T11:45:12.063Z",
   "inLanguage": "et",

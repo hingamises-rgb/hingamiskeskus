@@ -5,6 +5,9 @@
   "description": "Vabastav hingamine aitab kehal ja närvisüsteemil pingeid vabastada, tuues rohkem rahu, energiat ja selgust igapäevaellu. Broneeri aeg Hingamiskeskuses Tallinnas.",
   "image": "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1440,h=756,fit=crop,f=jpeg/mnl6bgXbRMt7xGpW/inimene-lebab-matil-ja-tegeleb-vabastava-hingamisega-p3YG0lnd1I27DnZ9.png",
   "imageAlt": "inimene lebab matil ja tegeleb vabastava hingamisega",
+  "categories": [
+    "HINGAMINE"
+  ],
   "publishedTime": "2026-04-29T09:00:00.000Z",
   "modifiedTime": "2026-04-29T09:00:00.000Z",
   "inLanguage": "et",

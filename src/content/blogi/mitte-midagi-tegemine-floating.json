@@ -5,6 +5,9 @@
   "description": "Avasta, miks mitte midagi tegemine pole ajaraiskamine, vaid sügava taastumise ja loovuse allikas. Floating aitab sul päriselt puhata.",
   "image": "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1440,h=756,fit=crop,f=jpeg/mnl6bgXbRMt7xGpW/chatgpt-image-13.-okt-2025-16_46_56-dWxL3MoqrnF7Gzy7.png",
   "imageAlt": "Mees lõõgastub vaikses kohas mitte midagi tehes",
+  "categories": [
+    "FLOATING"
+  ],
   "publishedTime": "2025-10-21T00:00:00.000Z",
   "modifiedTime": "2025-10-21T00:00:00.000Z",
   "inLanguage": "et",

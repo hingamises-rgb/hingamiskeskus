@@ -5,6 +5,9 @@
   "description": "Depressioon ei ole laiskus, vaid keha hädasignaal. Loe kuidas vabastav hingamine, floating ja väikesed sammud aitavad närvisüsteemi rahustada ja alustada taastumist turvaliselt.",
   "image": "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1440,h=756,fit=crop,f=jpeg/mnl6bgXbRMt7xGpW/inimene-depressioonis-fR6mhhpY5D795guk.jpg",
   "imageAlt": "Depressioonis naine istub üksi pimedas ruumis ja vaatab alla, kujutades vaimset tervist ja kurbust.",
+  "categories": [
+    "STRESS, ÄREVUS, UNETUS, DEPRESSIOON, PTSD, ATH"
+  ],
   "publishedTime": "2026-03-10T10:00:00.000Z",
   "modifiedTime": "2026-03-10T10:00:00.000Z",
   "inLanguage": "et",

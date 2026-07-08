@@ -5,6 +5,9 @@
   "description": "Kuidas teha soolavanni kodus? Epsomi ja meresool leevendavad lihaspinget, parandavad und ja toetavad nahka. Koge ka floatingut Tallinnas broneeri aeg!",
   "image": "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1440,h=756,fit=crop,f=jpeg/mnl6bgXbRMt7xGpW/vannituba-koosvanniga-h72jQa8cfZOdCiw2.jpg",
   "imageAlt": "Lõõgastav soolavann Epsomi soolaga – kodus valmistamine",
+  "categories": [
+    "EPSOMI SOOL"
+  ],
   "publishedTime": "2026-01-15T07:10:13.418Z",
   "modifiedTime": "2026-01-15T07:10:13.418Z",
   "inLanguage": "et",

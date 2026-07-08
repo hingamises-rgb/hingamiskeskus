@@ -5,6 +5,10 @@
   "description": "Otsid vastust, mis tunne on floatingu vannis hõljuda? Selgitame lihtsas keeles, kuidas vann on üles ehitatud, kui puhas on vesi ja milliseid hirme aitab kogemus hajutada. Broneeri esimene seanss Tallinnas!",
   "image": "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1440,h=756,fit=crop,f=jpeg/mnl6bgXbRMt7xGpW/screenshot-2025-12-08-at-09.20.18-EGukHNsSylpq9KPu.png",
   "imageAlt": "Pildil on erinevad floatingu vannid ja nende tutvustus.",
+  "categories": [
+    "EPSOMI SOOL",
+    "FLOATING"
+  ],
   "publishedTime": "2025-12-06T00:00:00.000Z",
   "modifiedTime": "2025-12-06T00:00:00.000Z",
   "inLanguage": "et",

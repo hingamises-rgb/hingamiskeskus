@@ -5,6 +5,9 @@
   "description": "Kolmandas osas uurime, kuidas hingamistööd praktiliselt kasutada nii tervise, emotsionaalse tasakaalu kui ka vaimse kasvu toetamiseks. Toome näiteid meditsiinist, igapäevaelust ja vaimsetest praktikatest ning jagame lihtsat harjutust stressi leevendamiseks.",
   "image": "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1440,h=756,fit=crop,f=jpeg/mnl6bgXbRMt7xGpW/screenshot-2025-10-08-at-11.54.45-YBgjZw23MNSk675G.png",
   "imageAlt": "Hingamiskeskuse logo",
+  "categories": [
+    "HINGAMINE"
+  ],
   "publishedTime": "2025-10-13T00:00:00.000Z",
   "modifiedTime": "2025-10-13T00:00:00.000Z",
   "inLanguage": "et",

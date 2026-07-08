@@ -5,6 +5,9 @@
   "description": "Avasta, mis on vabastav hingamine ja kuidas pausideta hingamine aitab pingetest vabaneda ning toetab närvisüsteemi tasakaalu. Broneeri aeg Hingamiskeskuses.",
   "image": "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1440,h=756,fit=crop,f=jpeg/mnl6bgXbRMt7xGpW/vabatsava-hingamise-esimene-blogipilt-pqgpxVLNa0OhIScQ.jpg",
   "imageAlt": "Vabastav hingamine Hingamiskeskuses Tallinnas",
+  "categories": [
+    "HINGAMINE"
+  ],
   "publishedTime": "2026-04-11T09:57:10.777Z",
   "modifiedTime": "2026-04-11T09:57:10.777Z",
   "inLanguage": "et",

@@ -5,6 +5,9 @@
   "description": "Floating sünnib teaduslaboris, jõuab spaadesse ja aitab tänapäeval kehal ning närvisüsteemil sügavalt puhata. Tule proovi kaalutut lõõgastust Hingamiskeskuses.",
   "image": "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1440,h=756,fit=crop,f=jpeg/mnl6bgXbRMt7xGpW/screenshot-2025-07-04-at-09.53.40-m2WEQoO908F2eKDa.png",
   "imageAlt": "esimene floatingu paak 1960ndatest",
+  "categories": [
+    "FLOATING"
+  ],
   "publishedTime": "2026-03-26T10:00:00.000Z",
   "modifiedTime": "2026-03-26T10:00:00.000Z",
   "inLanguage": "et",
