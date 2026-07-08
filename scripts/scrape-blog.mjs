@@ -93,6 +93,9 @@ function cleanContent(html) {
     // Remove <u> tags but keep content (Zyro wraps links in <u>)
     .replace(/<u[^>]*>/g, '')
     .replace(/<\/u>/g, '')
+    // Convert H1 in body to H2 (only page title should be H1)
+    .replace(/<h1(\s[^>]*)?>/g, '<h2>')
+    .replace(/<\/h1>/g, '</h2>')
     // Remove <br> at the start of headings
     .replace(/<h([1-6])[^>]*>\s*<br\s*\/?>/g, '<h$1>')
     // Remove inline styles
@@ -115,21 +118,13 @@ function cleanContent(html) {
     .trim();
 }
 
-function extractImages(html) {
-  const marker = '&quot;type&quot;:[0,&quot;GridImage&quot;]';
-  const images = [];
-  let pos = 0;
-  while ((pos = html.indexOf(marker, pos)) !== -1) {
-    const area = html.substring(pos, pos + 15000);
-    // Look for &quot;origin&quot; or &quot;src&quot;
-    const srcMatch = area.match(/&quot;(?:origin|src)&quot;:\[0,&quot;([^&]+)&quot;/);
-    const altMatch = area.match(/&quot;alt&quot;:\[0,&quot;([^&]*)&quot;/);
-    if (srcMatch) {
-      images.push({ src: srcMatch[1], alt: altMatch ? altMatch[1] : '' });
-    }
-    pos += marker.length;
-  }
-  return images;
+function extractHeroImageAlt(html) {
+  // Find the first <img alt="..."> after block-blog-header
+  const headerIdx = html.indexOf('block-blog-header');
+  if (headerIdx === -1) return '';
+  const searchArea = html.substring(headerIdx, headerIdx + 20000);
+  const m = searchArea.match(/<img\s+alt="([^"]*)"/);
+  return m ? m[1] : '';
 }
 
 async function scrapeArticle(path) {
@@ -138,7 +133,7 @@ async function scrapeArticle(path) {
 
   const jsonLd = extractJsonLd(html);
   const boxes = extractGridTextBoxes(html);
-  const images = extractImages(html);
+  const imageAlt = extractHeroImageAlt(html);
 
   // Find article body: the longest decoded text block
   let bodyRaw = '';
@@ -159,11 +154,11 @@ async function scrapeArticle(path) {
     title: jsonLd?.name || '',
     description: jsonLd?.description || '',
     image: jsonLd?.image || '',
+    imageAlt,
     publishedTime: jsonLd?.datePublished || '',
     modifiedTime: jsonLd?.dateModified || '',
     inLanguage: jsonLd?.inLanguage || 'et',
     body,
-    images,
   };
 }
 
@@ -190,7 +185,7 @@ async function main() {
       results.push(article);
       const outFile = join(OUTPUT_DIR, `${article.slug}.json`);
       await writeFile(outFile, JSON.stringify(article, null, 2));
-      console.log(`OK (${article.body.length}c, ${article.images.length}i)`);
+      console.log(`OK (${article.body.length}c)`);
     } catch (e) {
       console.log(`FAIL: ${e.message}`);
       errors.push({ path, error: e.message });

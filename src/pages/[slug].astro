@@ -60,13 +60,12 @@ const publishedDate = article.publishedTime
   </div>
 
   {article.image && (
-    <img src={article.image} alt={article.title} class="article__image" />
+    <img src={article.image} alt={article.imageAlt || article.title} class="article__image" />
   )}
 
   <div class="article__body" set:html={article.body}></div>
 
   <div class="article__cta">
-    <a href="/broneeri-aeg" class="article__cta-btn">Broneeri aeg</a>
     <a href="/blogi" class="article__cta-link">← Tagasi blogisse</a>
   </div>
 </article>
