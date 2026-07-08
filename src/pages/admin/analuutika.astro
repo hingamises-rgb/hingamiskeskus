@@ -16,7 +16,7 @@ const orderCount = Number(totals.orders);
 const aov = orderCount > 0 ? sales / orderCount : 0;
 
 const daily = await sql`
-  SELECT date_trunc('day', created_at AT TIME ZONE 'Europe/Tallinn')::date AS day, SUM(amount) AS total
+  SELECT to_char(date_trunc('day', created_at AT TIME ZONE 'Europe/Tallinn'), 'YYYY-MM-DD') AS day, SUM(amount) AS total
   FROM orders WHERE created_at >= now() - make_interval(days => ${days})
   GROUP BY 1 ORDER BY 1
 `;
@@ -42,13 +42,16 @@ const topProducts = [...productMap.entries()]
   .slice(0, 15);
 const topQty = Math.max(...topProducts.map(p => p.qty), 1);
 
-// SVG tulpdiagramm
+// SVG tulpdiagramm — päevavõtmed Tallinna ajavööndis
 const W = 800, H = 220, PAD = 30;
-const dayMap = new Map(daily.map(d => [new Date(d.day).toISOString().slice(0, 10), Number(d.total)]));
+const dayMap = new Map(daily.map(d => [d.day, Number(d.total)]));
+function tallinnDay(offsetDays: number): string {
+  return new Date(Date.now() - offsetDays * 86400_000)
+    .toLocaleDateString('sv-SE', { timeZone: 'Europe/Tallinn' });
+}
 const series: { date: string; total: number }[] = [];
 for (let i = days - 1; i >= 0; i--) {
-  const d = new Date(Date.now() - i * 86400_000);
-  const key = d.toISOString().slice(0, 10);
+  const key = tallinnDay(i);
   series.push({ date: key, total: dayMap.get(key) || 0 });
 }
 const maxVal = Math.max(...series.map(s => s.total), 1);

@@ -41,16 +41,16 @@ const recent = await sql`
   FROM orders ORDER BY created_at DESC LIMIT 8
 `;
 
-// Viimase 30 päeva käive päevade lõikes
+// Viimase 30 päeva käive päevade lõikes (päevavõtmed Tallinna ajavööndis)
 const daily = await sql`
-  SELECT date_trunc('day', created_at AT TIME ZONE 'Europe/Tallinn')::date AS day, SUM(amount) AS total
+  SELECT to_char(date_trunc('day', created_at AT TIME ZONE 'Europe/Tallinn'), 'YYYY-MM-DD') AS day, SUM(amount) AS total
   FROM orders WHERE created_at >= now() - interval '30 days'
   GROUP BY 1 ORDER BY 1
 `;
 
 // Uued kliendid (esimese tellimuse kuupäeva järgi) viimase 30 päeva jooksul
 const newCustomers = await sql`
-  SELECT date_trunc('day', first_order AT TIME ZONE 'Europe/Tallinn')::date AS day, COUNT(*) AS cnt
+  SELECT to_char(date_trunc('day', first_order AT TIME ZONE 'Europe/Tallinn'), 'YYYY-MM-DD') AS day, COUNT(*) AS cnt
   FROM (SELECT email, MIN(created_at) AS first_order FROM orders GROUP BY email) t
   WHERE first_order >= now() - interval '30 days'
   GROUP BY 1 ORDER BY 1
@@ -58,11 +58,12 @@ const newCustomers = await sql`
 
 // SVG graafikute andmed
 const W = 600, H = 140, PAD = 8;
-function buildSeries(rows: { day: string | Date }[], key: string): { date: string; val: number }[] {
-  const map = new Map(rows.map((r: any) => [new Date(r.day).toISOString().slice(0, 10), Number(r[key])]));
+function buildSeries(rows: { day: string }[], key: string): { date: string; val: number }[] {
+  const map = new Map(rows.map((r: any) => [r.day, Number(r[key])]));
   const out = [];
   for (let i = 29; i >= 0; i--) {
-    const d = new Date(Date.now() - i * 86400_000).toISOString().slice(0, 10);
+    const d = new Date(Date.now() - i * 86400_000)
+      .toLocaleDateString('sv-SE', { timeZone: 'Europe/Tallinn' });
     out.push({ date: d, val: map.get(d) || 0 });
   }
   return out;

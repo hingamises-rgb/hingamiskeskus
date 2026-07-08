@@ -1,0 +1,158 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireDb } from '../../lib/db';
+
+const sql = requireDb();
+
+// Kulud + käive kuude lõikes (viimased 12 kuud)
+// NB: kuu võti tuleb SQL-ist tekstina (to_char), et vältida ajavööndi nihkeid
+const costs = await sql`
+  SELECT to_char(month, 'YYYY-MM') AS month_key, channel, amount, note FROM ad_costs
+  WHERE month >= date_trunc('month', now()) - interval '12 months'
+  ORDER BY month DESC, channel
+`;
+
+const revenue = await sql`
+  SELECT to_char(date_trunc('month', created_at AT TIME ZONE 'Europe/Tallinn'), 'YYYY-MM') AS month_key,
+         SUM(amount) AS total, COUNT(*) AS orders
+  FROM orders
+  WHERE created_at >= date_trunc('month', now()) - interval '12 months'
+  GROUP BY 1 ORDER BY 1 DESC
+`;
+
+// Koosta kuude koondtabel
+const monthMap = new Map<string, { revenue: number; orders: number; channels: Record<string, number>; spend: number }>();
+for (const r of revenue) {
+  monthMap.set(r.month_key, { revenue: Number(r.total), orders: Number(r.orders), channels: {}, spend: 0 });
+}
+for (const c of costs) {
+  const key = c.month_key;
+  if (!monthMap.has(key)) monthMap.set(key, { revenue: 0, orders: 0, channels: {}, spend: 0 });
+  const m = monthMap.get(key)!;
+  m.channels[c.channel] = Number(c.amount);
+  m.spend += Number(c.amount);
+}
+const months = [...monthMap.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+
+function fmtMonth(key: string) {
+  const [y, m] = key.split('-');
+  const names = ['jaanuar','veebruar','märts','aprill','mai','juuni','juuli','august','september','oktoober','november','detsember'];
+  return `${names[parseInt(m, 10) - 1]} ${y}`;
+}
+
+const currentMonth = new Date().toISOString().slice(0, 7);
+---
+
+<AdminLayout title="Reklaam" active="ads">
+  <h1>Reklaamikulud ja tootlus</h1>
+
+  <div class="panel">
+    <h2>Lisa kuu reklaamikulu</h2>
+    <p style="font-size:13px; color:#888; margin-bottom:16px;">
+      Võta summad Google Ads ja Meta Ads Manageri aruannetest ja sisesta siia kord kuus.
+      Sama kuu ja kanali uuesti sisestamine kirjutab vana summa üle.
+    </p>
+    <form id="cost-form" class="cost-form">
+      <div>
+        <label>Kuu</label>
+        <input type="month" name="month" value={currentMonth} required />
+      </div>
+      <div>
+        <label>Kanal</label>
+        <select name="channel">
+          <option value="google">Google Ads</option>
+          <option value="meta">Meta (FB/IG)</option>
+          <option value="muu">Muu</option>
+        </select>
+      </div>
+      <div>
+        <label>Summa (€)</label>
+        <input type="number" name="amount" step="0.01" min="0" required />
+      </div>
+      <button type="submit" class="btn">SALVESTA</button>
+      <span id="cost-status" style="font-size:13px; color:#1a7f37;"></span>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Kuude lõikes</h2>
+    {months.length === 0 ? (
+      <p style="color:#888; font-size:14px;">Andmeid pole veel.</p>
+    ) : (
+      <table class="admin-table">
+        <thead>
+          <tr><th>Kuu</th><th>Käive</th><th>Tellimusi</th><th>Google</th><th>Meta</th><th>Muu</th><th>Kulud kokku</th><th>ROAS</th></tr>
+        </thead>
+        <tbody>
+          {months.map(([key, m]) => {
+            const roas = m.spend > 0 ? m.revenue / m.spend : null;
+            return (
+              <tr>
+                <td style="white-space:nowrap;">{fmtMonth(key)}</td>
+                <td>€{m.revenue.toFixed(2)}</td>
+                <td>{m.orders}</td>
+                <td>{m.channels.google != null ? `€${m.channels.google.toFixed(2)}` : '—'}</td>
+                <td>{m.channels.meta != null ? `€${m.channels.meta.toFixed(2)}` : '—'}</td>
+                <td>{m.channels.muu != null ? `€${m.channels.muu.toFixed(2)}` : '—'}</td>
+                <td>{m.spend > 0 ? `€${m.spend.toFixed(2)}` : '—'}</td>
+                <td>
+                  {roas === null ? '—' : (
+                    <strong style={`color:${roas >= 4 ? '#1a7f37' : roas >= 2 ? '#b26a00' : '#b3261e'}`}>
+                      {roas.toFixed(2)}x
+                    </strong>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    )}
+    <p style="font-size:12px; color:#888; margin-top:14px; line-height:1.6;">
+      <strong>ROAS</strong> = käive ÷ reklaamikulu. Iga reklaami-euro toob nii mitu eurot müüki.
+      <span style="color:#1a7f37;">Roheline ≥ 4x (hea)</span> ·
+      <span style="color:#b26a00;">kollane 2–4x (jälgi)</span> ·
+      <span style="color:#b3261e;">punane &lt; 2x (vähenda või muuda kampaaniat)</span>.
+      NB: käive sisaldab kogu müüki, mitte ainult reklaamist tulnut — päris kanali-põhise tootluse saame GA e-commerce trackingu lisamisel.
+    </p>
+  </div>
+</AdminLayout>
+
+<script>
+  document.getElementById('cost-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.target as HTMLFormElement;
+    const res = await fetch('/api/admin/ad-cost', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        month: (f.elements.namedItem('month') as HTMLInputElement).value,
+        channel: (f.elements.namedItem('channel') as HTMLSelectElement).value,
+        amount: parseFloat((f.elements.namedItem('amount') as HTMLInputElement).value),
+      }),
+    });
+    if (res.ok) window.location.reload();
+    else {
+      const s = document.getElementById('cost-status')!;
+      s.textContent = 'Viga salvestamisel';
+      s.style.color = '#b3261e';
+    }
+  });
+</script>
+
+<style>
+  .cost-form { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .cost-form label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+  .cost-form input, .cost-form select {
+    font-family: inherit;
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+  }
+  .cost-form input:focus, .cost-form select:focus { border-color: #1f6d85; }
+</style>
