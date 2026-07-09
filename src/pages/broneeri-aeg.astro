@@ -1,0 +1,170 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+
+const HOPITUDE_URL = 'https://app.hopitude.com/et/calendar?cl=2376';
+---
+
+<Layout
+  title="Broneeri-aeg | Floating ja vabastav hingamine Tallinnas"
+  description="Broneeri aeg floatinguks või vabastavaks hingamiseks Tallinnas. Vali kalendrist sobiv aeg, maksa internetipangas või kohapeal. Sõle 14c, Tallinn."
+>
+
+<Header active="broneeri" />
+
+<section class="booking">
+  <h1 class="booking__title">Floatingu- ja hingamisseansid - broneeri aeg</h1>
+
+  <h2>Kuidas broneerida?</h2>
+  <p>1. Vali kalendrist sobiv aeg ja teenus</p>
+  <p>2. Loo endale meie broneerimissüsteemi konto</p>
+  <p>3. Vali makseviis - maksa internetipangas või sularahas kohapeal</p>
+  <p>Peale broneeringu kinnitust saadame Sinu emailile kinnituse.</p>
+
+  <div class="booking__calendar">
+    <iframe
+      src={HOPITUDE_URL}
+      title="Broneerimiskalender"
+      loading="lazy"
+      frameborder="0"
+    ></iframe>
+  </div>
+
+  <h2>Broneeri aeg vabastavaks hingamiseks või floatinguks Tallinnas</h2>
+  <p>Hingamiskeskus pakub vabastavat hingamist ja floatingut. Meie kogenud terapeudid juhendavad sind turvaliselt kogu protsessi vältel, olenemata sellest, kas tuled esimest korda või oled juba regulaarne külastaja. Hingamiskeskus on ainus koht Tallinnas, kus saad kogeda soojas vees hingamist.</p>
+  <p><a href="/vabastav-hingamine">Vabastav hingamine</a> aitab vabaneda emotsionaalsetest ja kehalistest pingetest, leevendada stressi ja ärevust ning saavutada sisemist selgust. Seanss kestab 2 tundi ja toimub privaatses ning rahulikus ruumis.</p>
+  <p><a href="/floating">Floating</a> ehk hõljumine Epsomi soolases vees lõdvestab lihaseid, rahustab närvisüsteemi ja parandab und. Üks tund floatingut annab kehale sama sügava puhkuse kui 4 tundi und.</p>
+  <p>Kõik seansid toimuvad Tallinna kesklinna lähedal asuvas Hingamiskeskuses aadressil Sõle 14c. Parkimine on võimalik maja ees ja Mulla tänavl.</p>
+
+  <h2>Mis juhtub pärast broneeringut?</h2>
+  <p>Pärast broneerimist saadame emailile kinnituse koos praktiliste juhistega. Palume saabuda 15 minutit enne seansi algust. Esimesel külastusel tutvustab terapeut teenust ning vastab kõigile küsimustele.</p>
+  <p>Küsimuste korral võta meiega julgelt ühendust, oleme alati abivalmis!</p>
+
+  <a href={HOPITUDE_URL} target="_blank" rel="noopener" class="booking__btn">BRONEERI AEG</a>
+</section>
+
+<footer class="footer">
+  <div class="location">
+    <h3 class="location__title">Aadress</h3>
+    <p class="location__address">Söle 14c, Tallinn</p>
+    <img src="/images/hoone.jpg" alt="Hingamiskeskus Söle 14c" class="location__photo" loading="lazy" />
+  </div>
+  <div class="footer__main">
+    <img src="/images/logo-valge.png" alt="Hingamiskeskus" class="footer__logo" />
+    <div class="footer__contact">
+      <h3>Kontakt</h3>
+      <p>E-post: Info@hingamiskeskus.ee</p>
+      <p>Telefoninumber:</p>
+      <p>+372 56695898</p>
+      <p>+372 56497689</p>
+      <p>(klienditugi 10.00-17.00)</p>
+      <p>Hingamises OÜ</p>
+      <p>EE147700771009732310</p>
+    </div>
+    <div class="footer__hours">
+      <h3>Lahtiolekuajad</h3>
+      <p>E-R 8.30 - 20.00</p>
+      <p>L-P 11.00 - 18.00</p>
+    </div>
+    <div class="footer__social">
+      <a href="https://www.facebook.com/Hingamiskeskus" aria-label="Facebook" target="_blank" rel="noopener">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/hingamiskeskus/" aria-label="Instagram" target="_blank" rel="noopener">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+      </a>
+    </div>
+    <div class="footer__legal">
+      <a href="/privaatsuspoliitika">Privaatsuspoliitika</a> | <a href="/muugitingimused">Müügitingimused</a>
+    </div>
+  </div>
+</footer>
+
+</Layout>
+
+<style>
+  .booking {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+    background: #f3fcff;
+  }
+  @media (min-width: 768px) {
+    .booking { padding: 60px 40px 80px; }
+  }
+
+  .booking__title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #1d1e20;
+    text-align: left;
+    margin-bottom: 32px;
+  }
+  @media (min-width: 768px) {
+    .booking__title { font-size: 42px; }
+  }
+
+  .booking h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1d1e20;
+    text-align: left;
+    margin: 32px 0 14px;
+  }
+
+  .booking p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1d1e20;
+    margin-bottom: 10px;
+  }
+
+  .booking a { color: #1f6d85; text-decoration: underline; }
+
+  .booking__calendar {
+    margin: 28px 0 8px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(31, 109, 133, 0.08);
+  }
+  .booking__calendar iframe {
+    width: 100%;
+    height: 680px;
+    display: block;
+    border: 0;
+  }
+
+  .booking__btn {
+    display: inline-block;
+    background: #1d1e20;
+    color: #fff !important;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 16px 36px;
+    border-radius: 10px;
+    text-decoration: none !important;
+    margin-top: 20px;
+  }
+  .booking__btn:hover { opacity: 0.88; }
+
+  .location {
+    background: #1f6d85;
+    padding: 20px 24px 24px;
+    color: #fff;
+    text-align: center;
+  }
+  .location__title { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+  .location__address { font-size: 14px; }
+  .location__photo { width: 80%; max-width: 320px; margin: 12px auto 0; display: block; border-radius: 10px; }
+  .footer__main { background: #1f6d85; padding: 24px; color: #fff; }
+  .footer__logo { height: 30px; width: auto; margin: 0 auto 20px; display: block; }
+  .footer__contact h3, .footer__hours h3 { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+  .footer__contact p, .footer__hours p { font-size: 13px; line-height: 1.8; }
+  .footer__hours { margin-top: 16px; }
+  .footer__social { display: flex; gap: 16px; margin-top: 16px; color: #fff; }
+  .footer__legal { font-size: 11px; margin-top: 16px; opacity: 0.7; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px; }
+  .footer__legal a { color: #fff; text-decoration: none; }
+</style>
