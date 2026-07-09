@@ -24,7 +24,8 @@ export async function getStaticPaths() {
   const sql = requireDb();
   const products = await sql`
     SELECT slug, page_slug, title, subtitle, description, ribbon, alt, image, cart_name,
-           price, old_price, price_prefix, category, sold_out
+           price, old_price, price_prefix, category, sold_out,
+           meta_title, meta_description, keywords
     FROM products WHERE page_slug IS NOT NULL AND active = true
   `;
   for (const product of products) {
@@ -42,8 +43,11 @@ const publishedDate = article?.publishedTime
   ? new Date(article.publishedTime).toLocaleDateString('et-EE', { year: 'numeric', month: 'long', day: 'numeric' })
   : '';
 
-const pageTitle = article ? `${article.title} | Hingamiskeskus` : `${product.title} | Hingamiskeskus`;
-const pageDesc = article ? (article.description || article.title) : (product.subtitle || product.title);
+// Meta täpselt nagu vanal saidil: artiklitel title ilma lisata,
+// toodetel oma meta_title/meta_description/keywords
+const pageTitle = article ? article.title : (product.meta_title || `${product.title} | Hingamiskeskus`);
+const pageDesc = article ? (article.description || article.title) : (product.meta_description || product.subtitle || product.title);
+const pageKeywords = article ? '' : (product.keywords || '');
 
 const cartProduct = product && !product.sold_out
   ? { id: product.slug, name: product.cart_name, price: Number(product.price) }
@@ -57,6 +61,7 @@ function fmtPrice(v: unknown) {
 <Layout
   title={pageTitle}
   description={pageDesc}
+  keywords={pageKeywords}
   image={article ? article.image : product.image}
   type={article ? 'article' : 'website'}
 >

@@ -4,12 +4,14 @@ import Popup from '../components/Popup.astro';
 interface Props {
   title: string;
   description?: string;
+  keywords?: string;
   image?: string;
   type?: string;
 }
 const {
   title,
   description = 'Hingamiskeskus - vabastav hingamine ja floating Tallinnas. Söle 14c.',
+  keywords = '',
   image = '/images/hero-bg.jpg',
   type = 'website',
 } = Astro.props;
@@ -26,6 +28,8 @@ const ogImage = image.startsWith('http') ? image : SITE + image;
   <link rel="icon" type="image/svg+xml" href="/images/logo.svg" />
   <title>{title}</title>
   <meta name="description" content={description} />
+  {keywords && <meta name="keywords" content={keywords} />}
+  <meta name="robots" content="index, follow" />
   <link rel="canonical" href={canonicalUrl} />
 
   <!-- Open Graph (Facebook, WhatsApp jt jagamised) -->
