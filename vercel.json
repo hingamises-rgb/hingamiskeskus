@@ -1,6 +1,11 @@
 {
   "redirects": [
     {
+      "source": "/sitemap.xml",
+      "destination": "/sitemap-index.xml",
+      "permanent": true
+    },
+    {
       "source": "/privaatsuspoliitika-and-muugitingimused",
       "destination": "/privaatsuspoliitika",
       "permanent": true
