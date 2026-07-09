@@ -1,0 +1,190 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireDb } from '../../lib/db';
+
+const sql = requireDb();
+
+const [cfg] = await sql`SELECT active, heading, description, code, timer_minutes FROM popup_config WHERE id = 1`;
+
+// Kuude statistika: külastajad, vaatamised, popupi näitamised, konversioonid
+const monthly = await sql`
+  SELECT t.month_key,
+         COALESCE(t.visitors, 0) AS visitors,
+         COALESCE(t.views, 0) AS views,
+         COALESCE(p.shows, 0) AS shows,
+         COALESCE(p.conversions, 0) AS conversions
+  FROM (
+    SELECT to_char(day, 'YYYY-MM') AS month_key, COUNT(DISTINCT vid) AS visitors, SUM(views) AS views
+    FROM traffic GROUP BY 1
+  ) t
+  FULL OUTER JOIN (
+    SELECT to_char(day, 'YYYY-MM') AS month_key, SUM(shows) AS shows, SUM(conversions) AS conversions
+    FROM popup_days GROUP BY 1
+  ) p USING (month_key)
+  ORDER BY month_key DESC
+  LIMIT 13
+`;
+
+const leads = await sql`
+  SELECT email, source, device, created_at FROM leads ORDER BY created_at DESC LIMIT 200
+`;
+const [leadStats] = await sql`SELECT COUNT(*) AS total FROM leads`;
+
+const sources = await sql`
+  SELECT COALESCE(source, 'Otse') AS source, COUNT(*) AS cnt FROM leads GROUP BY 1 ORDER BY 2 DESC
+`;
+const sourceTotal = sources.reduce((s, r) => s + Number(r.cnt), 0);
+
+function fmtMonth(key: string) {
+  const [y, m] = key.split('-');
+  const names = ['jaanuar','veebruar','märts','aprill','mai','juuni','juuli','august','september','oktoober','november','detsember'];
+  return `${names[parseInt(m, 10) - 1]} ${y}`;
+}
+function fmtDateTime(d: string | Date) {
+  return new Date(d).toLocaleString('et-EE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Tallinn' });
+}
+---
+
+<AdminLayout title="Turundus" active="marketing">
+  <h1>Turundus</h1>
+
+  <div class="panel">
+    <h2>Popupi seaded</h2>
+    <form id="popup-form">
+      <label class="check" style="margin-bottom:14px;">
+        <input type="checkbox" name="active" checked={cfg?.active} /> Popup on saidil sees
+      </label>
+      <div class="row">
+        <div>
+          <label>Pealkiri</label>
+          <input type="text" name="heading" value={cfg?.heading || ''} required />
+        </div>
+        <div>
+          <label>Sooduskood (saadetakse meilile)</label>
+          <input type="text" name="code" value={cfg?.code || ''} required />
+        </div>
+        <div>
+          <label>Taimer (minutit)</label>
+          <input type="number" name="timer_minutes" min="1" max="60" value={cfg?.timer_minutes || 3} />
+        </div>
+      </div>
+      <label>Kirjeldus</label>
+      <input type="text" name="description" value={cfg?.description || ''} />
+      <button type="submit" class="btn" style="margin-top:14px;">SALVESTA</button>
+      <span id="cfg-status" style="font-size:13px; color:#1a7f37; margin-left:10px;"></span>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Kuude statistika (Exceli jaoks)</h2>
+    {monthly.length === 0 ? (
+      <p style="color:#888; font-size:14px;">Andmed hakkavad kogunema, kui sait on live.</p>
+    ) : (
+      <table class="admin-table">
+        <thead>
+          <tr><th>Kuu</th><th>Külastajaid</th><th>Lehevaatamisi</th><th>Popupi näitamisi</th><th>Konversioone</th><th>Konversiooni %</th></tr>
+        </thead>
+        <tbody>
+          {monthly.map(m => (
+            <tr>
+              <td>{fmtMonth(m.month_key)}</td>
+              <td>{m.visitors}</td>
+              <td>{m.views}</td>
+              <td>{m.shows}</td>
+              <td>{m.conversions}</td>
+              <td>{Number(m.visitors) > 0 ? ((Number(m.conversions) / Number(m.visitors)) * 100).toFixed(2) + '%' : '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+
+  <div class="split">
+    <div class="panel">
+      <h2>Leadid ({leadStats.total}) <a href="/api/admin/leads-csv" class="btn btn--outline" style="float:right;">EKSPORDI CSV</a></h2>
+      {leads.length === 0 ? (
+        <p style="color:#888; font-size:14px;">Leade pole veel.</p>
+      ) : (
+        <table class="admin-table">
+          <thead><tr><th>E-post</th><th>Allikas</th><th>Seade</th><th>Aeg</th></tr></thead>
+          <tbody>
+            {leads.map(l => (
+              <tr>
+                <td>{l.email}</td>
+                <td>{l.source}</td>
+                <td>{l.device}</td>
+                <td style="white-space:nowrap;">{fmtDateTime(l.created_at)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+
+    <div class="panel">
+      <h2>Konversiooni allikad</h2>
+      {sources.length === 0 ? (
+        <p style="color:#888; font-size:14px;">Andmeid pole veel.</p>
+      ) : (
+        <div class="src-bars">
+          {sources.map(s => (
+            <div class="src-bar">
+              <span class="src-bar__name">{s.source}</span>
+              <div class="src-bar__track"><div class="src-bar__fill" style={`width:${(Number(s.cnt) / sourceTotal) * 100}%`}></div></div>
+              <span class="src-bar__val">{((Number(s.cnt) / sourceTotal) * 100).toFixed(0)}% ({s.cnt})</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  document.getElementById('popup-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.target as HTMLFormElement;
+    const res = await fetch('/api/admin/popup-config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        active: (f.elements.namedItem('active') as HTMLInputElement).checked,
+        heading: (f.elements.namedItem('heading') as HTMLInputElement).value,
+        description: (f.elements.namedItem('description') as HTMLInputElement).value,
+        code: (f.elements.namedItem('code') as HTMLInputElement).value,
+        timer_minutes: parseInt((f.elements.namedItem('timer_minutes') as HTMLInputElement).value || '3', 10),
+      }),
+    });
+    const s = document.getElementById('cfg-status')!;
+    s.textContent = res.ok ? 'Salvestatud ✓' : 'Viga salvestamisel';
+    setTimeout(() => (s.textContent = ''), 2500);
+  });
+</script>
+
+<style>
+  form label { display: block; font-size: 13px; font-weight: 500; margin: 10px 0 6px; }
+  form input[type="text"], form input[type="number"] {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+  }
+  form input:focus { border-color: #1f6d85; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .check { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+  .check input { width: auto; }
+  .split { display: grid; grid-template-columns: 1fr; gap: 24px; }
+  @media (min-width: 1000px) { .split { grid-template-columns: 3fr 2fr; } }
+  .src-bars { display: flex; flex-direction: column; gap: 10px; }
+  .src-bar { display: grid; grid-template-columns: 110px 1fr 80px; align-items: center; gap: 10px; font-size: 13px; }
+  .src-bar__track { background: #eef4f6; border-radius: 999px; height: 10px; overflow: hidden; }
+  .src-bar__fill { background: #1f6d85; height: 100%; border-radius: 999px; }
+  .src-bar__val { color: #888; text-align: right; }
+</style>

@@ -1,0 +1,258 @@
+---
+// Sooduskoodi popup + külastusloendur. Lisatakse Layoutis igale lehele;
+// ei näidata /admin, /checkout ja makse lehtedel.
+---
+
+<div class="hk-popup" id="hk-popup" hidden>
+  <div class="hk-popup__box">
+    <button class="hk-popup__close" id="hk-popup-close" aria-label="Sulge">✕</button>
+    <div class="hk-popup__timer">
+      <div class="hk-popup__timer-unit">
+        <span class="hk-popup__timer-num" id="hk-timer-min">03</span>
+        <span class="hk-popup__timer-label">Minutit</span>
+      </div>
+      <span class="hk-popup__timer-colon">:</span>
+      <div class="hk-popup__timer-unit">
+        <span class="hk-popup__timer-num" id="hk-timer-sec">00</span>
+        <span class="hk-popup__timer-label">Sekundit</span>
+      </div>
+    </div>
+    <h2 class="hk-popup__heading" id="hk-popup-heading">15% SOODUSTUST</h2>
+    <p class="hk-popup__desc" id="hk-popup-desc">Sisesta enda email ja saadame Sulle sooduskoodi emaili peale. Sooduskood kehtib ühekordse külastuse puhul</p>
+    <form class="hk-popup__form" id="hk-popup-form">
+      <input type="email" name="email" class="hk-popup__input" placeholder="Email:" required />
+      <input type="text" name="veebileht" class="hk-popup__hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <button type="submit" class="hk-popup__btn">SOOVIN KUPONGI</button>
+    </form>
+    <p class="hk-popup__status" id="hk-popup-status"></p>
+  </div>
+</div>
+
+<script is:inline>
+(function() {
+  var SKIP = ['/admin', '/checkout', '/makse-tehtud', '/makse-ebaonnestus'];
+  var path = location.pathname;
+  for (var i = 0; i < SKIP.length; i++) if (path.indexOf(SKIP[i]) === 0) return;
+
+  // --- Külastaja ID + esimese allika salvestus ---
+  var vid = localStorage.getItem('hk_vid');
+  if (!vid) {
+    vid = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem('hk_vid', vid);
+  }
+  if (!localStorage.getItem('hk_entry')) {
+    localStorage.setItem('hk_entry', JSON.stringify({
+      ref: document.referrer || '',
+      url: location.href,
+      ts: Date.now()
+    }));
+  }
+
+  // --- Lehevaatamise loendus ---
+  try {
+    fetch('/api/hit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ vid: vid }),
+      keepalive: true
+    });
+  } catch (e) {}
+
+  // --- Popup ---
+  // Ära näita: kui juba konverteerus, või suleti viimase 3 päeva jooksul
+  if (localStorage.getItem('hk_popup_done')) return;
+  var closedAt = parseInt(localStorage.getItem('hk_popup_closed') || '0', 10);
+  if (closedAt && Date.now() - closedAt < 3 * 86400000) return;
+
+  var popup = document.getElementById('hk-popup');
+  if (!popup) return;
+
+  function classifySource() {
+    try {
+      var entry = JSON.parse(localStorage.getItem('hk_entry') || '{}');
+      var ref = (entry.ref || '').toLowerCase();
+      var url = (entry.url || '').toLowerCase();
+      if (url.indexOf('gclid=') > -1 || (url.indexOf('utm_source=google') > -1 && url.indexOf('cpc') > -1)) return 'Google Ads';
+      if (url.indexOf('utm_source=facebook') > -1 || url.indexOf('fbclid=') > -1 || ref.indexOf('facebook') > -1 || ref.indexOf('instagram') > -1) return 'Sotsiaalmeedia';
+      if (ref.indexOf('google.') > -1 || ref.indexOf('bing.') > -1 || ref.indexOf('duckduckgo') > -1) return 'Otsing';
+      if (!ref) return 'Otse';
+      return 'Muu';
+    } catch (e) { return 'Otse'; }
+  }
+
+  var timerInterval = null;
+  function startTimer(minutes) {
+    var total = minutes * 60;
+    var minEl = document.getElementById('hk-timer-min');
+    var secEl = document.getElementById('hk-timer-sec');
+    timerInterval = setInterval(function() {
+      total--;
+      if (total <= 0) { total = 0; clearInterval(timerInterval); }
+      minEl.textContent = String(Math.floor(total / 60)).padStart(2, '0');
+      secEl.textContent = String(total % 60).padStart(2, '0');
+    }, 1000);
+  }
+
+  setTimeout(function() {
+    fetch('/api/popup').then(function(r) { return r.json(); }).then(function(cfg) {
+      if (!cfg || !cfg.active) return;
+      document.getElementById('hk-popup-heading').textContent = cfg.heading;
+      document.getElementById('hk-popup-desc').textContent = cfg.description;
+      var mins = cfg.timer_minutes || 3;
+      document.getElementById('hk-timer-min').textContent = String(mins).padStart(2, '0');
+      popup.hidden = false;
+      startTimer(mins);
+      fetch('/api/popup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'show' })
+      });
+    }).catch(function() {});
+  }, 12000);
+
+  document.getElementById('hk-popup-close').addEventListener('click', function() {
+    popup.hidden = true;
+    if (timerInterval) clearInterval(timerInterval);
+    localStorage.setItem('hk_popup_closed', String(Date.now()));
+  });
+
+  document.getElementById('hk-popup-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var form = e.target;
+    var status = document.getElementById('hk-popup-status');
+    var btn = form.querySelector('.hk-popup__btn');
+    btn.disabled = true;
+    fetch('/api/popup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'lead',
+        email: form.email.value,
+        veebileht: form.veebileht.value,
+        source: classifySource(),
+        device: window.innerWidth < 768 ? 'mobiil' : 'arvuti',
+        referrer: (JSON.parse(localStorage.getItem('hk_entry') || '{}').ref) || ''
+      })
+    }).then(function(r) { return r.json().then(function(d) { return { ok: r.ok, d: d }; }); })
+      .then(function(res) {
+        if (res.ok) {
+          status.textContent = 'Kood on teel Sinu emailile!';
+          status.style.color = '#c8f5d0';
+          localStorage.setItem('hk_popup_done', '1');
+          setTimeout(function() { popup.hidden = true; }, 3000);
+        } else {
+          status.textContent = (res.d && res.d.error) || 'Midagi läks valesti';
+          status.style.color = '#ffd4d4';
+          btn.disabled = false;
+        }
+      }).catch(function() {
+        status.textContent = 'Midagi läks valesti, proovi uuesti';
+        status.style.color = '#ffd4d4';
+        btn.disabled = false;
+      });
+  });
+})();
+</script>
+
+<style is:global>
+  .hk-popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .hk-popup[hidden] { display: none; }
+  .hk-popup__box {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    background: #2d6274;
+    background-image: radial-gradient(circle at 15% 25%, rgba(255,255,255,0.06) 0 90px, transparent 90px),
+                      radial-gradient(circle at 80% 70%, rgba(255,255,255,0.05) 0 120px, transparent 120px),
+                      radial-gradient(circle at 60% 15%, rgba(0,0,0,0.06) 0 70px, transparent 70px);
+    border-radius: 14px;
+    padding: 44px 32px 32px;
+    text-align: center;
+    color: #fff;
+  }
+  .hk-popup__close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .hk-popup__timer {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .hk-popup__timer-unit { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .hk-popup__timer-num {
+    display: block;
+    background: linear-gradient(#ffffff 50%, #e3e3e3 50%);
+    color: #1d1e20;
+    font-size: 44px;
+    font-weight: 500;
+    line-height: 1;
+    padding: 18px 20px;
+    border-radius: 8px;
+    min-width: 88px;
+    font-variant-numeric: tabular-nums;
+  }
+  .hk-popup__timer-label { font-size: 16px; color: #fff; }
+  .hk-popup__timer-colon { font-size: 40px; padding-top: 20px; }
+  .hk-popup__heading {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 42px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    color: #fff;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .hk-popup__desc { font-size: 17px; line-height: 1.5; color: #fff; margin-bottom: 24px; }
+  .hk-popup__form { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hk-popup__input {
+    flex: 1.6;
+    min-width: 200px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    padding: 16px 18px;
+    border: none;
+    border-radius: 6px;
+    outline: none;
+  }
+  .hk-popup__hp { position: absolute; left: -9999px; opacity: 0; height: 0; }
+  .hk-popup__btn {
+    flex: 1;
+    min-width: 160px;
+    background: #ececec;
+    color: #1d1e20;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .hk-popup__btn:hover { background: #fff; }
+  .hk-popup__btn:disabled { opacity: 0.6; cursor: wait; }
+  .hk-popup__status { font-size: 14px; margin-top: 12px; min-height: 18px; }
+
+  @media (max-width: 600px) {
+    .hk-popup__heading { font-size: 30px; }
+    .hk-popup__timer-num { font-size: 32px; min-width: 68px; padding: 14px 14px; }
+  }
+</style>

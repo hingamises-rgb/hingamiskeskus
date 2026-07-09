@@ -1,4 +1,6 @@
 ---
+import Popup from '../components/Popup.astro';
+
 interface Props {
   title: string;
   description?: string;
@@ -34,6 +36,7 @@ const { title, description = 'Hingamiskeskus - vabastav hingamine ja floating Ta
 </head>
 <body>
   <slot />
+  <Popup />
 </body>
 </html>
 
