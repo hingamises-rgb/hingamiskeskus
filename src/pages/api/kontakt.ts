@@ -62,11 +62,9 @@ export const POST: APIRoute = async ({ request }) => {
       html,
     });
     return json({ ok: true }, 200);
-  } catch (e: any) {
+  } catch (e) {
     console.error('Kontaktivormi meil ebaõnnestus:', e);
-    // Ajutine diagnostika (eemaldada peale seadistuse kontrolli):
-    const diag = `${e?.code || ''} ${e?.responseCode || ''} smailyUser=${SMAILY_USER ? 'olemas' : 'PUUDU'}`.trim();
-    return json({ error: 'Saatmine ebaõnnestus, proovi hiljem uuesti', diag }, 500);
+    return json({ error: 'Saatmine ebaõnnestus, proovi hiljem uuesti' }, 500);
   }
 };
 
