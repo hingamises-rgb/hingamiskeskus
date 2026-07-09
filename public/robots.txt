@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /checkout
+Disallow: /makse-tehtud
+Disallow: /makse-ebaonnestus
+
+Sitemap: https://www.hingamiskeskus.ee/sitemap-index.xml

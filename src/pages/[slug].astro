@@ -54,7 +54,12 @@ function fmtPrice(v: unknown) {
 }
 ---
 
-<Layout title={pageTitle} description={pageDesc}>
+<Layout
+  title={pageTitle}
+  description={pageDesc}
+  image={article ? article.image : product.image}
+  type={article ? 'article' : 'website'}
+>
 
 <Header active={article ? 'blogi' : 'epood'} />
 

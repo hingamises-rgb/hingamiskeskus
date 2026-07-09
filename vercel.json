@@ -1,0 +1,24 @@
+{
+  "redirects": [
+    {
+      "source": "/privaatsuspoliitika-and-muugitingimused",
+      "destination": "/privaatsuspoliitika",
+      "permanent": true
+    },
+    {
+      "source": "/paketid",
+      "destination": "/e-pood",
+      "permanent": true
+    },
+    {
+      "source": "/reiki",
+      "destination": "/teenused",
+      "permanent": true
+    },
+    {
+      "source": "/uritused",
+      "destination": "/",
+      "permanent": true
+    }
+  ]
+}

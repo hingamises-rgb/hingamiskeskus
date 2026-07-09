@@ -4,8 +4,19 @@ import Popup from '../components/Popup.astro';
 interface Props {
   title: string;
   description?: string;
+  image?: string;
+  type?: string;
 }
-const { title, description = 'Hingamiskeskus - vabastav hingamine ja floating Tallinnas. Söle 14c.' } = Astro.props;
+const {
+  title,
+  description = 'Hingamiskeskus - vabastav hingamine ja floating Tallinnas. Söle 14c.',
+  image = '/images/hero-bg.jpg',
+  type = 'website',
+} = Astro.props;
+
+const SITE = 'https://www.hingamiskeskus.ee';
+const canonicalUrl = SITE + Astro.url.pathname;
+const ogImage = image.startsWith('http') ? image : SITE + image;
 ---
 <!doctype html>
 <html lang="et">
@@ -15,6 +26,17 @@ const { title, description = 'Hingamiskeskus - vabastav hingamine ja floating Ta
   <link rel="icon" type="image/svg+xml" href="/images/logo.svg" />
   <title>{title}</title>
   <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalUrl} />
+
+  <!-- Open Graph (Facebook, WhatsApp jt jagamised) -->
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:type" content={type} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:site_name" content="Hingamiskeskus" />
+  <meta property="og:locale" content="et_EE" />
+  <meta name="twitter:card" content="summary_large_image" />
 
   <!-- Meta Pixel -->
   <script is:inline>
