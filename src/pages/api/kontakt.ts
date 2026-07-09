@@ -9,9 +9,10 @@ const NOTIFY_EMAIL = 'info@hingamiskeskus.ee';
 
 const transporter = nodemailer.createTransport({
   host: 'pecatdf6.sendsmaily.net',
-  port: 587,
-  secure: false,
+  port: 465,
+  secure: true,
   auth: { user: SMAILY_USER, pass: SMAILY_KEY },
+  connectionTimeout: 8000,
 });
 
 function esc(s: string) {
