@@ -6,15 +6,15 @@ import nodemailer from 'nodemailer';
 import { sql } from '../../lib/db';
 
 const SIGN_PASSWORD = import.meta.env.PAYSERA_SIGN_PASSWORD;
-const SMAILY_USER = import.meta.env.SMAILY_API_USER || '';
-const SMAILY_KEY = import.meta.env.SMAILY_API_KEY || '';
+const EMAIL_USER = import.meta.env.EMAIL_USER || 'info@hingamiskeskus.ee';
+const EMAIL_PASS = import.meta.env.EMAIL_PASS || '';
 const NOTIFY_EMAIL = 'hingamises@gmail.com';
 
 const transporter = nodemailer.createTransport({
-  host: 'pecatdf6.sendsmaily.net',
+  host: 'smtp.hostinger.com',
   port: 465,
   secure: true,
-  auth: { user: SMAILY_USER, pass: SMAILY_KEY },
+  auth: { user: EMAIL_USER, pass: EMAIL_PASS },
   connectionTimeout: 8000,
 });
 
