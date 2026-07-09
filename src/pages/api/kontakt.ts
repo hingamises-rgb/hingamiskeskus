@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer';
 
 const SMAILY_USER = import.meta.env.SMAILY_API_USER || '';
 const SMAILY_KEY = import.meta.env.SMAILY_API_KEY || '';
-const NOTIFY_EMAIL = 'hingamises@gmail.com';
+const NOTIFY_EMAIL = 'info@hingamiskeskus.ee';
 
 const transporter = nodemailer.createTransport({
   host: 'pecatdf6.sendsmaily.net',
@@ -61,9 +61,11 @@ export const POST: APIRoute = async ({ request }) => {
       html,
     });
     return json({ ok: true }, 200);
-  } catch (e) {
+  } catch (e: any) {
     console.error('Kontaktivormi meil ebaõnnestus:', e);
-    return json({ error: 'Saatmine ebaõnnestus, proovi hiljem uuesti' }, 500);
+    // Ajutine diagnostika (eemaldada peale seadistuse kontrolli):
+    const diag = `${e?.code || ''} ${e?.responseCode || ''} smailyUser=${SMAILY_USER ? 'olemas' : 'PUUDU'}`.trim();
+    return json({ error: 'Saatmine ebaõnnestus, proovi hiljem uuesti', diag }, 500);
   }
 };
 
