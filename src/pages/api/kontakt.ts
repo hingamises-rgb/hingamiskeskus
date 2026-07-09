@@ -1,0 +1,75 @@
+export const prerender = false;
+
+import type { APIRoute } from 'astro';
+import nodemailer from 'nodemailer';
+
+const SMAILY_USER = import.meta.env.SMAILY_API_USER || '';
+const SMAILY_KEY = import.meta.env.SMAILY_API_KEY || '';
+const NOTIFY_EMAIL = 'hingamises@gmail.com';
+
+const transporter = nodemailer.createTransport({
+  host: 'pecatdf6.sendsmaily.net',
+  port: 587,
+  secure: false,
+  auth: { user: SMAILY_USER, pass: SMAILY_KEY },
+});
+
+function esc(s: string) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+export const POST: APIRoute = async ({ request }) => {
+  let b;
+  try {
+    b = await request.json();
+  } catch {
+    return json({ error: 'Vigane päring' }, 400);
+  }
+
+  // Honeypot: robotid täidavad peidetud välja
+  if (b.veebileht) return json({ ok: true }, 200);
+
+  const nimi = String(b.nimi || '').trim().slice(0, 100);
+  const perekonnanimi = String(b.perekonnanimi || '').trim().slice(0, 100);
+  const telefon = String(b.telefon || '').trim().slice(0, 40);
+  const email = String(b.email || '').trim().slice(0, 200);
+  const sonum = String(b.sonum || '').trim().slice(0, 5000);
+  const source = String(b.source || 'Veebileht').trim().slice(0, 100);
+
+  if (!email || !email.includes('@') || !sonum) {
+    return json({ error: 'E-post ja sõnum on kohustuslikud' }, 400);
+  }
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px;">
+      <h2>Uus päring veebilehelt</h2>
+      <p><strong>Leht:</strong> ${esc(source)}</p>
+      <p><strong>Nimi:</strong> ${esc(nimi)} ${esc(perekonnanimi)}</p>
+      <p><strong>E-post:</strong> <a href="mailto:${esc(email)}">${esc(email)}</a></p>
+      ${telefon ? `<p><strong>Telefon:</strong> ${esc(telefon)}</p>` : ''}
+      <hr style="border:none; border-top:1px solid #eee;" />
+      <p style="white-space: pre-wrap;">${esc(sonum)}</p>
+    </div>
+  `;
+
+  try {
+    await transporter.sendMail({
+      from: `"Hingamiskeskus veebileht" <info@hingamiskeskus.ee>`,
+      to: NOTIFY_EMAIL,
+      replyTo: email,
+      subject: `Uus päring: ${source}${nimi ? ` — ${nimi}` : ''}`,
+      html,
+    });
+    return json({ ok: true }, 200);
+  } catch (e) {
+    console.error('Kontaktivormi meil ebaõnnestus:', e);
+    return json({ error: 'Saatmine ebaõnnestus, proovi hiljem uuesti' }, 500);
+  }
+};
+
+function json(data: object, status: number) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}

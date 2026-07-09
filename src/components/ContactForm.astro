@@ -1,0 +1,144 @@
+---
+// Kontaktivorm — saadab päringu /api/kontakt kaudu meilile.
+interface Props {
+  source: string;   // mis lehelt päring tuli (läheb meili teemasse)
+  title?: string;
+  description?: string;
+}
+const { source, title = 'Aja broneerimine', description = 'Aja broneerimiseks jäta meile oma kontaktandmed ja võtame Sinuga ise ühendust' } = Astro.props;
+const formId = `cf-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<section class="cform" id="kontaktivorm">
+  <h2 class="cform__title">{title}</h2>
+  <p class="cform__desc">{description}</p>
+  <form class="cform__form" id={formId} data-source={source}>
+    <label class="cform__label">Nimi
+      <input type="text" name="nimi" class="cform__input" />
+    </label>
+    <label class="cform__label">Perekonnanimi
+      <input type="text" name="perekonnanimi" class="cform__input" />
+    </label>
+    <label class="cform__label">Telefon
+      <input type="tel" name="telefon" class="cform__input" />
+    </label>
+    <label class="cform__label">Sinu email
+      <input type="email" name="email" class="cform__input" required />
+    </label>
+    <label class="cform__label">Sõnum
+      <textarea name="sonum" class="cform__textarea" rows="4" required></textarea>
+    </label>
+    <input type="text" name="veebileht" class="cform__hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+    <button type="submit" class="cform__btn">SAADA</button>
+    <p class="cform__status" data-status></p>
+  </form>
+</section>
+
+<script is:inline define:vars={{ formId }}>
+(function() {
+  const form = document.getElementById(formId);
+  const status = form.querySelector('[data-status]');
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = form.querySelector('.cform__btn');
+    btn.disabled = true;
+    btn.textContent = 'SAADAN...';
+    status.textContent = '';
+    try {
+      const res = await fetch('/api/kontakt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nimi: form.nimi.value,
+          perekonnanimi: form.perekonnanimi.value,
+          telefon: form.telefon.value,
+          email: form.email.value,
+          sonum: form.sonum.value,
+          veebileht: form.veebileht.value,
+          source: form.dataset.source,
+        }),
+      });
+      if (res.ok) {
+        form.reset();
+        status.textContent = 'Aitäh! Sinu sõnum on saadetud, võtame peagi ühendust.';
+        status.style.color = '#1a7f37';
+      } else {
+        const d = await res.json().catch(function() { return {}; });
+        status.textContent = d.error || 'Saatmine ebaõnnestus, proovi hiljem uuesti.';
+        status.style.color = '#b3261e';
+      }
+    } catch (err) {
+      status.textContent = 'Saatmine ebaõnnestus, proovi hiljem uuesti.';
+      status.style.color = '#b3261e';
+    }
+    btn.disabled = false;
+    btn.textContent = 'SAADA';
+  });
+})();
+</script>
+
+<style>
+  .cform {
+    background: #f3fcff;
+    padding: 40px 24px;
+  }
+  .cform__title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1d1e20;
+    margin-bottom: 8px;
+  }
+  .cform__desc {
+    font-size: 15px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .cform__form {
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .cform__label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1d1e20;
+  }
+  .cform__input, .cform__textarea {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    padding: 12px 14px;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    border-radius: 10px;
+    outline: none;
+    background: #fff;
+    margin-top: 6px;
+    resize: vertical;
+  }
+  .cform__input:focus, .cform__textarea:focus { border-color: #1f6d85; }
+  .cform__hp { position: absolute; left: -9999px; opacity: 0; height: 0; }
+  .cform__btn {
+    background: #1d1e20;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 16px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  .cform__btn:hover { opacity: 0.88; }
+  .cform__btn:disabled { opacity: 0.6; cursor: wait; }
+  .cform__status { font-size: 14px; text-align: center; min-height: 20px; }
+
+  @media (min-width: 768px) {
+    .cform { padding: 60px 40px; }
+  }
+</style>

@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
+import ContactForm from '../components/ContactForm.astro';
 ---
 
 <Layout title="Aromatouch-kehahooldus õrn massaaž eeterlike õlidega">
@@ -56,28 +57,7 @@ import Header from '../components/Header.astro';
 </section>
 
 <!-- BOOKING FORM -->
-<section class="float-form">
-  <h2 class="float-form__title">Aja broneerimine</h2>
-  <p class="float-form__desc">Aja broneerimiseks jäta meile oma kontaktandmed ja võtame Sinuga ise ühendust</p>
-  <form class="contact-form" action="mailto:Info@hingamiskeskus.ee" method="POST" enctype="text/plain">
-    <label class="contact-form__label">Nimi
-      <input type="text" name="nimi" class="contact-form__input" />
-    </label>
-    <label class="contact-form__label">Perekonnanimi
-      <input type="text" name="perekonnanimi" class="contact-form__input" />
-    </label>
-    <label class="contact-form__label">Telefon
-      <input type="tel" name="telefon" class="contact-form__input" />
-    </label>
-    <label class="contact-form__label">Sinu email
-      <input type="email" name="email" class="contact-form__input" required />
-    </label>
-    <label class="contact-form__label">Sõnum
-      <textarea name="sonum" class="contact-form__textarea" rows="4" required></textarea>
-    </label>
-    <button type="submit" class="contact-form__btn">SAADA</button>
-  </form>
-</section>
+<ContactForm source="Aromatouch kehahooldus" />
 
 <!-- FOOTER -->
 <footer class="footer">

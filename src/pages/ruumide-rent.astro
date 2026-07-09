@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
+import ContactForm from '../components/ContactForm.astro';
 ---
 
 <Layout title="Ruumide rentimine Tallinnas Hingamiskeskuses">
@@ -21,7 +22,7 @@ import Header from '../components/Header.astro';
 
 <!-- CTA -->
 <section class="float-info float-info--cta">
-  <a href="mailto:Info@hingamiskeskus.ee" class="float-cta__btn">TÄIDA VORM</a>
+  <a href="#kontaktivorm" class="float-cta__btn">TÄIDA VORM</a>
 </section>
 
 <!-- ROOMS -->
@@ -52,6 +53,9 @@ import Header from '../components/Header.astro';
 
   <p style="margin-top: 24px;">Aja broneerimiseks jäta meile oma kontaktandmed ja võtame Sinuga ise ühendust: <a href="mailto:Info@hingamiskeskus.ee" class="float-info__link">Info@hingamiskeskus.ee</a></p>
 </section>
+
+<!-- KONTAKTIVORM -->
+<ContactForm source="Ruumide rent" title="Ruumide rendi päring" description="Kirjelda oma soove ja eelistatud kuupäevi — võtame Sinuga ise ühendust" />
 
 <!-- FOOTER -->
 <footer class="footer">
