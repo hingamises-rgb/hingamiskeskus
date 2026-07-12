@@ -1,0 +1,157 @@
+---
+// Broneeringu vaatamine ja tühistamine meililingi kaudu (kuni 1h enne algust).
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import { getBookingByToken, withinCutoff, getSettings, hhmm, timeToMin, minToTime, dateStr } from '../../lib/booking';
+import { humanDate } from '../../lib/booking-emails';
+
+const token = Astro.params.token || '';
+const rows = token.length >= 20 ? await getBookingByToken(token) : [];
+const makse = Astro.url.searchParams.get('makse') || '';
+const settings = await getSettings();
+const cutoff = Number(settings.cutoff_min || 60);
+
+const locale = (rows[0]?.locale || 'et') as 'et' | 'ru' | 'en';
+const T: any = {
+  et: {
+    title: 'Sinu broneering', notFound: 'Broneeringut ei leitud. Kontrolli meilis olevat linki.',
+    info: 'Tühistada saab kuni 1 tund enne algust. Hiljem helista +372 5669 5898.',
+    cancelBtn: 'Tühista broneering', cancelQ: 'Kas oled kindel, et soovid tühistada?',
+    yes: 'Jah, tühista', no: 'Jäta alles',
+    cancelled: 'Tühistatud', active: 'Kinnitatud', pending: 'Ootab kinnitust',
+    late: 'Algus on vähem kui 1 tunni pärast — veebis enam tühistada ei saa. Helista +372 5669 5898.',
+    done: 'Broneering on tühistatud. Aeg vabanes teistele. Kui maksid ette, jäi summa sinu e-posti külge ettemaksuna.',
+    seats: 'kohta',
+  },
+  ru: {
+    title: 'Ваша бронь', notFound: 'Бронь не найдена. Проверьте ссылку из письма.',
+    info: 'Отменить можно до 1 часа до начала. Позже — по тел. +372 5669 5898.',
+    cancelBtn: 'Отменить бронь', cancelQ: 'Точно отменить?',
+    yes: 'Да, отменить', no: 'Оставить',
+    cancelled: 'Отменена', active: 'Подтверждена', pending: 'Ожидает подтверждения',
+    late: 'До начала менее 1 часа — онлайн-отмена закрыта. Позвоните +372 5669 5898.',
+    done: 'Бронь отменена. Время освободилось. Если вы платили заранее, сумма осталась предоплатой.',
+    seats: 'мест',
+  },
+  en: {
+    title: 'Your booking', notFound: 'Booking not found. Check the link in your email.',
+    info: 'You can cancel up to 1 hour before start. After that, call +372 5669 5898.',
+    cancelBtn: 'Cancel booking', cancelQ: 'Cancel this booking?',
+    yes: 'Yes, cancel', no: 'Keep it',
+    cancelled: 'Cancelled', active: 'Confirmed', pending: 'Pending approval',
+    late: 'Less than 1 hour to start — online cancellation is closed. Call +372 5669 5898.',
+    done: 'Booking cancelled. The time is free for others. If you prepaid, the amount stays as credit.',
+    seats: 'spots',
+  },
+}[locale];
+
+const items = rows.map((b: any) => {
+  const date = dateStr(b.date);
+  const time = hhmm(b.start_time);
+  return {
+    id: b.id,
+    service: b.session_name || (b.type === 'float' ? 'Floating' : b.type === 'rent' ? b.room_name : b.room_name),
+    room: b.room_name,
+    type: b.type,
+    dateHuman: humanDate(date, locale),
+    time: `${time} – ${minToTime(timeToMin(time) + b.duration_min)}`,
+    seats: b.seats,
+    status: b.status,
+    cancellable: (b.status === 'active' || b.status === 'pending') && withinCutoff(date, time, cutoff),
+  };
+});
+const anyCancellable = items.some((i) => i.cancellable);
+const allCancelled = items.length > 0 && items.every((i) => i.status === 'cancelled');
+---
+
+<Layout title="Broneering | Hingamiskeskus" description="Sinu broneeringu vaatamine ja tühistamine." noindex={true}>
+<Header active="broneeri" />
+
+<div class="bkt">
+  <h1>{T.title}</h1>
+
+  {makse === 'ok' && <div class="notice ok">{
+    locale === 'ru' ? 'Оплата прошла успешно! Подтверждение уже в пути на ваш e-mail.'
+    : locale === 'en' ? 'Payment successful! Your confirmation is on its way by email.'
+    : 'Makse õnnestus! Kinnitus on teel sinu e-postile.'
+  }</div>}
+  {makse === 'katkes' && <div class="notice" style="background:#fff3e0;color:#b26a00">{
+    locale === 'ru' ? 'Оплата не завершилась. Бронь сохранена — оплатите на месте или позвоните +372 5669 5898.'
+    : locale === 'en' ? 'Payment was not completed. Your booking is kept — pay at the centre or call +372 5669 5898.'
+    : 'Makse jäi pooleli. Broneering on alles — saad maksta kohapeal või helista +372 5669 5898.'
+  }</div>}
+
+  {items.length === 0 && <div class="notice">{T.notFound}</div>}
+
+  {items.map((i) => (
+    <div class="bkt-card">
+      <div class="bkt-row"><b>{i.service}</b>
+        <span class={'bkt-status ' + i.status}>{i.status === 'cancelled' ? T.cancelled : i.status === 'pending' ? T.pending : T.active}</span>
+      </div>
+      <div class="bkt-row"><span>{i.dateHuman}</span><span>{i.time}</span></div>
+      {i.type === 'float' && <div class="bkt-row muted"><span>{i.room}</span></div>}
+      {i.seats > 1 && <div class="bkt-row muted"><span>{i.seats} {T.seats}</span></div>}
+    </div>
+  ))}
+
+  {allCancelled && <div class="notice ok" id="bkt-done">{T.done}</div>}
+
+  {items.length > 0 && !allCancelled && (
+    anyCancellable ? (
+      <>
+        <div class="notice">{T.info}</div>
+        <div id="bkt-actions">
+          <button class="bkt-btn danger" id="bkt-cancel">{T.cancelBtn}</button>
+        </div>
+        <div id="bkt-confirm" style="display:none">
+          <p style="font-weight:600">{T.cancelQ}</p>
+          <button class="bkt-btn danger" id="bkt-yes">{T.yes}</button>
+          <button class="bkt-btn ghost" id="bkt-no">{T.no}</button>
+        </div>
+        <div class="notice ok" id="bkt-result" style="display:none">{T.done}</div>
+      </>
+    ) : (
+      <div class="notice">{T.late}</div>
+    )
+  )}
+</div>
+
+<style is:global>
+.bkt{max-width:540px;margin:0 auto;padding:24px 16px 64px;font-family:'DM Sans',sans-serif;color:#1d1e20}
+.bkt h1{font-size:24px}
+.bkt .bkt-card{background:#fff;border:1px solid #d7e6ec;border-radius:10px;padding:15px 16px;margin-bottom:10px}
+.bkt .bkt-row{display:flex;justify-content:space-between;gap:10px;padding:2px 0;font-size:15px}
+.bkt .bkt-row.muted{color:#5a6e76;font-size:13.5px}
+.bkt .bkt-status{font-size:12px;font-weight:700;padding:2px 10px;border-radius:99px;background:#e5f3ea;color:#2e7d4f}
+.bkt .bkt-status.cancelled{background:#eee;color:#777}
+.bkt .bkt-status.pending{background:#fdf3e0;color:#9a6b0a}
+.bkt .notice{background:#e3f2f7;border-radius:8px;padding:10px 13px;font-size:13.5px;margin:14px 0}
+.bkt .notice.ok{background:#e5f3ea;color:#2e7d4f}
+.bkt .bkt-btn{display:block;width:100%;padding:14px;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;margin-bottom:8px}
+.bkt .bkt-btn.danger{background:#b3261e;color:#fff}
+.bkt .bkt-btn.ghost{background:none;border:1px solid #d7e6ec;color:#1d1e20}
+</style>
+
+<script>
+const token = location.pathname.split('/').pop();
+const cancelBtn = document.getElementById('bkt-cancel');
+if (cancelBtn) {
+  const actions = document.getElementById('bkt-actions')!;
+  const confirm = document.getElementById('bkt-confirm')!;
+  const result = document.getElementById('bkt-result')!;
+  cancelBtn.addEventListener('click', () => { actions.style.display = 'none'; confirm.style.display = 'block'; });
+  document.getElementById('bkt-no')!.addEventListener('click', () => { confirm.style.display = 'none'; actions.style.display = 'block'; });
+  document.getElementById('bkt-yes')!.addEventListener('click', async () => {
+    (document.getElementById('bkt-yes') as HTMLButtonElement).disabled = true;
+    const res = await fetch('/api/booking/cancel', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    });
+    if (res.ok) { confirm.style.display = 'none'; result.style.display = 'block'; setTimeout(() => location.reload(), 1500); }
+    else { (document.getElementById('bkt-yes') as HTMLButtonElement).disabled = false; }
+  });
+}
+</script>
+</Layout>

@@ -4,6 +4,7 @@ import type { APIRoute } from 'astro';
 import { createHash } from 'crypto';
 import nodemailer from 'nodemailer';
 import { sql } from '../../lib/db';
+import { grantShopPackages } from '../../lib/booking';
 
 const SIGN_PASSWORD = import.meta.env.PAYSERA_SIGN_PASSWORD;
 const EMAIL_USER = import.meta.env.EMAIL_USER || 'info@hingamiskeskus.ee';
@@ -61,6 +62,14 @@ export const GET: APIRoute = async ({ request }) => {
         `;
       } catch (err) {
         console.error('Tellimuse salvestamine ebaõnnestus:', err);
+      }
+
+      // Paketiost → broneeritavad korrad automaatselt (idempotentne orderid järgi)
+      try {
+        const g = await grantShopPackages(email, name, items, orderid);
+        if (g.granted) console.log(`Tellimus ${orderid}: loodud ${g.granted} paketti broneerimissüsteemi`);
+      } catch (err) {
+        console.error('Paketi loomine ebaõnnestus:', err);
       }
     }
 

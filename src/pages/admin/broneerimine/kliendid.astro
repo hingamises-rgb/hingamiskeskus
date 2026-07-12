@@ -1,0 +1,185 @@
+---
+// Broneerimise kliendid: otsing, märkmed, blokeerimine, paketid, ettemaks.
+// (Eraldi e-poe /admin/kliendid lehest — need on broneerimissüsteemi kliendid.)
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { requireDb } from '../../../lib/db';
+import { nowTallinn, dateStr } from '../../../lib/booking';
+
+const sql = requireDb();
+const now = nowTallinn();
+const q = (Astro.url.searchParams.get('q') || '').trim();
+
+let clients: any[] = [];
+if (q) {
+  const like = `%${q}%`;
+  clients = await sql`
+    SELECT * FROM bk_clients
+    WHERE email ILIKE ${like} OR name ILIKE ${like} OR phone ILIKE ${like}
+    ORDER BY created_at DESC LIMIT 50
+  `;
+} else {
+  clients = await sql`SELECT * FROM bk_clients ORDER BY created_at DESC LIMIT 30`;
+}
+
+const ids = clients.map((c: any) => c.id);
+const packages = ids.length ? await sql`
+  SELECT * FROM bk_packages WHERE client_id = ANY(${ids}) ORDER BY valid_until
+` : [];
+const credits = ids.length ? await sql`
+  SELECT client_id, SUM(amount_cents) AS c FROM bk_credits WHERE client_id = ANY(${ids}) GROUP BY client_id
+` : [];
+const bookingCounts = ids.length ? await sql`
+  SELECT client_id, count(*) AS n FROM bk_bookings WHERE client_id = ANY(${ids}) AND status = 'active' GROUP BY client_id
+` : [];
+
+const creditOf = (id: number) => Number((credits as any[]).find((c: any) => c.client_id === id)?.c || 0);
+const bookingsOf = (id: number) => Number((bookingCounts as any[]).find((c: any) => c.client_id === id)?.n || 0);
+const pkgsOf = (id: number) => (packages as any[]).filter((p: any) => p.client_id === id);
+const fmtD = (d: any) => dateStr(d).split('-').reverse().join('.');
+---
+
+<AdminLayout title="Broneerimise kliendid" active="booking">
+  <h1>Broneerimise kliendid</h1>
+  <p style="margin:-12px 0 20px"><a href="/admin/broneerimine" style="color:#1f6d85">‹ Broneerimine</a></p>
+
+  <div class="panel">
+    <form method="get" style="display:flex;gap:10px;flex-wrap:wrap">
+      <input type="text" name="q" value={q} placeholder="Otsi e-posti, nime või telefoni järgi"
+        style="flex:1;min-width:220px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font:inherit" />
+      <button class="btn" type="submit">Otsi</button>
+      <button class="btn btn--outline" type="button" id="new-client">+ Uus klient</button>
+    </form>
+  </div>
+
+  {clients.map((c: any) => (
+    <div class="panel" data-cid={c.id}>
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+        <h2 style="margin:0">{c.name || '—'} <small style="font-weight:400;color:#888">{c.email} · {c.phone || '—'}</small></h2>
+        <div>
+          {c.member_until && dateStr(c.member_until) >= now.date && <span class="badge badge--paid">liige kuni {fmtD(c.member_until)}</span>}
+          {c.blocked && <span class="badge" style="background:#fdecea;color:#b3261e">BLOKEERITUD</span>}
+          <span class="badge badge--fulfilled">{bookingsOf(c.id)} broneeringut</span>
+          {creditOf(c.id) !== 0 && <span class="badge badge--unfulfilled">ettemaks {(creditOf(c.id) / 100).toFixed(2)}€</span>}
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:12px;align-items:start">
+        <textarea class="c-notes" placeholder="Märkmed (nt eelistused, hilinemised...)"
+          style="width:100%;min-height:56px;padding:9px 11px;border:1px solid #eee;border-radius:8px;font:inherit;font-size:13.5px">{c.notes}</textarea>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button class="btn btn--outline c-save">Salvesta märkmed</button>
+          <button class={`btn btn--outline c-block ${c.blocked ? '' : ''}`} style={c.blocked ? '' : 'color:#b3261e;border-color:#b3261e'}>
+            {c.blocked ? 'Eemalda blokeering' : 'Blokeeri'}
+          </button>
+        </div>
+      </div>
+
+      <div style="margin-top:14px">
+        <b style="font-size:13.5px">Paketid:</b>
+        {pkgsOf(c.id).length === 0 && <span style="font-size:13.5px;color:#888"> pole</span>}
+        <table class="admin-table" style={pkgsOf(c.id).length ? '' : 'display:none'}>
+          <tbody>
+            {pkgsOf(c.id).map((p: any) => (
+              <tr>
+                <td>{p.name}</td>
+                <td>{p.total_sessions - p.used_sessions} / {p.total_sessions} alles</td>
+                <td>kehtib {fmtD(p.valid_until)}</td>
+                <td><small>{p.source}</small></td>
+                <td><button class="p-del" data-pid={p.id} style="background:none;border:none;color:#b3261e;font-size:12px">Kustuta</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px" class="p-form">
+          <select class="p-name" style="padding:8px;border:1px solid #ddd;border-radius:8px;font:inherit;font-size:13px">
+            <option value="Liikme pakett|2|30">Liikme pakett (2 korda)</option>
+            <option value="Keha ja meele 3x proovipakett|3|30">Keha ja meele 3x proovipakett</option>
+            <option value="3 korra kaart|3|92">3 korra kaart</option>
+            <option value="5 korra kaart|5|153">5 korra kaart</option>
+            <option value="10 korra kaart|10|305">10 korra kaart</option>
+            <option value="Sinu hommikune energialaeng|5|183">Sinu hommikune energialaeng</option>
+            <option value="Kinkekaart 40€|1|183">Kinkekaart 40€ (1 kord)</option>
+            <option value="Kinkekaart 80€|2|183">Kinkekaart 80€ (2 korda)</option>
+            <option value="Kinkekaart 120€|3|183">Kinkekaart 120€ (3 korda)</option>
+            <option value="custom">Muu…</option>
+          </select>
+          <input class="p-custom" placeholder="Nimi | kordi | päevi" style="display:none;padding:8px;border:1px solid #ddd;border-radius:8px;font:inherit;font-size:13px" />
+          <button class="btn btn--outline p-add">Lisa pakett</button>
+          <input class="cr-amount" type="number" step="0.01" placeholder="± € ettemaks" style="width:120px;padding:8px;border:1px solid #ddd;border-radius:8px;font:inherit;font-size:13px" />
+          <button class="btn btn--outline cr-add">Muuda ettemaksu</button>
+        </div>
+      </div>
+    </div>
+  ))}
+
+  {clients.length === 0 && <div class="panel">Kliente ei leitud.</div>}
+</AdminLayout>
+
+<script>
+async function act(body: any) {
+  const res = await fetch('/api/admin/booking-action', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  });
+  return { ok: res.ok, data: await res.json().catch(() => ({})) };
+}
+
+document.getElementById('new-client')?.addEventListener('click', async () => {
+  const email = prompt('Uue kliendi e-post:');
+  if (!email) return;
+  const name = prompt('Nimi:') || '';
+  const { ok } = await act({ action: 'client_create', email, name });
+  if (ok) location.href = '/admin/broneerimine/kliendid?q=' + encodeURIComponent(email);
+});
+
+document.querySelectorAll('[data-cid]').forEach((panel) => {
+  const id = Number((panel as HTMLElement).dataset.cid);
+  const q = (cls: string) => panel.querySelector(cls) as HTMLInputElement;
+  const blocked = q('.c-block').textContent!.includes('Eemalda');
+
+  q('.c-save')?.addEventListener('click', async () => {
+    const { ok } = await act({ action: 'client_update', id, notes: q('.c-notes').value, blocked });
+    if (ok) location.reload();
+  });
+  q('.c-block')?.addEventListener('click', async () => {
+    const msg = blocked ? 'Eemaldan blokeeringu?' : 'Blokeerin kliendi? Ta ei saa enam veebis broneerida.';
+    if (!confirm(msg)) return;
+    const { ok } = await act({ action: 'client_update', id, notes: q('.c-notes').value, blocked: !blocked });
+    if (ok) location.reload();
+  });
+
+  q('.p-name')?.addEventListener('change', () => {
+    q('.p-custom').style.display = q('.p-name').value === 'custom' ? '' : 'none';
+  });
+  q('.p-add')?.addEventListener('click', async () => {
+    let name: string, sessions: number, days: number;
+    if (q('.p-name').value === 'custom') {
+      const parts = q('.p-custom').value.split('|').map((s) => s.trim());
+      if (parts.length < 3) { alert('Formaat: Nimi | kordi | päevi'); return; }
+      [name, sessions, days] = [parts[0], Number(parts[1]), Number(parts[2])];
+    } else {
+      const [n, s, d] = q('.p-name').value.split('|');
+      [name, sessions, days] = [n, Number(s), Number(d)];
+    }
+    const validUntil = new Date(Date.now() + days * 86400000).toISOString().slice(0, 10);
+    const { ok } = await act({ action: 'package_add', clientId: id, name, sessions, validUntil });
+    if (ok) location.reload(); else alert('Ebaõnnestus');
+  });
+
+  panel.querySelectorAll('.p-del').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Kustutan paketi?')) return;
+      const { ok } = await act({ action: 'package_delete', id: Number((btn as HTMLElement).dataset.pid) });
+      if (ok) location.reload();
+    });
+  });
+
+  q('.cr-add')?.addEventListener('click', async () => {
+    const amount = Number(q('.cr-amount').value);
+    if (!amount) return;
+    const { ok } = await act({ action: 'credit_adjust', clientId: id, amountEur: amount, note: 'Admini korrigeerimine' });
+    if (ok) location.reload();
+  });
+});
+</script>

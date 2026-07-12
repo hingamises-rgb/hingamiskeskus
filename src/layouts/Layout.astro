@@ -7,6 +7,7 @@ interface Props {
   keywords?: string;
   image?: string;
   type?: string;
+  noindex?: boolean;
 }
 const {
   title,
@@ -14,6 +15,7 @@ const {
   keywords = '',
   image = '/images/hero-bg.jpg',
   type = 'website',
+  noindex = false,
 } = Astro.props;
 
 const SITE = 'https://www.hingamiskeskus.ee';
@@ -29,7 +31,7 @@ const ogImage = image.startsWith('http') ? image : SITE + image;
   <title>{title}</title>
   <meta name="description" content={description} />
   {keywords && <meta name="keywords" content={keywords} />}
-  <meta name="robots" content="index, follow" />
+  <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
   <link rel="canonical" href={canonicalUrl} />
 
   <!-- Open Graph (Facebook, WhatsApp jt jagamised) -->

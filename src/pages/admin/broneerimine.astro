@@ -1,0 +1,277 @@
+---
+// Broneerimise admin: päevavaade ruumide kaupa, rendisoovid, tulevased broneeringud,
+// käsitsi broneeringu lisamine (telefoni teel / Hopitude migratsioon).
+export const prerender = false;
+
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireDb } from '../../lib/db';
+import { nowTallinn, dowOf, hhmm, dateStr, addDays } from '../../lib/booking';
+
+const sql = requireDb();
+const now = nowTallinn();
+const date = /^\d{4}-\d{2}-\d{2}$/.test(Astro.url.searchParams.get('date') || '')
+  ? Astro.url.searchParams.get('date')! : now.date;
+const dow = dowOf(date);
+
+const rooms = await sql`SELECT * FROM bk_rooms ORDER BY id`;
+const templates = await sql`SELECT * FROM bk_templates WHERE dow = ${dow} ORDER BY start_time`;
+const dayBookings = await sql`
+  SELECT b.*, c.name AS client_name, c.email, c.phone
+  FROM bk_bookings b JOIN bk_clients c ON c.id = b.client_id
+  WHERE b.date = ${date} AND b.status IN ('active','pending')
+  ORDER BY b.start_time
+`;
+const daySessions = await sql`
+  SELECT * FROM bk_sessions WHERE date = ${date} AND status = 'active' ORDER BY start_time
+`;
+const dayBlocks = await sql`SELECT * FROM bk_blocks WHERE date = ${date}`;
+
+const pendingRents = await sql`
+  SELECT b.*, c.name AS client_name, c.email, c.phone, r.name AS room_name
+  FROM bk_bookings b JOIN bk_clients c ON c.id = b.client_id JOIN bk_rooms r ON r.id = b.room_id
+  WHERE b.type = 'rent' AND b.status = 'pending' AND b.date >= ${now.date}
+  ORDER BY b.date, b.start_time
+`;
+// grupeeri tokeni juure järgi (mitu tundi = mitu rida sama juurega)
+const rentGroups: Record<string, any[]> = {};
+for (const r of pendingRents) {
+  const root = String(r.token).split('_')[0];
+  (rentGroups[root] ||= []).push(r);
+}
+
+const upcoming = await sql`
+  SELECT b.*, c.name AS client_name, c.email, r.name AS room_name, s.name AS session_name
+  FROM bk_bookings b
+  JOIN bk_clients c ON c.id = b.client_id
+  JOIN bk_rooms r ON r.id = b.room_id
+  LEFT JOIN bk_sessions s ON s.id = b.session_id
+  WHERE b.date >= ${now.date} AND b.status IN ('active','pending')
+  ORDER BY b.date, b.start_time LIMIT 100
+`;
+
+const stats = await sql`
+  SELECT
+    (SELECT count(*) FROM bk_bookings WHERE date = ${now.date} AND status = 'active') AS today,
+    (SELECT count(*) FROM bk_bookings WHERE date >= ${now.date} AND date <= ${addDays(now.date, 7)} AND status = 'active') AS week,
+    (SELECT count(*) FROM bk_bookings WHERE type = 'rent' AND status = 'pending' AND date >= ${now.date}) AS rents
+`;
+
+function roomDay(room: any) {
+  const items: { time: string; label: string; kind: string; id?: number }[] = [];
+  if (room.type === 'floating') {
+    for (const t of templates.filter((x: any) => x.room_id === room.id)) {
+      const time = hhmm(t.start_time);
+      const bk = dayBookings.find((b: any) => b.room_id === room.id && hhmm(b.start_time) === time);
+      if (bk) items.push({ time, label: `${bk.client_name || bk.email}${bk.status === 'pending' ? ' (ootel)' : ''}`, kind: bk.type === 'rent' ? 'rent' : 'booked', id: bk.id });
+      else items.push({ time, label: 'vaba', kind: 'free' });
+    }
+  }
+  for (const s of daySessions.filter((x: any) => x.room_id === room.id)) {
+    items.push({ time: hhmm(s.start_time), label: `${s.name} · ${s.booked}/${s.capacity}`, kind: 'session' });
+  }
+  for (const b of dayBookings.filter((x: any) => x.room_id === room.id && x.type === 'rent')) {
+    items.push({ time: hhmm(b.start_time), label: `Rent: ${b.client_name || b.email}${b.status === 'pending' ? ' (ootel)' : ''}`, kind: 'rent', id: b.id });
+  }
+  for (const bl of dayBlocks.filter((x: any) => x.room_id === room.id || x.room_id === null)) {
+    items.push({ time: bl.start_time ? hhmm(bl.start_time) : '—', label: `Lukus: ${bl.reason || ''}`, kind: 'block' });
+  }
+  return items.sort((a, b) => a.time.localeCompare(b.time));
+}
+
+const prevDate = addDays(date, -1);
+const nextDate = addDays(date, 1);
+const dateHuman = new Date(date + 'T12:00:00Z').toLocaleDateString('et-EE', {
+  weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Tallinn',
+});
+const fmtD = (d: any) => dateStr(d).split('-').reverse().slice(0, 2).join('.');
+---
+
+<AdminLayout title="Broneerimine" active="booking">
+  <h1>Broneerimine</h1>
+
+  <div class="tiles">
+    <div class="tile"><div class="tile__label">Täna</div><div class="tile__value">{stats[0].today}</div><div class="tile__sub">aktiivset broneeringut</div></div>
+    <div class="tile"><div class="tile__label">7 päeva</div><div class="tile__value">{stats[0].week}</div><div class="tile__sub">tulevast broneeringut</div></div>
+    <div class="tile"><div class="tile__label">Rendisoovid</div><div class="tile__value">{stats[0].rents}</div><div class="tile__sub">ootel kinnitust</div></div>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+    <a class="btn btn--outline" href="/admin/broneerimine/seansid">Grupiseansid</a>
+    <a class="btn btn--outline" href="/admin/broneerimine/kliendid">Kliendid ja paketid</a>
+    <a class="btn btn--outline" href="/admin/broneerimine/seaded">Seaded</a>
+  </div>
+
+  {Object.keys(rentGroups).length > 0 && (
+    <div class="panel" style="border-color:#f0c36d;background:#fffbf2">
+      <h2>Rendisoovid ootel ({Object.keys(rentGroups).length})</h2>
+      <table class="admin-table">
+        <thead><tr><th>Kuupäev</th><th>Tunnid</th><th>Ruum</th><th>Klient</th><th>Otstarve</th><th></th></tr></thead>
+        <tbody>
+          {Object.entries(rentGroups).map(([root, rows]) => (
+            <tr>
+              <td>{fmtD(rows[0].date)}</td>
+              <td>{rows.map((r: any) => hhmm(r.start_time)).sort().join(', ')}</td>
+              <td>{rows[0].room_name}</td>
+              <td>{rows[0].client_name}<br /><small>{rows[0].email} · {rows[0].phone}</small></td>
+              <td style="max-width:220px">{rows[0].purpose}</td>
+              <td style="white-space:nowrap">
+                <button class="btn" data-rent={root} data-approve="1">Kinnita</button>
+                <button class="btn btn--outline" data-rent={root} data-approve="">Lükka tagasi</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <div class="panel">
+    <h2 style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      Päevavaade:
+      <a class="btn btn--outline" href={`/admin/broneerimine?date=${prevDate}`}>‹</a>
+      <span style="text-transform:capitalize">{dateHuman}</span>
+      <a class="btn btn--outline" href={`/admin/broneerimine?date=${nextDate}`}>›</a>
+      <input type="date" id="datepick" value={date} style="padding:8px;border:1px solid #ddd;border-radius:8px;font:inherit" />
+    </h2>
+    <div class="day-grid">
+      {rooms.map((room: any) => (
+        <div class={`day-room ${room.active ? '' : 'day-room--off'}`}>
+          <h3>{room.name}{room.active ? '' : ' (väljas)'}</h3>
+          {roomDay(room).length === 0 && <div class="day-item day-item--free">—</div>}
+          {roomDay(room).map((i) => (
+            <div class={`day-item day-item--${i.kind}`}>
+              <b>{i.time}</b> {i.label}
+              {i.id && i.kind === 'booked' && <button class="day-x" data-cancel={i.id} title="Tühista">✕</button>}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Lisa broneering käsitsi (telefon / Hopitude ülekanne)</h2>
+    <div class="man-form">
+      <select id="m-type" style="grid-column:span 2">
+        <option value="float">Floating</option>
+        <option value="group">Grupihingamine</option>
+      </select>
+      <input type="date" id="m-date" value={date} />
+      <input type="time" id="m-time" value="12:00" step="1800" />
+      <select id="m-room">
+        {rooms.filter((r: any) => r.type === 'floating' && r.active).map((r: any) => (
+          <option value={r.slug}>{r.slug === 'peruu' ? 'Peruu' : r.slug === 'brasiilia' ? 'Brasiilia' : r.name}</option>
+        ))}
+      </select>
+      <input type="number" id="m-seats" value="1" min="1" max="10" title="Kohti (grupil)" style="display:none" />
+      <input type="text" id="m-name" placeholder="Nimi" />
+      <input type="email" id="m-email" placeholder="E-post" />
+      <input type="tel" id="m-phone" placeholder="Telefon" />
+      <input type="text" id="m-note" placeholder="Märkus (nt Hopitudest)" style="grid-column:span 2" />
+      <button class="btn" id="m-save" style="grid-column:span 2">Lisa broneering</button>
+    </div>
+    <p id="m-msg" style="font-size:13px;margin-top:8px"></p>
+    <p style="font-size:12px;color:#888;margin-top:6px">Grupihingamise puhul kasutatakse kuupäeva+kellaaja asemel olemasolevat seanssi (vali kuupäev, mil seanss toimub). Kinnitusmeili käsitsi lisamisel EI saadeta.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Tulevased broneeringud ({upcoming.length})</h2>
+    <table class="admin-table">
+      <thead><tr><th>Kuupäev</th><th>Aeg</th><th>Teenus</th><th>Ruum</th><th>Klient</th><th>Makse</th><th></th></tr></thead>
+      <tbody>
+        {upcoming.map((b: any) => (
+          <tr>
+            <td>{fmtD(b.date)}</td>
+            <td>{hhmm(b.start_time)}</td>
+            <td>{b.session_name || (b.type === 'float' ? 'Floating' : b.type === 'rent' ? 'Rent' : b.type)}{b.seats > 1 ? ` (${b.seats} kohta)` : ''}</td>
+            <td>{b.room_name}</td>
+            <td>{b.client_name}<br /><small>{b.email}</small></td>
+            <td>
+              <span class={`badge ${b.paid ? 'badge--paid' : 'badge--unfulfilled'}`}>
+                {b.payment === 'package' ? 'pakett' : b.payment === 'credit' ? 'ettemaks' : b.payment === 'paysera' ? (b.paid ? 'makstud' : 'maksmata') : 'kohapeal'}
+              </span>
+              {b.status === 'pending' && <span class="badge badge--unfulfilled">ootel</span>}
+            </td>
+            <td><button class="btn btn--outline" data-cancel={b.id}>Tühista</button></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>
+
+<style is:global>
+.day-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.day-room h3{font-size:14px;margin-bottom:8px}
+.day-room--off{opacity:.45}
+.day-item{font-size:12.5px;padding:6px 8px;border-radius:6px;margin-bottom:4px;position:relative;padding-right:24px}
+.day-item--free{background:#f2f7f9;color:#8aa}
+.day-item--booked{background:#e7f4f8;color:#155a70}
+.day-item--session{background:#e6f4ea;color:#1a7f37}
+.day-item--rent{background:#fff3e0;color:#b26a00}
+.day-item--block{background:#eee;color:#666}
+.day-x{position:absolute;right:4px;top:4px;background:none;border:none;color:#b3261e;font-size:12px}
+.man-form{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:520px}
+.man-form input,.man-form select{padding:9px 10px;border:1px solid #ddd;border-radius:8px;font:inherit;font-size:14px}
+</style>
+
+<script>
+async function act(body: any) {
+  const res = await fetch('/api/admin/booking-action', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  });
+  return { ok: res.ok, data: await res.json().catch(() => ({})) };
+}
+
+document.getElementById('datepick')?.addEventListener('change', (e) => {
+  location.href = '/admin/broneerimine?date=' + (e.target as HTMLInputElement).value;
+});
+
+document.querySelectorAll('[data-cancel]').forEach((btn) => {
+  btn.addEventListener('click', async () => {
+    if (!confirm('Tühistan broneeringu? Klient saab teavitusmeili; paketikord/raha tagastatakse.')) return;
+    const { ok } = await act({ action: 'cancel_booking', id: Number((btn as HTMLElement).dataset.cancel) });
+    if (ok) location.reload(); else alert('Tühistamine ebaõnnestus');
+  });
+});
+
+document.querySelectorAll('[data-rent]').forEach((btn) => {
+  btn.addEventListener('click', async () => {
+    const approve = !!(btn as HTMLElement).dataset.approve;
+    if (!confirm(approve ? 'Kinnitan rendisoovi? Klient saab meili.' : 'Lükkan rendisoovi tagasi? Klient saab meili.')) return;
+    const { ok } = await act({ action: 'rent_decision', token: (btn as HTMLElement).dataset.rent, approve });
+    if (ok) location.reload(); else alert('Ebaõnnestus');
+  });
+});
+
+// käsitsi lisamine
+const mType = document.getElementById('m-type') as HTMLSelectElement;
+mType?.addEventListener('change', () => {
+  const grp = mType.value === 'group';
+  (document.getElementById('m-room') as HTMLElement).style.display = grp ? 'none' : '';
+  (document.getElementById('m-seats') as HTMLElement).style.display = grp ? '' : 'none';
+  (document.getElementById('m-time') as HTMLElement).style.display = grp ? 'none' : '';
+});
+document.getElementById('m-save')?.addEventListener('click', async () => {
+  const v = (id: string) => (document.getElementById(id) as HTMLInputElement).value;
+  const msg = document.getElementById('m-msg')!;
+  const body: any = {
+    action: 'manual_booking', type: mType.value,
+    name: v('m-name'), email: v('m-email'), phone: v('m-phone'), note: v('m-note'),
+  };
+  if (mType.value === 'float') {
+    body.roomSlug = v('m-room'); body.date = v('m-date'); body.time = v('m-time');
+  } else {
+    // leia seansi id kuupäeva järgi
+    const res = await fetch('/api/booking/availability?type=group');
+    const g = await res.json();
+    const sess = (g.sessions || []).find((s: any) => s.date === v('m-date'));
+    if (!sess) { msg.textContent = 'Sellel kuupäeval pole aktiivset grupiseanssi.'; msg.style.color = '#b3261e'; return; }
+    body.sessionId = sess.id; body.seats = Number(v('m-seats')) || 1;
+  }
+  if (!body.name || !body.email.includes('@')) { msg.textContent = 'Nimi ja e-post on kohustuslikud.'; msg.style.color = '#b3261e'; return; }
+  const { ok, data } = await act(body);
+  if (ok) { msg.textContent = 'Lisatud!'; msg.style.color = '#1a7f37'; setTimeout(() => location.reload(), 700); }
+  else { msg.textContent = data.error === 'conflict' ? 'See aeg on juba kinni.' : data.error === 'full' ? 'Seanss on täis.' : 'Ebaõnnestus.'; msg.style.color = '#b3261e'; }
+});
+</script>

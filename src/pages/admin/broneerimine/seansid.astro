@@ -1,0 +1,148 @@
+---
+// Grupiseansside haldus: korduv muster (T/N), üksiku korra lisamine, nime/kohtade
+// muutmine, ärajätmine (osalejad saavad teavitusmeili, tagastused automaatselt).
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { requireDb } from '../../../lib/db';
+import { nowTallinn, hhmm, dateStr } from '../../../lib/booking';
+
+const sql = requireDb();
+const now = nowTallinn();
+const sessions = await sql`
+  SELECT s.*, (SELECT count(*) FROM bk_bookings b WHERE b.session_id = s.id AND b.status = 'active') AS bookings
+  FROM bk_sessions s
+  WHERE s.date >= ${now.date} AND s.status = 'active'
+  ORDER BY s.date, s.start_time
+`;
+const fmtD = (d: any) => {
+  const ds = dateStr(d);
+  const dow = ['P', 'E', 'T', 'K', 'N', 'R', 'L'][new Date(ds + 'T12:00:00Z').getUTCDay()];
+  return `${dow}, ${ds.split('-').reverse().slice(0, 2).join('.')}`;
+};
+---
+
+<AdminLayout title="Grupiseansid" active="booking">
+  <h1>Grupiseansid (Suur saal)</h1>
+  <p style="margin:-12px 0 20px"><a href="/admin/broneerimine" style="color:#1f6d85">‹ Broneerimine</a></p>
+
+  <div class="panel">
+    <h2>Genereeri korduv muster</h2>
+    <div class="sess-form">
+      <label><input type="checkbox" class="g-dow" value="2" checked /> Teisipäev</label>
+      <label><input type="checkbox" class="g-dow" value="4" checked /> Neljapäev</label>
+      <label><input type="checkbox" class="g-dow" value="1" /> E</label>
+      <label><input type="checkbox" class="g-dow" value="3" /> K</label>
+      <label><input type="checkbox" class="g-dow" value="5" /> R</label>
+      <label><input type="checkbox" class="g-dow" value="6" /> L</label>
+      <label><input type="checkbox" class="g-dow" value="0" /> P</label>
+    </div>
+    <div class="sess-form" style="margin-top:10px">
+      <input type="time" id="g-time" value="18:00" />
+      <input type="number" id="g-weeks" value="8" min="1" max="16" title="Mitu nädalat ette" style="width:80px" />
+      <span style="font-size:13px;color:#888">nädalat ette</span>
+      <input type="text" id="g-name" value="Vabastav hingamine grupis" style="min-width:240px" />
+      <input type="number" id="g-cap" value="10" min="1" max="30" title="Kohti" style="width:70px" />
+      <span style="font-size:13px;color:#888">kohta</span>
+      <input type="number" id="g-price" value="40" min="0" step="1" title="Hind €" style="width:70px" />
+      <span style="font-size:13px;color:#888">€</span>
+      <button class="btn" id="g-gen">Genereeri</button>
+    </div>
+    <p style="font-size:12px;color:#888;margin-top:8px">Olemasolevaid kordi ei muudeta ega dubleerita — genereerimine lisab ainult puuduvad. Kestus 2h (18:00–20:00).</p>
+    <p id="g-msg" style="font-size:13px;margin-top:6px"></p>
+  </div>
+
+  <div class="panel">
+    <h2>Lisa üksik kord (nt „koos elava muusikaga“)</h2>
+    <div class="sess-form">
+      <input type="date" id="s-date" />
+      <input type="time" id="s-time" value="18:00" />
+      <input type="text" id="s-name" value="Vabastav hingamine koos elava muusikaga" style="min-width:280px" />
+      <input type="number" id="s-cap" value="10" min="1" max="30" style="width:70px" />
+      <span style="font-size:13px;color:#888">kohta</span>
+      <input type="number" id="s-price" value="40" min="0" step="1" style="width:70px" />
+      <span style="font-size:13px;color:#888">€</span>
+      <button class="btn" id="s-add">Lisa</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Tulevased seansid ({sessions.length})</h2>
+    <table class="admin-table">
+      <thead><tr><th>Kuupäev</th><th>Aeg</th><th>Nimi</th><th>Kohti</th><th>Hind</th><th></th></tr></thead>
+      <tbody>
+        {sessions.map((s: any) => (
+          <tr data-sid={s.id}>
+            <td>{fmtD(s.date)}</td>
+            <td>{hhmm(s.start_time)}</td>
+            <td><input class="e-name" value={s.name} style="width:100%;padding:6px;border:1px solid #eee;border-radius:6px;font:inherit" /></td>
+            <td>
+              <span class={s.booked > 0 ? 'badge badge--fulfilled' : ''}>{s.booked}</span> /
+              <input class="e-cap" type="number" value={s.capacity} min={s.booked} max="30" style="width:56px;padding:6px;border:1px solid #eee;border-radius:6px;font:inherit" />
+            </td>
+            <td><input class="e-price" type="number" value={s.price_cents / 100} min="0" style="width:64px;padding:6px;border:1px solid #eee;border-radius:6px;font:inherit" /> €</td>
+            <td style="white-space:nowrap">
+              <button class="btn btn--outline e-save">Salvesta</button>
+              <button class="btn btn--outline e-del" style="color:#b3261e;border-color:#b3261e">Jäta ära</button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>
+
+<style is:global>
+.sess-form{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sess-form input[type=time],.sess-form input[type=date],.sess-form input[type=number],.sess-form input[type=text]{padding:9px 10px;border:1px solid #ddd;border-radius:8px;font:inherit;font-size:14px}
+.sess-form label{font-size:13.5px;display:inline-flex;gap:5px;align-items:center}
+</style>
+
+<script>
+async function act(body: any) {
+  const res = await fetch('/api/admin/booking-action', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  });
+  return { ok: res.ok, data: await res.json().catch(() => ({})) };
+}
+const v = (id: string) => (document.getElementById(id) as HTMLInputElement).value;
+
+document.getElementById('g-gen')?.addEventListener('click', async () => {
+  const dows = [...document.querySelectorAll('.g-dow:checked')].map((c) => Number((c as HTMLInputElement).value));
+  const msg = document.getElementById('g-msg')!;
+  if (!dows.length) { msg.textContent = 'Vali vähemalt üks nädalapäev.'; return; }
+  const { ok, data } = await act({
+    action: 'session_generate', dows, time: v('g-time'), weeks: Number(v('g-weeks')),
+    name: v('g-name'), capacity: Number(v('g-cap')), priceEur: Number(v('g-price')),
+  });
+  if (ok) { msg.textContent = `Lisatud ${data.created} uut korda.`; setTimeout(() => location.reload(), 800); }
+  else msg.textContent = 'Ebaõnnestus.';
+});
+
+document.getElementById('s-add')?.addEventListener('click', async () => {
+  if (!v('s-date')) { alert('Vali kuupäev'); return; }
+  const { ok } = await act({
+    action: 'session_create', date: v('s-date'), time: v('s-time'),
+    name: v('s-name'), capacity: Number(v('s-cap')), priceEur: Number(v('s-price')),
+  });
+  if (ok) location.reload(); else alert('Ebaõnnestus');
+});
+
+document.querySelectorAll('tr[data-sid]').forEach((tr) => {
+  const id = Number((tr as HTMLElement).dataset.sid);
+  const q = (cls: string) => (tr.querySelector(cls) as HTMLInputElement);
+  tr.querySelector('.e-save')?.addEventListener('click', async () => {
+    const { ok } = await act({
+      action: 'session_update', id,
+      name: q('.e-name').value, capacity: Number(q('.e-cap').value), priceEur: Number(q('.e-price').value),
+    });
+    if (ok) location.reload(); else alert('Ebaõnnestus');
+  });
+  tr.querySelector('.e-del')?.addEventListener('click', async () => {
+    if (!confirm('Jätan selle korra ära? Kõik broneeringud tühistatakse, osalejad saavad teavitusmeili ja paketikorrad/raha tagastatakse.')) return;
+    const { ok, data } = await act({ action: 'session_cancel', id });
+    if (ok) { alert(`Ära jäetud. Teavitatud: ${data.notified} broneeringut.`); location.reload(); }
+    else alert('Ebaõnnestus');
+  });
+});
+</script>

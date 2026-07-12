@@ -2,6 +2,7 @@ export const prerender = false;
 
 import type { APIRoute } from 'astro';
 import { createHash } from 'crypto';
+import { trialAllowed } from '../../lib/booking';
 
 const PROJECT_ID = '253930';
 const SIGN_PASSWORD = import.meta.env.PAYSERA_SIGN_PASSWORD;
@@ -12,6 +13,19 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (!orderid || !amount || !email) {
     return new Response(JSON.stringify({ error: 'Puuduvad andmed' }), { status: 400 });
+  }
+
+  // "Keha ja meele 3x proovipakett" on ainult uutele klientidele (kasutaja reegel 10.07.2026)
+  if (/proovipakett/i.test(String(description || ''))) {
+    try {
+      if (!(await trialAllowed(String(email)))) {
+        return new Response(JSON.stringify({
+          error: '3x proovipakett on mõeldud ainult uutele klientidele ja seda saab osta üks kord. Vaata meie teisi pakette (nt 3 korra kaart) või helista +372 5669 5898.',
+        }), { status: 409 });
+      }
+    } catch (e) {
+      console.error('trial check failed', e); // kontrolli vea korral ei blokeeri ostu
+    }
   }
 
   const origin = new URL(request.url).origin;

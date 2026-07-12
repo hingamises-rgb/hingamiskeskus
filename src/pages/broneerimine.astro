@@ -1,0 +1,606 @@
+---
+// Uus oma broneerimissüsteem (paroolivaba voog). Leht ise on staatiline,
+// kõik andmed tulevad /api/booking/* otspunktidest kliendi JS-iga.
+// Vana Hopitude iframe (/broneeri-aeg) jääb paralleelkäituse ajaks alles.
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+---
+
+<Layout
+  title="Broneeri aeg | Floating ja vabastav hingamine Tallinnas"
+  description="Broneeri floatingu või vabastava hingamise aeg Hingamiskeskuses. Kontot pole vaja — kinnitus tuleb e-postile."
+  keywords="broneeri aeg, floating, vabastav hingamine"
+>
+
+<Header active="broneeri" />
+
+<div class="bkw">
+  <div class="bk-head">
+    <div class="bk-langs" id="bk-langs"></div>
+  </div>
+  <div id="bk-app"><p class="bk-loading">…</p></div>
+</div>
+
+<style is:global>
+.bkw{max-width:540px;margin:0 auto;padding:12px 16px 64px;font-family:'DM Sans',sans-serif;color:var(--bk-text,#1d1e20)}
+.bkw{--teal:#1f6d85;--teal-soft:#e3f2f7;--text:#1d1e20;--muted:#5a6e76;--bg:#f3fcff;--card:#fff;--line:#d7e6ec;--btn:#1d1e20;--btn-text:#fff;--ok:#2e7d4f;--ok-soft:#e5f3ea;--danger:#b3261e}
+.bkw .bk-head{display:flex;justify-content:flex-end;padding:6px 0 2px}
+.bkw .bk-langs{display:flex;gap:4px}
+.bkw .bk-langs button{border:1px solid var(--line);background:var(--card);color:var(--muted);font:inherit;font-size:12px;font-weight:600;padding:4px 9px;border-radius:99px;cursor:pointer}
+.bkw .bk-langs button.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.bkw h1{font-size:24px;margin:6px 0 2px;letter-spacing:-.01em}
+.bkw .sub{color:var(--muted);font-size:14.5px;margin:0 0 18px}
+.bkw .steps{display:flex;gap:6px;margin:0 0 20px}
+.bkw .steps .st{flex:1;text-align:center;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.bkw .steps .st::before{content:"";display:block;height:3px;border-radius:3px;background:var(--line);margin-bottom:6px}
+.bkw .steps .st.done::before,.bkw .steps .st.now::before{background:var(--teal)}
+.bkw .steps .st.now{color:var(--teal)}
+.bkw .card{background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 1px 3px rgba(31,109,133,.08),0 4px 14px rgba(31,109,133,.07);padding:18px;margin-bottom:14px}
+.bkw .svc{cursor:pointer;transition:border-color .15s;position:relative}
+.bkw .svc:hover{border-color:var(--teal)}
+.bkw .svc h2{margin:0 0 4px;font-size:17.5px;padding-right:26px}
+.bkw .svc .meta{color:var(--teal);font-weight:700;font-size:14px;margin-bottom:6px}
+.bkw .svc p{margin:0;color:var(--muted);font-size:14px}
+.bkw .svc .go{position:absolute;right:16px;top:18px;color:var(--teal);font-size:20px}
+.bkw .back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:13.5px;background:none;border:none;font-family:inherit;cursor:pointer;padding:0;margin:0 0 12px}
+.bkw .back:hover{color:var(--teal)}
+.bkw h3.step-title{font-size:18px;margin:0 0 12px}
+.bkw .roomtabs{display:flex;gap:8px;margin-bottom:14px}
+.bkw .roomtabs button{flex:1;padding:11px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);font-family:inherit;cursor:pointer;color:var(--text);text-align:left}
+.bkw .roomtabs button .rn{font-weight:700;font-size:14.5px}
+.bkw .roomtabs button .rp{font-size:12.5px;color:var(--muted)}
+.bkw .roomtabs button.on{border-color:var(--teal);background:var(--teal-soft)}
+.bkw .cal{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:12px;margin-bottom:14px}
+.bkw .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.bkw .cal-head .m{font-weight:700;font-size:15px;text-transform:capitalize}
+.bkw .cal-head button{width:34px;height:34px;border:1px solid var(--line);border-radius:8px;background:var(--card);font-family:inherit;font-size:16px;cursor:pointer;color:var(--text);line-height:1}
+.bkw .cal-head button:disabled{opacity:.3;cursor:default}
+.bkw .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.bkw .cal-grid .dh{text-align:center;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;padding:3px 0}
+.bkw .cal-grid button{aspect-ratio:1.15;border:none;border-radius:8px;background:none;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;color:var(--text)}
+.bkw .cal-grid button:hover:not(:disabled):not(.on){background:var(--teal-soft)}
+.bkw .cal-grid button.on{background:var(--teal);color:#fff}
+.bkw .cal-grid button:disabled{color:var(--line);cursor:default}
+.bkw .cal-grid .pad{visibility:hidden}
+.bkw .slotgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.bkw .slotgrid button{padding:9px 0;border:1px solid var(--line);border-radius:8px;background:var(--card);font-family:inherit;font-size:14.5px;font-weight:600;cursor:pointer;color:var(--text)}
+.bkw .slotgrid button:hover:not(:disabled){border-color:var(--teal)}
+.bkw .slotgrid button.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.bkw .slotgrid button:disabled{opacity:.32;cursor:default;text-decoration:line-through}
+.bkw .hint{font-size:12.5px;color:var(--muted);margin:10px 0 0}
+.bkw .sessrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);margin-bottom:8px;cursor:pointer}
+.bkw .sessrow:hover:not(.full){border-color:var(--teal)}
+.bkw .sessrow.on{border-color:var(--teal);background:var(--teal-soft)}
+.bkw .sessrow.full{opacity:.5;cursor:default}
+.bkw .sessrow .when{font-weight:700;font-size:15px}
+.bkw .sessrow .dur{color:var(--muted);font-size:12.5px}
+.bkw .sessrow .free{font-size:12.5px;font-weight:700;color:var(--ok);background:var(--ok-soft);padding:3px 9px;border-radius:99px;white-space:nowrap}
+.bkw .sessrow.full .free{color:var(--muted);background:var(--line)}
+.bkw .monthlbl{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:14px 0 7px}
+.bkw .stepper{display:flex;align-items:center;gap:14px;margin-top:12px}
+.bkw .stepper button{width:38px;height:38px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:19px;font-family:inherit;cursor:pointer;color:var(--text);line-height:1}
+.bkw .stepper button:disabled{opacity:.35;cursor:default}
+.bkw .stepper .n{font-size:19px;font-weight:700;min-width:24px;text-align:center}
+.bkw label{display:block;font-size:13px;font-weight:600;margin:0 0 5px}
+.bkw label .opt{color:var(--muted);font-weight:500}
+.bkw input[type=text],.bkw input[type=email],.bkw input[type=tel],.bkw textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:15px;background:var(--card);color:var(--text);margin-bottom:14px;box-sizing:border-box}
+.bkw textarea{resize:vertical;min-height:70px}
+.bkw input:focus,.bkw textarea:focus{outline:2px solid var(--teal);border-color:var(--teal)}
+.bkw .field-err{color:var(--danger);font-size:12.5px;margin:-10px 0 12px;display:none}
+.bkw .remember{display:flex;align-items:flex-start;gap:9px;margin:0 0 16px;cursor:pointer;font-size:13.5px;font-weight:500}
+.bkw .remember input{margin-top:3px;accent-color:var(--teal)}
+.bkw .prefilled{font-size:12.5px;color:var(--ok);margin:-8px 0 12px}
+.bkw .btn{display:block;width:100%;padding:14px;border:none;border-radius:8px;cursor:pointer;background:var(--btn);color:var(--btn-text);font-family:inherit;font-size:14px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.bkw .btn:hover{opacity:.88}
+.bkw .btn:disabled{opacity:.4;cursor:default}
+.bkw .btn.ghost{background:none;border:1px solid var(--line);color:var(--text)}
+.bkw .btn.danger{background:var(--danger);color:#fff}
+.bkw .sumbox{border:1px solid var(--line);border-radius:8px;padding:13px 14px;margin-bottom:14px;font-size:14.5px}
+.bkw .sumbox .row{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
+.bkw .sumbox .row .l{color:var(--muted)}
+.bkw .sumbox .row.total{border-top:1px solid var(--line);margin-top:7px;padding-top:9px;font-weight:700;font-size:15.5px}
+.bkw .payopt{display:flex;gap:11px;align-items:flex-start;padding:12px 13px;border:1px solid var(--line);border-radius:8px;margin-bottom:8px;cursor:pointer}
+.bkw .payopt.on{border-color:var(--teal);background:var(--teal-soft)}
+.bkw .payopt input{margin-top:3px;accent-color:var(--teal)}
+.bkw .payopt .t{font-weight:700;font-size:14.5px}
+.bkw .payopt .d{color:var(--muted);font-size:13px}
+.bkw .pkg{border:1.5px solid var(--teal);background:var(--teal-soft);border-radius:8px;padding:13px 14px;margin-bottom:12px}
+.bkw .pkg .t{font-weight:700;color:var(--teal);font-size:14.5px;margin-bottom:2px}
+.bkw .pkg .d{font-size:13px}
+.bkw .promo{display:flex;gap:8px;margin:4px 0 14px}
+.bkw .promo input{flex:1;margin:0}
+.bkw .promo button{padding:0 16px;border:1px solid var(--text);background:none;border-radius:8px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;color:var(--text)}
+.bkw .done-icon{width:56px;height:56px;border-radius:99px;background:var(--ok-soft);color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:28px;margin:4px auto 12px}
+.bkw .center{text-align:center}
+.bkw .notice{background:var(--teal-soft);border-radius:8px;padding:10px 13px;font-size:13.5px;margin-bottom:14px}
+.bkw .err-notice{background:#fdecea;border-radius:8px;padding:10px 13px;font-size:13.5px;margin-bottom:14px;color:var(--danger)}
+.bkw .bk-loading{text-align:center;color:var(--muted);padding:40px 0}
+@media (max-width:420px){.bkw .slotgrid{grid-template-columns:repeat(3,1fr)}}
+</style>
+
+<script>
+// Broneerimisvoo klient. Andmed /api/booking/* kaudu; hinnad kuvamiseks /config-ist,
+// autoriteetne summa tuleb alati serveri vastusest broneeringu loomisel.
+import { texts } from '../lib/booking-i18n';
+
+const L: any = texts;
+const S: any = {
+  lang: 'et', step: 0, service: null,
+  dateKey: null, calOff: 0, slots: [], sessions: [], groupIdx: null, seats: 1,
+  rentRoom: 'suur-saal', rentHours: [],
+  name: '', email: '', phone: '', purpose: '', remember: true,
+  pay: 'paysera', promoCode: '', flags: null, assets: null, selPackage: null,
+  codeSent: false, busy: false, error: null, result: null,
+};
+let CFG: any = { floatCents: 4000, memberCents: 3000, rentSuurCents: 2500, rentVaikeCents: 700, horizonDays: 92 };
+const availCache: Record<string, any> = {};
+
+const t = () => L[S.lang];
+const eur = (c: number) => (c % 100 === 0 ? String(c / 100) : (c / 100).toFixed(2)) + '€';
+
+function todayStr() {
+  return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Tallinn' }).format(new Date());
+}
+const TODAY = todayStr();
+function addDays(d: string, n: number) {
+  const x = new Date(d + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + n);
+  return x.toISOString().slice(0, 10);
+}
+const MAXDATE = () => addDays(TODAY, CFG.horizonDays);
+function fmtDate(dstr: string) {
+  const _ = t(); const d = new Date(dstr + 'T12:00:00Z');
+  return _.dows[d.getUTCDay()] + ', ' + d.getUTCDate() + '. ' + _.months[d.getUTCMonth()];
+}
+function endTime(time: string, mins: number) {
+  const [h, m] = time.split(':').map(Number); const e = h * 60 + m + mins;
+  return String(Math.floor(e / 60) % 24).padStart(2, '0') + ':' + String(e % 60).padStart(2, '0');
+}
+function esc(s: string) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+async function api(path: string, body?: any) {
+  const res = await fetch('/api/booking/' + path, body
+    ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+    : undefined);
+  const data = await res.json().catch(() => ({}));
+  return { status: res.status, data };
+}
+
+const app = document.getElementById('bk-app')!;
+function h(html: string) { app.innerHTML = html; }
+
+function renderLangs() {
+  document.getElementById('bk-langs')!.innerHTML = ['et', 'ru', 'en'].map((l) =>
+    `<button class="${S.lang === l ? 'on' : ''}" data-lang="${l}">${l.toUpperCase()}</button>`).join('');
+}
+function stepsBar(cur: number) {
+  return '<div class="steps">' + t().steps.map((s: string, i: number) =>
+    `<div class="st ${i < cur ? 'done' : i === cur ? 'now' : ''}">${s}</div>`).join('') + '</div>';
+}
+const backBtn = (to: number) => `<button class="back" data-go="${to}">← ${t().back}</button>`;
+
+// ---------- vaated ----------
+
+function vService() {
+  const _ = t();
+  h(`<h1>${_.title}</h1><p class="sub">${_.sub}</p>${stepsBar(0)}
+  <div class="card svc" data-pick="float"><div class="go">→</div><h2>${_.svcFloatH}</h2><div class="meta">${_.svcFloatMeta(eur(CFG.floatCents))}</div><p>${_.svcFloatP}</p></div>
+  <div class="card svc" data-pick="group"><div class="go">→</div><h2>${_.svcGroupH}</h2><div class="meta">${_.svcGroupMeta(eur(CFG.groupCents || 4000))}</div><p>${_.svcGroupP}</p></div>
+  <div class="card svc" data-pick="rent"><div class="go">→</div><h2>${_.svcRentH}</h2><div class="meta">${_.svcRentMeta(eur(CFG.rentSuurCents), eur(CFG.rentVaikeCents))}</div><p>${_.svcRentP}</p></div>`);
+}
+
+function calendar() {
+  const _ = t();
+  const base = new Date(TODAY + 'T12:00:00Z');
+  base.setUTCDate(1); base.setUTCMonth(base.getUTCMonth() + S.calOff);
+  const y = base.getUTCFullYear(), m = base.getUTCMonth();
+  const firstDow = (new Date(Date.UTC(y, m, 1)).getUTCDay() + 6) % 7;
+  const dim = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+  let cells = '';
+  for (let i = 0; i < firstDow; i++) cells += '<button class="pad" disabled></button>';
+  for (let d = 1; d <= dim; d++) {
+    const k = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const off = k < TODAY || k > MAXDATE();
+    cells += `<button ${off ? 'disabled' : ''} class="${S.dateKey === k ? 'on' : ''}" data-date="${k}">${d}</button>`;
+  }
+  return `<div class="cal"><div class="cal-head">
+    <button ${S.calOff > 0 ? '' : 'disabled'} data-cal="-1">‹</button>
+    <div class="m">${_.monthsFull[m]} ${y}</div>
+    <button ${S.calOff < 3 ? '' : 'disabled'} data-cal="1">›</button></div>
+    <div class="cal-grid">${[1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="dh">${_.dows[i]}</div>`).join('')}${cells}</div></div>`;
+}
+
+async function loadAvail(date: string) {
+  const key = S.service === 'rent' ? `rent:${S.rentRoom}:${date}` : `float:${date}`;
+  if (availCache[key]) return availCache[key];
+  const q = S.service === 'rent'
+    ? `availability?type=rent&room=${S.rentRoom}&date=${date}`
+    : `availability?type=float&date=${date}`;
+  const { data } = await api(q);
+  availCache[key] = data;
+  return data;
+}
+
+async function vTime() {
+  const _ = t();
+  if (S.service === 'group') {
+    if (!S.sessions.length) {
+      h(backBtn(0) + stepsBar(1) + `<p class="bk-loading">${_.loading}</p>`);
+      const { data } = await api('availability?type=group');
+      S.sessions = data.sessions || [];
+    }
+    let rows = '', lastM = -1;
+    if (!S.sessions.length) rows = `<div class="notice">${_.noSessions}</div>`;
+    S.sessions.forEach((g: any, i: number) => {
+      const mo = Number(g.date.slice(5, 7)) - 1;
+      if (mo !== lastM) { lastM = mo; rows += `<div class="monthlbl">${_.monthsFull[mo]}</div>`; }
+      const freeTxt = g.free === 0 ? _.full : g.free === 1 ? _.freeOne : _.free(g.free);
+      rows += `<div class="sessrow ${g.free === 0 ? 'full' : S.groupIdx === i ? 'on' : ''}" data-sess="${g.free ? i : ''}">
+        <div><div class="when">${fmtDate(g.date)} · ${g.time}</div><div class="dur">${esc(g.name)} · ${g.time}–${endTime(g.time, g.durationMin)}</div></div>
+        <div class="free">${freeTxt}</div></div>`;
+    });
+    const g = S.groupIdx != null ? S.sessions[S.groupIdx] : null;
+    const stepper = g ? `<div class="card"><label>${_.seats}</label><div class="stepper">
+      <button data-seat="-1" ${S.seats <= 1 ? 'disabled' : ''}>−</button><div class="n">${S.seats}</div>
+      <button data-seat="1" ${S.seats >= g.free ? 'disabled' : ''}>+</button>
+      <div style="font-weight:700">${eur(S.seats * g.priceCents)}</div></div><p class="hint">${_.seatsHint}</p></div>` : '';
+    h(backBtn(0) + stepsBar(1) + `<h3 class="step-title">${_.pickSess}</h3>` + rows + stepper +
+      `<div style="margin-top:14px"><button class="btn" ${g ? '' : 'disabled'} data-go="2">${_.next}</button></div>`);
+    return;
+  }
+
+  const isRent = S.service === 'rent';
+  h(backBtn(0) + stepsBar(1) + `<p class="bk-loading">${_.loading}</p>`);
+  const avail = await loadAvail(S.dateKey);
+  const tabs = isRent ? `<div class="roomtabs">
+    <button class="${S.rentRoom === 'suur-saal' ? 'on' : ''}" data-room="suur-saal"><div class="rn">${_.roomBig}</div><div class="rp">${eur(CFG.rentSuurCents)}/h + km · ${_.roomBigD}</div></button>
+    <button class="${S.rentRoom === 'vaike-tuba' ? 'on' : ''}" data-room="vaike-tuba"><div class="rn">${_.roomSmall}</div><div class="rp">${eur(CFG.rentVaikeCents)}/h + km · ${_.roomSmallD}</div></button></div>` : '';
+
+  let grid = '';
+  if (isRent) {
+    grid = (avail.hours || []).map((time: string) => {
+      const on = S.rentHours.includes(time);
+      return `<button class="${on ? 'on' : ''}" data-hour="${time}">${time}</button>`;
+    }).join('');
+    if (!grid) grid = `<div class="notice" style="grid-column:1/-1">${_.noTimes}</div>`;
+  } else {
+    const all = [...new Set([...(avail.slots || []), ...(avail.taken || [])])].sort();
+    grid = all.map((time) => {
+      const freeSlot = (avail.slots || []).includes(time);
+      const on = S.slots.some((x: any) => x.date === S.dateKey && x.time === time);
+      return `<button ${freeSlot ? '' : 'disabled'} class="${on ? 'on' : ''}" data-slot="${time}">${time}</button>`;
+    }).join('');
+    if (!all.length) grid = `<div class="notice" style="grid-column:1/-1">${_.noTimes}</div>`;
+  }
+
+  const n = isRent ? S.rentHours.length : S.slots.length;
+  const price = isRent
+    ? n * (S.rentRoom === 'suur-saal' ? CFG.rentSuurCents : CFG.rentVaikeCents)
+    : n * CFG.floatCents;
+  const chosen = n ? `<div class="notice"><b>${isRent ? _.rentChosen(n, eur(price)) : _.chosen(n)}</b>${isRent ? '' : ' · ' + eur(price)}</div>` : '';
+  h(backBtn(0) + stepsBar(1) +
+    `<h3 class="step-title">${isRent ? _.pickRent : _.pickTime}</h3>` + tabs + calendar() +
+    `<div class="slotgrid">${grid}</div>
+    <p class="hint">${_.cutoffHint} ${isRent ? _.rentHint : _.floatHours + '<br>' + _.multiHint}</p>
+    <div style="margin-top:16px">${chosen}
+    <button class="btn" ${n ? '' : 'disabled'} data-go="2">${_.next}</button></div>`);
+}
+
+function vDetails() {
+  const _ = t();
+  let prefilled = false;
+  if (!S.name && !S.email) {
+    try {
+      const saved = JSON.parse(localStorage.getItem('hk_bk_contact') || 'null');
+      if (saved) { S.name = saved.name || ''; S.email = saved.email || ''; S.phone = saved.phone || ''; prefilled = !!S.email; }
+    } catch {}
+  }
+  const purpose = S.service === 'rent'
+    ? `<label for="f-purpose">${_.purpose} <span class="opt">${_.optional}</span></label>
+       <textarea id="f-purpose" placeholder="${esc(_.purposePh)}">${esc(S.purpose)}</textarea>` : '';
+  h(backBtn(1) + stepsBar(2) + `<h3 class="step-title">${_.yourData}</h3>
+  <div class="card"><div class="notice">${_.noAccount}</div>
+  ${prefilled ? `<div class="prefilled">✓ ${_.prefilled}</div>` : ''}
+  <label for="f-name">${_.name}</label><input type="text" id="f-name" value="${esc(S.name)}" autocomplete="name">
+  <div class="field-err" id="e-name">${_.nameErr}</div>
+  <label for="f-email">${_.email}</label><input type="email" id="f-email" value="${esc(S.email)}" autocomplete="email" inputmode="email">
+  <div class="field-err" id="e-email">${_.emailErr}</div>
+  <p class="hint" style="margin:-8px 0 12px">${_.emailHint}</p>
+  <label for="f-phone">${_.phone}</label><input type="tel" id="f-phone" value="${esc(S.phone)}" autocomplete="tel" inputmode="tel">
+  <div class="field-err" id="e-phone">${_.phoneErr}</div>
+  ${purpose}
+  <input type="text" id="f-veebileht" style="display:none" tabindex="-1" autocomplete="off">
+  <label class="remember"><input type="checkbox" id="f-remember" ${S.remember ? 'checked' : ''}>${_.remember}</label>
+  <button class="btn" id="b-details" data-act="details">${_.next}</button></div>`);
+}
+
+function sumLines() {
+  const _ = t();
+  let rows = '';
+  if (S.service === 'float') {
+    for (const s of [...S.slots].sort((a: any, b: any) => (a.date + a.time).localeCompare(b.date + b.time))) {
+      rows += `<div class="row"><span class="l">${fmtDate(s.date)}</span><span>${s.time} – ${endTime(s.time, 60)}</span></div>`;
+    }
+  } else if (S.service === 'group') {
+    const g = S.sessions[S.groupIdx];
+    rows += `<div class="row"><span class="l">${_.sTime}</span><span>${fmtDate(g.date)} · ${g.time} – ${endTime(g.time, g.durationMin)}</span></div>`;
+    rows += `<div class="row"><span class="l">${_.sWhat}</span><span>${esc(g.name)}</span></div>`;
+    rows += `<div class="row"><span class="l">${_.sSeats}</span><span>${S.seats}</span></div>`;
+  } else {
+    rows += `<div class="row"><span class="l">${_.sRoom}</span><span>${S.rentRoom === 'suur-saal' ? _.roomBig : _.roomSmall}</span></div>`;
+    rows += `<div class="row"><span class="l">${_.sTime}</span><span>${fmtDate(S.dateKey)}</span></div>`;
+    rows += `<div class="row"><span class="l">${_.sHours}</span><span>${[...S.rentHours].sort().join(', ')}</span></div>`;
+  }
+  return rows;
+}
+
+function units() { return S.service === 'float' ? S.slots.length : S.seats; }
+function baseCents() {
+  if (S.service === 'group') return units() * S.sessions[S.groupIdx].priceCents;
+  return units() * CFG.floatCents;
+}
+function memberActive() { return S.flags?.member && S.flags?.verified; }
+function displayCents() {
+  let c = memberActive()
+    ? units() * Math.min(CFG.memberCents, S.service === 'group' ? S.sessions[S.groupIdx].priceCents : CFG.floatCents)
+    : baseCents();
+  return c;
+}
+
+function vPay() {
+  const _ = t();
+  if (S.service === 'rent') {
+    const rate = S.rentRoom === 'suur-saal' ? CFG.rentSuurCents : CFG.rentVaikeCents;
+    h(backBtn(2) + stepsBar(3) + `<h3 class="step-title">${_.confirmRent}</h3>
+    <div class="sumbox"><div class="row"><span class="l">${_.sum}</span><span><b>${_.svcRentH}</b></span></div>${sumLines()}
+    <div class="row total"><span>${_.sPrice}</span><span>${eur(S.rentHours.length * rate)} + km</span></div></div>
+    ${S.purpose ? `<div class="notice">${esc(S.purpose)}</div>` : ''}
+    <div class="notice">${_.rentApproval}</div>
+    ${S.error ? `<div class="err-notice">${S.error}</div>` : ''}
+    <button class="btn" data-act="confirm" ${S.busy ? 'disabled' : ''}>${S.busy ? '…' : _.confirmRent}</button>`);
+    return;
+  }
+
+  const f = S.flags || {};
+  const hasAssets = f.hasPackages || f.hasCredit || f.member;
+  let assetBlock = '';
+  if (hasAssets && !f.verified) {
+    assetBlock = `<div class="pkg"><div class="t">${_.assetsFound}</div><div class="d">${_.assetsVerify}</div>
+      ${S.codeSent ? `
+        <label style="margin-top:10px">${_.verifyCode}</label>
+        <input type="text" id="f-code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" style="margin-bottom:8px">
+        <div class="field-err" id="e-code">${_.verifyErr}</div>
+        <button class="btn ghost" data-act="verify">${_.verifyBtn}</button>`
+      : `<button class="btn ghost" style="margin-top:10px" data-act="sendcode">${_.sendCode}</button>`}
+    </div>`;
+  }
+  let pkgOpts = '';
+  if (f.verified && S.assets) {
+    for (const p of S.assets.packages) {
+      if (p.left < units()) continue;
+      pkgOpts += payopt('pkg:' + p.id, _.pkgUse(esc(p.name), p.left), _.pkgValid(p.validUntil));
+    }
+    if (S.assets.creditCents >= displayCents() && displayCents() > 0) {
+      pkgOpts += payopt('credit', _.useCredit(eur(S.assets.creditCents)), '');
+    }
+    if (f.member) pkgOpts = `<div class="pkg"><div class="t">${_.memberFound}</div><div class="d">${_.memberDesc(eur(CFG.memberCents))}</div></div>` + pkgOpts;
+  }
+
+  const total = displayCents();
+  const priceRow = memberActive()
+    ? `<div class="row"><span class="l">${_.memberRow}</span><span>−${eur(baseCents() - total)}</span></div>
+       <div class="row total"><span>${_.sPrice}</span><span>${eur(total)}</span></div>`
+    : `<div class="row total"><span>${_.sPrice}</span><span>${eur(total)}${S.promoCode ? ' *' : ''}</span></div>`;
+
+  const svcName = S.service === 'float' ? _.svcFloatH : esc(S.sessions[S.groupIdx].name);
+  h(backBtn(2) + stepsBar(3) + `<h3 class="step-title">${_.confirmStep}</h3>
+  <div class="sumbox"><div class="row"><span class="l">${_.sum}</span><span><b>${svcName}</b></span></div>${sumLines()}${priceRow}</div>
+  ${assetBlock}${pkgOpts}
+  ${payopt('paysera', _.payNow, _.payNowD)}
+  ${payopt('cash', _.paySpot, _.paySpotD)}
+  <label>${_.promoQ}</label><div class="promo">
+    <input type="text" id="f-promo" placeholder="${_.promoPh}" value="${esc(S.promoCode)}">
+  </div>
+  <p class="hint" style="margin:-8px 0 12px">${S.promoCode ? '* ' : ''}${_.promoNote}</p>
+  ${_.gtk(S.service)}
+  ${S.error ? `<div class="err-notice">${S.error}</div>` : ''}
+  <button class="btn" data-act="confirm" ${S.busy ? 'disabled' : ''}>${S.busy ? '…' : _.confirmBtn}</button>`);
+}
+
+function payopt(id: string, tt: string, dd: string) {
+  return `<div class="payopt ${S.pay === id ? 'on' : ''}" data-pay="${id}">
+  <input type="radio" name="pay" ${S.pay === id ? 'checked' : ''}><div><div class="t">${tt}</div>${dd ? `<div class="d">${dd}</div>` : ''}</div></div>`;
+}
+
+function vDone() {
+  const _ = t();
+  const r = S.result;
+  if (S.service === 'rent') {
+    h(`<div class="center" style="margin-top:14px"><div class="done-icon">✓</div><h1>${_.rentDoneH}</h1>
+    <p class="sub">${_.rentDoneP(esc(S.email))}</p></div>
+    <div class="sumbox"><div class="row"><span class="l">${_.sum}</span><span><b>${_.svcRentH}</b></span></div>${sumLines()}</div>
+    <button class="btn" data-act="restart">${_.again}</button>`);
+    return;
+  }
+  const first = r.bookings[0];
+  const manageUrl = '/broneering/' + first.token;
+  let lines = '';
+  for (const bk of r.bookings) {
+    lines += `<div class="row"><span class="l">${fmtDate(bk.date)}</span><span>${bk.time} · ${esc(bk.roomName)}</span></div>`;
+  }
+  h(`<div class="center" style="margin-top:14px"><div class="done-icon">✓</div><h1>${_.doneH}</h1>
+  <p class="sub">${_.doneSent(esc(S.email))}<br>${_.doneRemind}</p></div>
+  <div class="sumbox">${lines}
+  <div class="row total"><span>${_.sPrice}</span><span>${eur(r.amountCents)}</span></div></div>
+  ${S.pay === 'paysera' ? `<div class="notice">${_.payLater}</div>` : ''}
+  <a class="btn ghost" style="text-align:center;text-decoration:none;box-sizing:border-box;display:block;margin-bottom:10px" href="${manageUrl}">${_.manageDemo}</a>
+  <button class="btn" data-act="restart">${_.again}</button>`);
+}
+
+// ---------- tegevused ----------
+
+async function doDetails() {
+  const _ = t();
+  const g = (id: string) => (document.getElementById(id) as HTMLInputElement);
+  const name = g('f-name').value.trim();
+  const email = g('f-email').value.trim();
+  const phone = g('f-phone').value.trim();
+  let ok = true;
+  g('e-name' as any) && ((document.getElementById('e-name')!).style.display = name ? 'none' : 'block'); if (!name) ok = false;
+  const eok = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+  (document.getElementById('e-email')!).style.display = eok ? 'none' : 'block'; if (!eok) ok = false;
+  const pok = phone.replace(/\D/g, '').length >= 7;
+  (document.getElementById('e-phone')!).style.display = pok ? 'none' : 'block'; if (!pok) ok = false;
+  if (!ok) return;
+  if (g('f-veebileht').value) return; // robot
+
+  S.name = name; S.email = email; S.phone = phone;
+  const pu = document.getElementById('f-purpose') as HTMLTextAreaElement | null;
+  S.purpose = pu ? pu.value.trim() : '';
+  S.remember = g('f-remember').checked;
+  try {
+    if (S.remember) localStorage.setItem('hk_bk_contact', JSON.stringify({ name, email, phone }));
+    else localStorage.removeItem('hk_bk_contact');
+  } catch {}
+
+  (document.getElementById('b-details') as HTMLButtonElement).disabled = true;
+  const { data } = await api('flags', { email });
+  S.flags = data; S.assets = data.assets || null; S.error = null;
+  if (data.blocked) { S.error = _.blocked; S.flags = { ...data, hasPackages: false, hasCredit: false, member: false }; }
+  S.pay = 'paysera';
+  S.step = 3; render();
+}
+
+async function doSendCode() {
+  const { status } = await api('request-code', { email: S.email, locale: S.lang });
+  S.codeSent = status === 200 || status === 429;
+  render();
+}
+
+async function doVerify() {
+  const code = (document.getElementById('f-code') as HTMLInputElement).value.trim();
+  const { status, data } = await api('verify-code', { email: S.email, code });
+  if (status !== 200) { (document.getElementById('e-code')!).style.display = 'block'; return; }
+  S.flags.verified = true; S.assets = data.assets;
+  render();
+}
+
+async function doConfirm() {
+  const _ = t();
+  const promoEl = document.getElementById('f-promo') as HTMLInputElement | null;
+  if (promoEl) S.promoCode = promoEl.value.trim();
+  S.busy = true; S.error = null; render();
+
+  const body: any = {
+    type: S.service, name: S.name, email: S.email, phone: S.phone,
+    locale: S.lang, promoCode: S.promoCode || undefined, veebileht: '',
+  };
+  if (S.service === 'float') body.slots = S.slots;
+  if (S.service === 'group') { body.sessionId = S.sessions[S.groupIdx].id; body.seats = S.seats; }
+  if (S.service === 'rent') {
+    body.rentRoom = S.rentRoom; body.rentDate = S.dateKey;
+    body.rentHours = [...S.rentHours].sort(); body.purpose = S.purpose;
+    body.payment = 'cash';
+  } else if (S.pay.startsWith('pkg:')) {
+    body.payment = 'package'; body.packageId = Number(S.pay.slice(4));
+  } else {
+    body.payment = S.pay;
+  }
+
+  const { status, data } = await api('create', body);
+  S.busy = false;
+  if (status === 200 && data.ok) {
+    Object.keys(availCache).forEach((k) => delete availCache[k]);
+    // "Maksa kohe" → suuna Paysera makselehele; tagasi tulles maandub /broneering/[token] lehel
+    if (S.service !== 'rent' && S.pay === 'paysera') {
+      const payRes = await api('pay', { tokens: data.bookings.map((bk: any) => bk.token) });
+      if (payRes.status === 200 && payRes.data.data) {
+        const f = document.createElement('form');
+        f.method = 'POST'; f.action = payRes.data.url; f.style.display = 'none';
+        for (const [k, val] of [['data', payRes.data.data], ['sign', payRes.data.sign]]) {
+          const i = document.createElement('input');
+          i.type = 'hidden'; i.name = k; i.value = val as string;
+          f.appendChild(i);
+        }
+        document.body.appendChild(f);
+        f.submit();
+        return; // brauser lahkub Payserasse
+      }
+      // makse algatamine ebaõnnestus — broneering jääb alles, kuvame payLater teate
+    }
+    S.result = data; S.step = 4;
+  } else {
+    S.error = data.error === 'conflict' ? _.errConflict
+      : data.error === 'full' ? _.errFull
+      : data.error === 'blocked' ? _.blocked
+      : data.error === 'no_package' ? _.errPackage
+      : data.error === 'too_late' ? _.errLate : _.errGeneric;
+    if (data.error === 'conflict' || data.error === 'full') {
+      S.slots = []; S.groupIdx = null; S.sessions = []; S.step = 1;
+    }
+  }
+  render();
+}
+
+// ---------- sündmused (delegeeritud) ----------
+
+document.querySelector('.bkw')!.addEventListener('click', (ev) => {
+  const el = (ev.target as HTMLElement).closest('[data-lang],[data-pick],[data-go],[data-date],[data-cal],[data-slot],[data-hour],[data-room],[data-sess],[data-seat],[data-pay],[data-act]') as HTMLElement | null;
+  if (!el) return;
+  const d = el.dataset;
+  if (d.lang) { S.lang = d.lang; render(); }
+  else if (d.pick) {
+    S.service = d.pick; S.slots = []; S.rentHours = []; S.groupIdx = null; S.seats = 1;
+    S.calOff = 0; S.error = null; S.result = null; S.codeSent = false;
+    if (!S.dateKey || S.dateKey < TODAY) S.dateKey = TODAY;
+    S.step = 1; render();
+  }
+  else if (d.go !== undefined) { S.step = Number(d.go); S.error = null; render(); }
+  else if (d.date) { S.dateKey = d.date; if (S.service === 'rent') S.rentHours = []; render(); }
+  else if (d.cal) { S.calOff = Math.max(0, Math.min(3, S.calOff + Number(d.cal))); render(); }
+  else if (d.slot) {
+    const i = S.slots.findIndex((x: any) => x.date === S.dateKey && x.time === d.slot);
+    if (i >= 0) S.slots.splice(i, 1);
+    else if (S.slots.length < 6) S.slots.push({ date: S.dateKey, time: d.slot });
+    render();
+  }
+  else if (d.hour) {
+    const i = S.rentHours.indexOf(d.hour);
+    if (i >= 0) S.rentHours.splice(i, 1); else if (S.rentHours.length < 12) S.rentHours.push(d.hour);
+    render();
+  }
+  else if (d.room) { S.rentRoom = d.room; S.rentHours = []; render(); }
+  else if (d.sess !== undefined && d.sess !== '') {
+    S.groupIdx = Number(d.sess);
+    const g = S.sessions[S.groupIdx];
+    if (S.seats > g.free) S.seats = g.free;
+    render();
+  }
+  else if (d.seat) { S.seats += Number(d.seat); render(); }
+  else if (d.pay) { S.pay = d.pay; render(); }
+  else if (d.act === 'details') doDetails();
+  else if (d.act === 'sendcode') doSendCode();
+  else if (d.act === 'verify') doVerify();
+  else if (d.act === 'confirm') doConfirm();
+  else if (d.act === 'restart') {
+    S.step = 0; S.service = null; S.slots = []; S.rentHours = []; S.groupIdx = null;
+    S.seats = 1; S.promoCode = ''; S.error = null; S.result = null; S.sessions = [];
+    render();
+  }
+});
+
+function render() {
+  renderLangs();
+  [vService, vTime, vDetails, vPay, vDone][S.step]();
+  window.scrollTo({ top: 0 });
+}
+
+(async () => {
+  try {
+    const res = await fetch('/api/booking/config');
+    if (res.ok) CFG = { ...CFG, ...(await res.json()) };
+  } catch {}
+  render();
+})();
+</script>
+</Layout>

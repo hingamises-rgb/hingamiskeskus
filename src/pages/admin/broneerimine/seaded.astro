@@ -1,0 +1,182 @@
+---
+// Broneerimise seaded: hinnad, ruumide sisse/välja lülitamine (Ecuador!),
+// sooduskoodid, aegade lukustamine (puhkus/remont).
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { requireDb } from '../../../lib/db';
+import { getSettings, nowTallinn, hhmm, dateStr } from '../../../lib/booking';
+
+const sql = requireDb();
+const now = nowTallinn();
+const s = await getSettings();
+const rooms = await sql`SELECT * FROM bk_rooms ORDER BY id`;
+const promos = await sql`SELECT * FROM bk_promos ORDER BY id DESC LIMIT 50`;
+const blocks = await sql`
+  SELECT b.*, r.name AS room_name FROM bk_blocks b LEFT JOIN bk_rooms r ON r.id = b.room_id
+  WHERE b.date >= ${now.date} ORDER BY b.date
+`;
+const fmtD = (d: any) => dateStr(d).split('-').reverse().join('.');
+const prices = [
+  ['price_float_cents', 'Floating (€/kord)'],
+  ['price_member_cents', 'Liikmehind (€/kord)'],
+  ['price_group_cents', 'Grupihingamise vaikehind (€)'],
+  ['rent_suur_cents_h', 'Suur saal rent (€/h)'],
+  ['rent_vaike_cents_h', 'Väike tuba rent (€/h)'],
+];
+---
+
+<AdminLayout title="Broneerimise seaded" active="booking">
+  <h1>Broneerimise seaded</h1>
+  <p style="margin:-12px 0 20px"><a href="/admin/broneerimine" style="color:#1f6d85">‹ Broneerimine</a></p>
+
+  <div class="panel">
+    <h2>Ruumid</h2>
+    <table class="admin-table">
+      <tbody>
+        {rooms.map((r: any) => (
+          <tr>
+            <td><b>{r.name}</b> <small style="color:#888">({r.type})</small></td>
+            <td>{r.active ? <span class="badge badge--paid">sees</span> : <span class="badge" style="background:#eee;color:#888">väljas</span>}</td>
+            <td>
+              <button class="btn btn--outline r-toggle" data-rid={r.id} data-active={r.active ? '' : '1'}>
+                {r.active ? 'Lülita välja' : 'Lülita sisse'}
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:#888;margin-top:8px">Väljas olev ruum ei ilmu kliendile ega paku aegu (nt Ecuador, kuni vett pole). Sisse lülitades hakkab kehtima Peruu graafik — kui Ecuadoril peavad olema teised ajad, ütle Claude'ile.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Hinnad</h2>
+    <div style="display:grid;grid-template-columns:auto 120px auto;gap:10px;align-items:center;max-width:480px">
+      {prices.map(([key, label]) => (
+        <>
+          <span style="font-size:14px">{label}</span>
+          <input type="number" step="0.5" class="price" data-key={key} value={Number(s[key] || 0) / 100}
+            style="padding:8px;border:1px solid #ddd;border-radius:8px;font:inherit" />
+          <button class="btn btn--outline p-save" data-key={key}>Salvesta</button>
+        </>
+      ))}
+    </div>
+    <p style="font-size:12px;color:#888;margin-top:8px">Hind kehtib uutele broneeringutele kohe. Grupiseansi hinda saab korra kaupa muuta Grupiseansside lehel.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Sooduskoodid</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <input id="pr-code" placeholder="KOOD (nt TERE15)" style="padding:9px;border:1px solid #ddd;border-radius:8px;font:inherit" />
+      <input id="pr-pct" type="number" placeholder="%" style="width:70px;padding:9px;border:1px solid #ddd;border-radius:8px;font:inherit" />
+      <span style="align-self:center;font-size:13px;color:#888">või</span>
+      <input id="pr-eur" type="number" placeholder="−€" style="width:70px;padding:9px;border:1px solid #ddd;border-radius:8px;font:inherit" />
+      <input id="pr-until" type="date" title="Kehtib kuni (tühi = tähtajatu)" style="padding:9px;border:1px solid #ddd;border-radius:8px;font:inherit" />
+      <input id="pr-max" type="number" placeholder="Max kasutusi" style="width:110px;padding:9px;border:1px solid #ddd;border-radius:8px;font:inherit" />
+      <button class="btn" id="pr-add">Lisa kood</button>
+    </div>
+    <table class="admin-table">
+      <thead><tr><th>Kood</th><th>Soodustus</th><th>Kehtib kuni</th><th>Kasutatud</th><th>Olek</th><th></th></tr></thead>
+      <tbody>
+        {promos.map((p: any) => (
+          <tr>
+            <td><b>{p.code}</b></td>
+            <td>{p.pct ? `−${p.pct}%` : `−${(p.amount_cents / 100)}€`}</td>
+            <td>{p.valid_until ? fmtD(p.valid_until) : '—'}</td>
+            <td>{p.used}{p.max_uses ? ` / ${p.max_uses}` : ''}</td>
+            <td>{p.active ? <span class="badge badge--paid">aktiivne</span> : <span class="badge" style="background:#eee;color:#888">väljas</span>}</td>
+            <td><button class="btn btn--outline pr-toggle" data-pid={p.id}>{p.active ? 'Lülita välja' : 'Lülita sisse'}</button></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Aegade lukustamine (puhkus, remont, hooldus)</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <select id="bl-room" style="padding:9px;border:1px solid #ddd;border-radius:8px;font:inherit">
+        <option value="">Kõik ruumid</option>
+        {rooms.map((r: any) => <option value={r.id}>{r.name}</option>)}
+      </select>
+      <input id="bl-date" type="date" style="padding:9px;border:1px solid #ddd;border-radius:8px;font:inherit" />
+      <input id="bl-time" type="time" title="Tühi = terve päev" style="padding:9px;border:1px solid #ddd;border-radius:8px;font:inherit" />
+      <input id="bl-dur" type="number" value="60" title="Kestus min" style="width:90px;padding:9px;border:1px solid #ddd;border-radius:8px;font:inherit" />
+      <input id="bl-reason" placeholder="Põhjus" style="padding:9px;border:1px solid #ddd;border-radius:8px;font:inherit" />
+      <button class="btn" id="bl-add">Lukusta</button>
+    </div>
+    <table class="admin-table">
+      <tbody>
+        {blocks.map((b: any) => (
+          <tr>
+            <td>{fmtD(b.date)}</td>
+            <td>{b.start_time ? `${hhmm(b.start_time)} (${b.duration_min} min)` : 'terve päev'}</td>
+            <td>{b.room_name || 'kõik ruumid'}</td>
+            <td>{b.reason}</td>
+            <td><button class="btn btn--outline bl-del" data-bid={b.id}>Eemalda</button></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:#888;margin-top:8px">Lukustatud aeg ei ilmu kliendile broneeritavana. Olemasolevaid broneeringuid see ei tühista — need tühista käsitsi.</p>
+  </div>
+</AdminLayout>
+
+<script>
+async function act(body: any) {
+  const res = await fetch('/api/admin/booking-action', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  });
+  return { ok: res.ok, data: await res.json().catch(() => ({})) };
+}
+const v = (id: string) => (document.getElementById(id) as HTMLInputElement).value;
+
+document.querySelectorAll('.r-toggle').forEach((btn) => {
+  btn.addEventListener('click', async () => {
+    const el = btn as HTMLElement;
+    const { ok } = await act({ action: 'room_active', id: Number(el.dataset.rid), active: !!el.dataset.active });
+    if (ok) location.reload();
+  });
+});
+
+document.querySelectorAll('.p-save').forEach((btn) => {
+  btn.addEventListener('click', async () => {
+    const key = (btn as HTMLElement).dataset.key!;
+    const input = document.querySelector(`.price[data-key="${key}"]`) as HTMLInputElement;
+    const { ok } = await act({ action: 'setting_set', key, value: Math.round(Number(input.value) * 100) });
+    if (ok) { (btn as HTMLElement).textContent = 'Salvestatud ✓'; setTimeout(() => location.reload(), 600); }
+  });
+});
+
+document.getElementById('pr-add')?.addEventListener('click', async () => {
+  if (!v('pr-code').trim()) { alert('Sisesta kood'); return; }
+  if (!v('pr-pct') && !v('pr-eur')) { alert('Sisesta % või €'); return; }
+  const { ok } = await act({
+    action: 'promo_add', code: v('pr-code'), pct: v('pr-pct') || null,
+    amountEur: v('pr-eur') || null, validUntil: v('pr-until') || null, maxUses: v('pr-max') || null,
+  });
+  if (ok) location.reload();
+});
+document.querySelectorAll('.pr-toggle').forEach((btn) => {
+  btn.addEventListener('click', async () => {
+    const { ok } = await act({ action: 'promo_toggle', id: Number((btn as HTMLElement).dataset.pid) });
+    if (ok) location.reload();
+  });
+});
+
+document.getElementById('bl-add')?.addEventListener('click', async () => {
+  if (!v('bl-date')) { alert('Vali kuupäev'); return; }
+  const { ok } = await act({
+    action: 'block_add', roomId: v('bl-room') || null, date: v('bl-date'),
+    time: v('bl-time') || null, durationMin: Number(v('bl-dur')) || 60, reason: v('bl-reason'),
+  });
+  if (ok) location.reload();
+});
+document.querySelectorAll('.bl-del').forEach((btn) => {
+  btn.addEventListener('click', async () => {
+    const { ok } = await act({ action: 'block_delete', id: Number((btn as HTMLElement).dataset.bid) });
+    if (ok) location.reload();
+  });
+});
+</script>
