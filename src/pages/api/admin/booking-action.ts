@@ -141,6 +141,18 @@ export const POST: APIRoute = async ({ request }) => {
         return json({ ok: true });
       }
 
+      case 'package_use': {
+        // Käsitsi korra kasutamine (+1) või tagastamine (−1): telefonibroneering,
+        // "pane äsja käidud kord paketile" jne. Piirid 0..total.
+        const delta = Number(b.delta) === -1 ? -1 : 1;
+        await sql`
+          UPDATE bk_packages
+          SET used_sessions = LEAST(total_sessions, GREATEST(0, used_sessions + ${delta}))
+          WHERE id = ${Number(b.id)}
+        `;
+        return json({ ok: true });
+      }
+
       case 'package_delete': {
         await sql`DELETE FROM bk_package_uses WHERE package_id = ${Number(b.id)}`;
         await sql`DELETE FROM bk_packages WHERE id = ${Number(b.id)}`;

@@ -87,7 +87,11 @@ const fmtD = (d: any) => dateStr(d).split('-').reverse().join('.');
                 <td>{p.total_sessions - p.used_sessions} / {p.total_sessions} alles</td>
                 <td>kehtib {fmtD(p.valid_until)}</td>
                 <td><small>{p.source}</small></td>
-                <td><button class="p-del" data-pid={p.id} style="background:none;border:none;color:#b3261e;font-size:12px">Kustuta</button></td>
+                <td style="white-space:nowrap">
+                  <button class="p-use" data-pid={p.id} data-delta="1" title="Kasuta 1 kord (nt telefonibroneering)" style="border:1px solid #ddd;background:none;border-radius:6px;padding:2px 8px;font-size:12px">−1 kord</button>
+                  <button class="p-use" data-pid={p.id} data-delta="-1" title="Tagasta 1 kord" style="border:1px solid #ddd;background:none;border-radius:6px;padding:2px 8px;font-size:12px">+1 kord</button>
+                  <button class="p-del" data-pid={p.id} style="background:none;border:none;color:#b3261e;font-size:12px">Kustuta</button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -165,6 +169,14 @@ document.querySelectorAll('[data-cid]').forEach((panel) => {
     const validUntil = new Date(Date.now() + days * 86400000).toISOString().slice(0, 10);
     const { ok } = await act({ action: 'package_add', clientId: id, name, sessions, validUntil });
     if (ok) location.reload(); else alert('Ebaõnnestus');
+  });
+
+  panel.querySelectorAll('.p-use').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const el = btn as HTMLElement;
+      const { ok } = await act({ action: 'package_use', id: Number(el.dataset.pid), delta: Number(el.dataset.delta) });
+      if (ok) location.reload();
+    });
   });
 
   panel.querySelectorAll('.p-del').forEach((btn) => {
