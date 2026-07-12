@@ -7,7 +7,14 @@ import nodemailer from 'nodemailer';
 
 const EMAIL_USER = import.meta.env.EMAIL_USER || process.env.EMAIL_USER || 'info@hingamiskeskus.ee';
 const EMAIL_PASS = import.meta.env.EMAIL_PASS || process.env.EMAIL_PASS || '';
-const SITE = 'https://www.hingamiskeskus.ee';
+
+// Meililinkide baas-URL. Enne DNS-i vahetust peab see olema vercel.app (päris domeen
+// näitab veel vana saiti!), pärast vahetust hingamiskeskus.ee. VERCEL_PROJECT_PRODUCTION_URL
+// annab Vercelis alati õige: enne domeeni lisamist vercel.app, pärast custom domeeni.
+// BOOKING_SITE_URL env-iga saab vajadusel käsitsi üle kirjutada.
+const PROD_URL = import.meta.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || '';
+const SITE = import.meta.env.BOOKING_SITE_URL || process.env.BOOKING_SITE_URL
+  || (PROD_URL ? `https://${PROD_URL}` : 'https://www.hingamiskeskus.ee');
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.hostinger.com',
