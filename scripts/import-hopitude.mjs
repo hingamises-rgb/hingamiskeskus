@@ -65,8 +65,9 @@ const COLUMN_ALIASES = {
   name: ['nimi', 'name', 'eesnimi', 'klient', 'client', 'täisnimi', 'full name'],
   lastname: ['perekonnanimi', 'last name', 'surname', 'perenimi'],
   phone: ['telefon', 'phone', 'tel', 'mobiil', 'number'],
+  visits: ['total classes', 'külastus', 'visits', 'treeningud'],
   pkgname: ['pakett', 'package', 'paketi nimi', 'toode', 'nimetus'],
-  total: ['kordi', 'kordade arv', 'total', 'sessions', 'korrad', 'kogus', 'mahus'],
+  total: ['kordi', 'kordade arv', 'sessions', 'korrad', 'kogus', 'mahus'],
   used: ['kasutatud', 'used', 'tarbitud'],
   validuntil: ['kehtivus', 'kehtib kuni', 'valid until', 'aegub', 'expires', 'lõpp'],
 };
@@ -107,14 +108,15 @@ for (const row of clientRows.slice(1)) {
   if (!email.includes('@')) { invalid++; continue; }
   const name = [row[cmap.name], row[cmap.lastname]].filter(Boolean).join(' ').trim();
   const phone = String(row[cmap.phone] || '').trim();
+  const visits = cmap.visits !== undefined ? parseInt(row[cmap.visits], 10) || 0 : 0;
   if (DRY) { added++; continue; }
   const res = await sql`
-    INSERT INTO bk_clients (email, name, phone)
-    VALUES (${email}, ${name || null}, ${phone || null})
-    ON CONFLICT (email) DO NOTHING
-    RETURNING id
+    INSERT INTO bk_clients (email, name, phone, visits)
+    VALUES (${email}, ${name || null}, ${phone || null}, ${visits})
+    ON CONFLICT (email) DO UPDATE SET visits = GREATEST(bk_clients.visits, ${visits})
+    RETURNING (xmax = 0) AS inserted
   `;
-  if (res.length) added++; else skipped++;
+  if (res[0]?.inserted) added++; else skipped++;
 }
 console.log(`Kliendid: lisatud ${added}, juba olemas ${skipped}, vigase e-postiga ${invalid}${DRY ? ' (DRY RUN)' : ''}`);
 

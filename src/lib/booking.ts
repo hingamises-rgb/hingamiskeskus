@@ -679,7 +679,8 @@ export async function trialAllowed(email: string): Promise<boolean> {
       EXISTS (
         SELECT 1 FROM bk_clients c
         WHERE c.email = ${em} AND (
-          EXISTS (SELECT 1 FROM bk_bookings b WHERE b.client_id = c.id)
+          c.visits > 0   -- Hopitudest imporditud külastuste ajalugu
+          OR EXISTS (SELECT 1 FROM bk_bookings b WHERE b.client_id = c.id)
           OR EXISTS (SELECT 1 FROM bk_packages p WHERE p.client_id = c.id)
         )
       ) AS existing_client

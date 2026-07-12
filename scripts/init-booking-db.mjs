@@ -79,6 +79,7 @@ await sql`
     phone TEXT,
     notes TEXT NOT NULL DEFAULT '',
     blocked BOOLEAN NOT NULL DEFAULT false,
+    visits INT NOT NULL DEFAULT 0,           -- Hopitude ajalooline külastuste arv (impordist)
     member_until DATE,               -- liikmelisus (Stripe): liikmehind kehtib kuni selle kuupäevani
     locale TEXT NOT NULL DEFAULT 'et',
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
