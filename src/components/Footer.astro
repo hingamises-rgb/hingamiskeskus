@@ -1,0 +1,94 @@
+---
+// Ühine jalus (vana saidi kujundus): Aadress + maja pilt | logo + lahtiolekuajad + FB/IG | Kontakt.
+// Asendab varasema 18 lehel dubleeritud jalusemarkupi.
+---
+<footer class="ftr">
+  <div class="ftr__grid">
+    <div class="ftr__col ftr__col--address">
+      <h3>Aadress</h3>
+      <p>Söle 14c, Tallinn</p>
+      <img src="/images/hoone.jpg" alt="Hingamiskeskus Söle 14c" class="ftr__photo" loading="lazy" />
+      <p class="ftr__legal"><a href="/privaatsuspoliitika">Privaatsuspoliitika &amp; Müügitingimused</a></p>
+    </div>
+    <div class="ftr__col ftr__col--center">
+      <img src="/images/logo-valge.png" alt="Hingamiskeskus" class="ftr__logo" />
+      <h3>Lahtiolekuajad</h3>
+      <p>E-R 8.30 - 20.00</p>
+      <p>L-P 11.00 - 18.00</p>
+      <div class="ftr__social">
+        <a href="https://www.facebook.com/Hingamiskeskus" aria-label="Facebook" target="_blank" rel="noopener">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/hingamiskeskus/" aria-label="Instagram" target="_blank" rel="noopener">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="ftr__col ftr__col--contact">
+      <h3>Kontakt</h3>
+      <p>E-post:<br />Info@hingamiskeskus.ee</p>
+      <p>Telefoninumber:<br />+372 56695898</p>
+      <p>+372 56497689</p>
+      <p>(klienditugi 10.00-17.00)</p>
+      <p>Hingamises OÜ<br />EE147700771009732310</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ftr {
+    background: #1f6d85;
+    color: #fff;
+    padding: 40px 24px 48px;
+  }
+  .ftr__grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    gap: 32px;
+  }
+  .ftr h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 10px;
+  }
+  .ftr p {
+    font-size: 14.5px;
+    line-height: 1.8;
+    margin: 0 0 10px;
+  }
+  .ftr__photo {
+    width: 100%;
+    max-width: 390px;
+    border-radius: 6px;
+    display: block;
+    margin: 6px 0 14px;
+  }
+  .ftr__legal a {
+    color: #fff;
+    text-decoration: underline;
+    font-size: 14px;
+  }
+  .ftr__logo {
+    height: 44px;
+    width: auto;
+    margin-bottom: 28px;
+  }
+  .ftr__social {
+    display: flex;
+    gap: 22px;
+    margin-top: 26px;
+    color: #fff;
+  }
+  .ftr__social a { color: #fff; }
+
+  @media (min-width: 900px) {
+    .ftr { padding: 56px 40px 64px; }
+    .ftr__grid {
+      grid-template-columns: 1.1fr 1fr 1fr;
+      gap: 48px;
+    }
+    .ftr__col--center { padding-top: 4px; }
+    .ftr__col--contact { justify-self: start; }
+  }
+</style>
