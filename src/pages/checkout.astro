@@ -386,6 +386,10 @@ import Layout from '../layouts/Layout.astro';
         return;
       }
 
+      // Jäta ostusumma meelde makse-tehtud lehe jaoks (Meta Pixel / GA Purchase sündmus)
+      try {
+        localStorage.setItem('hk_last_order', JSON.stringify({ orderid: orderid, total: total, ts: Date.now() }));
+      } catch (e) {}
       localStorage.removeItem('hk_cart');
 
       document.getElementById('paysera-data').value = result.data;

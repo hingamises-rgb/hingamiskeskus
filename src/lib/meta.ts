@@ -9,6 +9,7 @@ export const metaConfigured = !!(TOKEN && ACCOUNT);
 export interface MonthlySpend {
   month: string; // YYYY-MM
   spend: number;
+  roas?: number; // platvormi atributeeritud ostu-ROAS (kordades), kui saadaval
 }
 
 // Tagastab viimase ~12 kuu Meta reklaamikulud kuude kaupa.
@@ -23,7 +24,7 @@ export async function fetchMetaMonthlySpend(): Promise<MonthlySpend[] | null> {
   const since = sinceDate.toISOString().slice(0, 10);
 
   const timeRange = encodeURIComponent(JSON.stringify({ since, until }));
-  const url = `https://graph.facebook.com/v23.0/${ACCOUNT}/insights?level=account&fields=spend&time_increment=monthly&time_range=${timeRange}&access_token=${TOKEN}`;
+  const url = `https://graph.facebook.com/v23.0/${ACCOUNT}/insights?level=account&fields=spend,purchase_roas&time_increment=monthly&time_range=${timeRange}&access_token=${TOKEN}`;
 
   try {
     const res = await fetch(url);
@@ -32,10 +33,16 @@ export async function fetchMetaMonthlySpend(): Promise<MonthlySpend[] | null> {
       return null;
     }
     const data = await res.json();
-    return (data.data || []).map((row: any) => ({
-      month: String(row.date_start).slice(0, 7),
-      spend: Number(row.spend) || 0,
-    }));
+    return (data.data || []).map((row: any) => {
+      // purchase_roas: [{action_type: 'omni_purchase', value: '2.31'}]
+      const roasRow = (row.purchase_roas || []).find((r: any) =>
+        r.action_type === 'omni_purchase' || r.action_type === 'purchase');
+      return {
+        month: String(row.date_start).slice(0, 7),
+        spend: Number(row.spend) || 0,
+        roas: roasRow ? Number(roasRow.value) : undefined,
+      };
+    });
   } catch (e) {
     console.error('Meta API päring ebaõnnestus:', e);
     return null;

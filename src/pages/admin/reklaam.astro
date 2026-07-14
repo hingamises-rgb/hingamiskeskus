@@ -16,6 +16,11 @@ const [metaSpend, googleSpend] = await Promise.all([
 const metaAuto = new Map((metaSpend || []).map(m => [m.month, m.spend]));
 const googleAuto = new Map((googleSpend || []).map(m => [m.month, m.spend]));
 
+// Platvormide atributeeritud kanali-ROAS (kordades). NB: see on platvormi enda
+// omistatud käive — kanaleid EI tohi kokku liita üldise ROAS-iga (topeltarvestus).
+const metaRoas = new Map((metaSpend || []).filter(m => m.roas != null).map(m => [m.month, m.roas!]));
+const googleRoas = new Map((googleSpend || []).filter(m => m.roas != null).map(m => [m.month, m.roas!]));
+
 // Kulud + käive kuude lõikes (viimased 12 kuud)
 // NB: kuu võti tuleb SQL-ist tekstina (to_char), et vältida ajavööndi nihkeid
 const costs = await sql`
@@ -114,7 +119,7 @@ const currentMonth = new Date().toISOString().slice(0, 7);
     ) : (
       <table class="admin-table">
         <thead>
-          <tr><th>Kuu</th><th>Käive</th><th>Tellimusi</th><th>Google</th><th>Meta{metaConfigured && metaSpend !== null ? ' (auto)' : ''}</th><th>Muu</th><th>Kulud kokku</th><th>ROAS</th></tr>
+          <tr><th>Kuu</th><th>Käive</th><th>Tellimusi</th><th>Google</th><th>G-ROAS</th><th>Meta{metaConfigured && metaSpend !== null ? ' (auto)' : ''}</th><th>M-ROAS</th><th>Muu</th><th>Kulud kokku</th><th>ROAS</th></tr>
         </thead>
         <tbody>
           {months.map(([key, m]) => {
@@ -125,7 +130,9 @@ const currentMonth = new Date().toISOString().slice(0, 7);
                 <td>€{m.revenue.toFixed(2)}</td>
                 <td>{m.orders}</td>
                 <td>{m.channels.google != null ? `€${m.channels.google.toFixed(2)}` : '—'}</td>
+                <td>{googleRoas.has(key) ? `${googleRoas.get(key)!.toFixed(2)}x` : '—'}</td>
                 <td>{m.channels.meta != null ? `€${m.channels.meta.toFixed(2)}` : '—'}</td>
+                <td>{metaRoas.has(key) ? `${metaRoas.get(key)!.toFixed(2)}x` : '—'}</td>
                 <td>{m.channels.muu != null ? `€${m.channels.muu.toFixed(2)}` : '—'}</td>
                 <td>{m.spend > 0 ? `€${m.spend.toFixed(2)}` : '—'}</td>
                 <td>

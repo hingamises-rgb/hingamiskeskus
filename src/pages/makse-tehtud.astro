@@ -16,6 +16,31 @@ import Footer from '../components/Footer.astro';
 
 <Footer />
 
+<script is:inline>
+  // Ostu sündmus reklaamikanalitele (kanali-ROAS). Summa tuleb kassast (hk_last_order),
+  // käivitub üks kord tellimuse kohta — võti kustutatakse, et värskendus topelt ei saadaks.
+  try {
+    var raw = localStorage.getItem('hk_last_order');
+    if (raw) {
+      var order = JSON.parse(raw);
+      var fresh = order && order.total > 0 && Date.now() - (order.ts || 0) < 3600e3;
+      if (fresh) {
+        if (typeof fbq === 'function') {
+          fbq('track', 'Purchase', { value: Number(order.total), currency: 'EUR' });
+        }
+        if (typeof gtag === 'function') {
+          gtag('event', 'purchase', {
+            transaction_id: String(order.orderid || ''),
+            value: Number(order.total),
+            currency: 'EUR',
+          });
+        }
+      }
+      localStorage.removeItem('hk_last_order');
+    }
+  } catch (e) {}
+</script>
+
 </Layout>
 
 <style>

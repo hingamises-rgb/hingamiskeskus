@@ -16,6 +16,7 @@ export const googleAdsConfigured = !!(DEV_TOKEN && CLIENT_ID && CLIENT_SECRET &&
 export interface MonthlySpend {
   month: string; // YYYY-MM
   spend: number;
+  roas?: number; // platvormi atributeeritud ostu-ROAS (conversions_value / cost), kui saadaval
 }
 
 async function getAccessToken(): Promise<string | null> {
@@ -51,7 +52,7 @@ export async function fetchGoogleMonthlySpend(): Promise<MonthlySpend[] | null> 
     sinceDate.setDate(1);
     const since = sinceDate.toISOString().slice(0, 10);
 
-    const query = `SELECT segments.month, metrics.cost_micros FROM campaign WHERE segments.date BETWEEN '${since}' AND '${until}'`;
+    const query = `SELECT segments.month, metrics.cost_micros, metrics.conversions_value FROM campaign WHERE segments.date BETWEEN '${since}' AND '${until}'`;
     const res = await fetch(
       `https://googleads.googleapis.com/${API_VERSION}/customers/${CUSTOMER_ID}/googleAds:searchStream`,
       {
@@ -72,16 +73,26 @@ export async function fetchGoogleMonthlySpend(): Promise<MonthlySpend[] | null> 
 
     // searchStream tagastab massiivi partiidest; summeeri kampaaniad kuude kaupa
     const batches = await res.json();
-    const byMonth = new Map<string, number>();
+    const byMonth = new Map<string, { micros: number; convValue: number }>();
     for (const batch of batches) {
       for (const row of batch.results || []) {
         const month = String(row.segments?.month || '').slice(0, 7); // '2026-07-01' -> '2026-07'
-        const micros = Number(row.metrics?.costMicros || 0);
-        if (month) byMonth.set(month, (byMonth.get(month) || 0) + micros);
+        if (!month) continue;
+        const agg = byMonth.get(month) || { micros: 0, convValue: 0 };
+        agg.micros += Number(row.metrics?.costMicros || 0);
+        agg.convValue += Number(row.metrics?.conversionsValue || 0);
+        byMonth.set(month, agg);
       }
     }
     return [...byMonth.entries()]
-      .map(([month, micros]) => ({ month, spend: Math.round(micros / 10000) / 100 }))
+      .map(([month, { micros, convValue }]) => {
+        const spend = Math.round(micros / 10000) / 100;
+        return {
+          month,
+          spend,
+          roas: spend > 0 && convValue > 0 ? Math.round((convValue / spend) * 100) / 100 : undefined,
+        };
+      })
       .sort((a, b) => a.month.localeCompare(b.month));
   } catch (e) {
     console.error('Google Ads API päring ebaõnnestus:', e);

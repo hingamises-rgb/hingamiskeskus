@@ -61,6 +61,15 @@ const ogImage = image.startsWith('http') ? image : SITE + image;
     <img height="1" width="1" style="display:none"
       src="https://www.facebook.com/tr?id=395736756494375&ev=PageView&noscript=1" />
   </noscript>
+
+  <!-- Google Analytics 4 (gtag) -->
+  <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-S5EP0KSWTQ"></script>
+  <script is:inline>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-S5EP0KSWTQ');
+  </script>
 </head>
 <body>
   <slot />
