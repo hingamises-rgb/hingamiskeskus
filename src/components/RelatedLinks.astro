@@ -1,0 +1,77 @@
+---
+// "Vaata ka" plokk sisulehtede lõppu: 2-3 seotud lehte, et ükski leht poleks tupik
+// (kasutajakogemus + sisemine linkimine SEO jaoks). Hoia linke 2-3, mitte rohkem.
+interface Props {
+  links: { href: string; label: string; desc?: string }[];
+}
+const { links } = Astro.props;
+---
+<section class="related">
+  <h2 class="related__title">Vaata ka</h2>
+  <div class="related__grid">
+    {links.map((l) => (
+      <a href={l.href} class="related__card">
+        <span class="related__label">{l.label}</span>
+        {l.desc && <span class="related__desc">{l.desc}</span>}
+        <span class="related__arrow">→</span>
+      </a>
+    ))}
+  </div>
+</section>
+
+<style>
+  .related {
+    background: #fff;
+    padding: 40px 24px 56px;
+  }
+  .related__title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #1d1e20;
+  }
+  .related__grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    gap: 14px;
+  }
+  .related__card {
+    position: relative;
+    display: block;
+    border: 1px solid rgba(31, 109, 133, 0.25);
+    border-radius: 10px;
+    padding: 18px 44px 18px 20px;
+    color: #1d1e20;
+    text-decoration: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .related__card:hover {
+    border-color: #1f6d85;
+    background: #f3fcff;
+  }
+  .related__label {
+    display: block;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .related__desc {
+    display: block;
+    font-size: 13.5px;
+    color: #5a6e76;
+    margin-top: 3px;
+  }
+  .related__arrow {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #1f6d85;
+    font-size: 20px;
+  }
+  @media (min-width: 768px) {
+    .related { padding: 56px 40px 72px; }
+    .related__grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  }
+</style>

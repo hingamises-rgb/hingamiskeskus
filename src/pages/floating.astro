@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
 ---
 
 <Layout
@@ -183,6 +184,12 @@ import Footer from '../components/Footer.astro';
   <p>Floatingu mõju on kinnitatud teadusuuringutes. Loe lähemalt: uuring 1 (süstemaatiline ülevaade 63 uuringust, 2025), uuring 2 (ärevuse ja depressiooni uuring, 2024), uuring 3 (teadvuse seisundid floatingu ajal, 2024)</p>
 
 </section>
+
+<RelatedLinks links={[
+  { href: "/vabastav-hingamine", label: "Vabastav hingamine", desc: "Juhendatud hingamisseanss grupis" },
+  { href: "/soojas-vees-hingamine", label: "Soojas vees hingamine", desc: "Hingamine ja floating ühes seansis" },
+  { href: "/hakka-liikmeks", label: "Hakka liikmeks", desc: "Floating liikmele 30€ kord" },
+]} />
 
 <Footer />
 

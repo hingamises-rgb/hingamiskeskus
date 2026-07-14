@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
 ---
 
 <Layout
@@ -59,6 +60,12 @@ import Footer from '../components/Footer.astro';
   <p>Hingamise avarus ja kergus näitab sinu elamise helgust. Läbi hingamise saame muuta mustreid, mis takistavad hingamast kergelt ja elamast kerguses.
   Hingamiskeskus pakub vabastava hingamise töötubasid Tallinnas turvalises ja toetavas keskkonnas, kus saad kogeda sügavat lõdvestust ja sisemist tasakaalu.</p>
 </section>
+
+<RelatedLinks links={[
+  { href: "/floating", label: "Floating", desc: "Sügav lõõgastus Epsomi soolavees" },
+  { href: "/soojas-vees-hingamine", label: "Soojas vees hingamine", desc: "Hingamine ja floating ühes seansis" },
+  { href: "/hakka-liikmeks", label: "Hakka liikmeks", desc: "Grupihingamine liikmele 30€ kord" },
+]} />
 
 <Footer />
 

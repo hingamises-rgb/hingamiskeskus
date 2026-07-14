@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
 ---
 
 <Layout
@@ -54,6 +55,12 @@ import Footer from '../components/Footer.astro';
   <h2 class="float-seo__heading">Ohutus ja vastunäidustused.</h2>
   <p>NeuroVIZR on mõeldud tervele täiskasvanule. Kasutamist ei soovitata juhul kui sul on diagnoositud epilepsia või esineb kalduvus valgusest tingitud krampidele, samuti tõsiste neuroloogiliste või psühhiaatriliste seisundite puhul ja raseduse alguses ilma arsti loata. Kasutamise ajal väldi väsimust, alkoholi või uimastite mõju. Alusta alati madala intensiivsuse ja lühikese kestusega seanssidest ning kasuta seadet istuvas ja mugavas asendis. Kui tunned end ebamugavalt, katkesta seanss koheselt. Pea meeles, et NeuroVIZR ei ole meditsiiniseade, vaid heaolutehnoloogia, mis toetab aju loomulikke protsesse.</p>
 </section>
+
+<RelatedLinks links={[
+  { href: "/floating", label: "Floating", desc: "Sügav lõõgastus Epsomi soolavees" },
+  { href: "/vabastav-hingamine", label: "Vabastav hingamine", desc: "Juhendatud hingamisseanss grupis" },
+  { href: "/kkk", label: "Korduma kippuvad küsimused", desc: "Soovitused ja vastused" },
+]} />
 
 <Footer />
 

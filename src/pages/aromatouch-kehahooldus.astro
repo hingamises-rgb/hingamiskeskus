@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import ContactForm from '../components/ContactForm.astro';
 import Footer from '../components/Footer.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
 ---
 
 <Layout
@@ -47,6 +48,12 @@ import Footer from '../components/Footer.astro';
 
 <!-- BOOKING FORM -->
 <ContactForm source="Aromatouch kehahooldus" />
+
+<RelatedLinks links={[
+  { href: "/floating", label: "Floating", desc: "Sügav lõõgastus Epsomi soolavees" },
+  { href: "/vabastav-hingamine", label: "Vabastav hingamine", desc: "Juhendatud hingamisseanss grupis" },
+  { href: "/e-pood", label: "E-pood", desc: "Kinkekaardid ja paketid" },
+]} />
 
 <Footer />
 
