@@ -13,33 +13,25 @@ import Footer from '../components/Footer.astro';
 <!-- HEADER -->
 <Header active="teenused" />
 
-<!-- HERO SECTION -->
+<!-- HERO SECTION (tekst + punktid vasakul, pilt + nupp paremal) -->
 <section class="float-hero">
   <div class="float-hero__content">
     <div class="float-hero__text">
       <h1 class="float-hero__title">Neurovizr</h1>
       <p class="float-hero__subtitle">Mis on NeuroVIZR?</p>
       <p>NeuroVIZR on uuenduslik aju- ja meelepõhine tehnoloogia, mis kasutab valguse ja heli kombinatsiooni, et toetada aju loomulikke rütme ja edendada neuroplastilisust. Seade on loodud selleks, et aidata saavutada sügavamat lõõgastust, parandada keskendumisvõimet, tõsta meeleolu ning soodustada vaimset taastumist.</p>
+      <ul class="float-benefits__list">
+        <li>Põhineb AVS-tehnoloogial (Audio-Visual Stimulation), stress ja pinged kaovad</li>
+        <li>Mõjutab ajulainete aktiivsust sünkroniseeritud valguse ja heli mustrite kaudu.</li>
+        <li>Suunab aju soovitud seisundisse, milleks on lõdvestus, keskendumine või taastumine.</li>
+        <li>Tavalistest heliteraapiaseadmetest erineb mitmekihilise neurodoseerimise süsteemi poolest (valgus, heli ja värv).</li>
+      </ul>
     </div>
     <div class="float-hero__media">
       <img src="/images/teenus-neurovizr.jpg" alt="NeuroVIZR Hingamiskeskuses" class="float-hero__img" loading="lazy" />
+      <a href="tel:+37256695898" class="float-cta__btn">BRONEERI +372 56 695 898</a>
     </div>
   </div>
-</section>
-
-<!-- BENEFITS -->
-<section class="float-benefits">
-  <ul class="float-benefits__list">
-    <li>Põhineb AVS-tehnoloogial (Audio-Visual Stimulation), stress ja pinged kaovad</li>
-    <li>Mõjutab ajulainete aktiivsust sünkroniseeritud valguse ja heli mustrite kaudu.</li>
-    <li>Suunab aju soovitud seisundisse, milleks on lõdvestus, keskendumine või taastumine.</li>
-    <li>Tavalistest heliteraapiaseadmetest erineb mitmekihilise neurodoseerimise süsteemi poolest (valgus, heli ja värv).</li>
-  </ul>
-</section>
-
-<!-- CTA -->
-<section class="float-info float-info--cta">
-  <a href="tel:+37256695898" class="float-cta__btn">BRONEERI +372 56 695 898</a>
 </section>
 
 <!-- SEO TEXT -->
@@ -118,6 +110,8 @@ import Footer from '../components/Footer.astro';
     color: #1f6d85;
     margin-bottom: 16px;
   }
+  .float-hero__text { text-align: left; }
+  .float-hero__title { text-align: left; }
   .float-hero__text p {
     font-size: 15px;
     line-height: 1.7;
@@ -156,7 +150,9 @@ import Footer from '../components/Footer.astro';
     margin: 0 auto;
   }
   .float-cta__btn {
-    display: inline-block;
+    display: block;
+    text-align: center;
+    margin-top: 24px;
     background: #1d1e20;
     color: #fff;
     font-size: 12px;
@@ -183,6 +179,7 @@ import Footer from '../components/Footer.astro';
     margin-bottom: 0;
   }
   .float-seo__heading {
+    text-align: left;
     font-size: 18px;
     font-weight: 700;
     color: #1d1e20;
@@ -258,24 +255,25 @@ import Footer from '../components/Footer.astro';
     .header { padding: 12px 40px; }
     .header__logo img { height: 36px; }
 
-    .float-hero { padding: 48px 40px; }
+    .float-hero { padding: 64px 40px; }
     .float-hero__content {
       display: flex;
-      align-items: center;
-      gap: 40px;
+      align-items: flex-start;
+      gap: 64px;
+      max-width: 1200px;
     }
-    .float-hero__text {
-      flex: 1;
-    }
-    .float-hero__media {
-      flex: 1;
-    }
-    .float-hero__title { font-size: 36px; }
-    .float-hero__subtitle { font-size: 20px; }
+    .float-hero__text { flex: 1.15; }
+    .float-hero__media { flex: 1; position: sticky; top: 100px; }
+    .float-hero__title { font-size: 44px; line-height: 1.15; margin-bottom: 16px; }
+    .float-hero__text p { font-size: 16px; }
+    .float-benefits__list li { font-size: 16px; margin-bottom: 10px; }
     .float-hero__img { margin-top: 0; }
 
-    .float-benefits { padding: 40px; }
-    .float-seo { padding: 40px; }
+    .float-seo {
+      padding: 48px max(40px, calc((100% - 1100px) / 2)) 64px;
+      max-width: none;
+      margin: 0;
+    }
   }
 
   @media (min-width: 1024px) {

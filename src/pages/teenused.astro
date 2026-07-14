@@ -21,24 +21,51 @@ import Footer from '../components/Footer.astro';
 <!-- SERVICE CARDS -->
 <section class="services">
   <div class="service-card">
-    <img src="/images/teenus-hingamine.jpg" alt="Vabastav hingamine Hingamiskeskuses" class="service-card__img" loading="lazy" />
+    <a href="/vabastav-hingamine" aria-label="Ava teenuse leht"><img src="/images/teenus-hingamine.jpg" alt="Vabastav hingamine Hingamiskeskuses" class="service-card__img" loading="lazy" /></a>
     <h2 class="service-card__title">Hingamine</h2>
     <p class="service-card__text">Hingamisteraapia aitab vabaneda igapäevaelu stressist, avab loovuse ning õpetab tundma rõõmu elust ja suhetest. Hingamisest teadlikkus vabastab mõtete virr-varrist, aitab kogeda enda sügavamat olemust ja terviklikkust ning leida rahu enda sees. Läbi sügava hingamise on võimalik vaigistada argiteadvus ja saada kontakt oma alateadvuse ja üliteadvusega...</p>
     <a href="/vabastav-hingamine" class="service-card__btn">LOE LÄHEMALT</a>
   </div>
 
   <div class="service-card">
-    <img src="/images/teenus-floating.jpg" alt="Floatingu vann" class="service-card__img" loading="lazy" />
+    <a href="/floating" aria-label="Ava teenuse leht"><img src="/images/teenus-floating.jpg" alt="Floatingu vann" class="service-card__img" loading="lazy" /></a>
     <h2 class="service-card__title">Floating</h2>
     <p class="service-card__text">Floatingu eesmärk on Sind sügavuti lõõgastada ning viia aju teeta sagedusele. Just see on seisund, milles meie imeliselt targad kehad oskavad end ise tervendada ja uuendada. Pimeduse, vaikuse ja hõljumise koostöö tulemusena hakkab ära kaduma gravitatsiooni tunnetus ning läbi selle on on võimalik saavutada meditatiivne olek, kus Sinu keha ja meel lülitavad end mõneks ajaks välja...</p>
     <a href="/floating" class="service-card__btn">LOE LÄHEMALT</a>
   </div>
 
   <div class="service-card">
-    <img src="/images/teenus-neurovizr.jpg" alt="Mees kasutab NeuroVIZR seadet" class="service-card__img" loading="lazy" />
+    <a href="/soojas-vees-hingamine" aria-label="Ava teenuse leht"><img src="/images/teenus-veeshingamine.png" alt="Soojas vees hingamine" class="service-card__img" loading="lazy" /></a>
+    <h2 class="service-card__title">Soojas vees hingamine</h2>
+    <p class="service-card__text">Sooja vee seanss on ainulaadne võimalus jõuda sügavale iseendasse. Ühendatud hingamine vees aitab leevendada stressi ja sünniga seotud traumasid, alateadlikke mustreid ja sisemisi pingeid, mis takistavad sul elus edasi liikumast...</p>
+    <a href="/soojas-vees-hingamine" class="service-card__btn">LOE LÄHEMALT</a>
+  </div>
+
+  <div class="service-card">
+    <a href="/neurovizr" aria-label="Ava teenuse leht"><img src="/images/teenus-neurovizr.jpg" alt="Mees kasutab NeuroVIZR seadet" class="service-card__img" loading="lazy" /></a>
     <h2 class="service-card__title">NeuroVIZR</h2>
     <p class="service-card__text">NeuroVIZR on uuenduslik aju- ja meelepõhine tehnoloogia, mis kasutab valguse ja heli kombinatsiooni, et toetada aju loomulikke rütme ja edendada neuroplastilisust. Seade on loodud selleks, et aidata saavutada sügavamat lõõgastust, parandada keskendumisvõimet, tõsta meeleolu ning soodustada vaimset taastumist....</p>
     <a href="/neurovizr" class="service-card__btn">LOE LÄHEMALT</a>
+  </div>
+
+  <div class="service-card">
+    <a href="/aromatouch-kehahooldus" aria-label="Ava teenuse leht"><img src="/images/aromatouch-kuunlad.jpg" alt="AromaTouch kehahooldus eeterlike õlidega" class="service-card__img" loading="lazy" /></a>
+    <h2 class="service-card__title">AromaTouch kehahooldus</h2>
+    <p class="service-card__text">Aromatouch tehnika on õrn ja lõõgastav kehahooldus, mis ühendab doTerra eeterlike õlide kasulikud omadused spetsiifiliste puudutustehnikatega. Hooldus toetab sügavat lõdvestumist ning keha ja meele tasakaalu...</p>
+    <a href="/aromatouch-kehahooldus" class="service-card__btn">LOE LÄHEMALT</a>
+  </div>
+
+  <div class="service-card">
+    <a href="/ruumide-rent" aria-label="Ava teenuse leht"><img src="/images/ruum-suur-1.jpg" alt="Hingamiskeskuse suur saal" class="service-card__img" loading="lazy" /></a>
+    <h2 class="service-card__title">Ruumide rent</h2>
+    <p class="service-card__text">Hingamiskeskuses pakume hubaseid ja harmoonilisi ruume, mis on loodud toetama sügavat lõdvestumist, sisemist rahu ja ühendust iseendaga. Meie keskuse atmosfäär on ideaalne erinevate teadlikkuse ja enesearengu praktikate jaoks...</p>
+    <a href="/ruumide-rent" class="service-card__btn">LOE LÄHEMALT</a>
+  </div>
+
+  <div class="service-card service-card--noimg">
+    <h2 class="service-card__title">Meie terapeudid</h2>
+    <p class="service-card__text">Tutvu meie kogenud terapeutidega, kes juhendavad hingamisseansse ja hoiavad Sind igal sammul. Loe lähemalt nende teekonnast, koolitustest ja sellest, miks nad oma tööd südamega teevad...</p>
+    <a href="/terapeudid" class="service-card__btn">LOE LÄHEMALT</a>
   </div>
 </section>
 
@@ -88,14 +115,24 @@ import Footer from '../components/Footer.astro';
 
   /* SERVICES */
   .services {
-    background: #f3fcff;
-    padding: 0 24px 40px;
+    background: #fff;
+    padding: 24px 24px 40px;
   }
   .service-card {
     background: #fff;
     text-align: center;
     margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
   }
+  .service-card__text { flex: 1; }
+  .service-card--noimg {
+    justify-content: center;
+    background: #f3fcff;
+    border-radius: 10px;
+    padding: 24px 0;
+  }
+  .service-card__btn { align-self: center; margin-top: auto; }
   .service-card:last-child { margin-bottom: 0; }
   .service-card__img {
     width: 100%;
@@ -194,20 +231,24 @@ import Footer from '../components/Footer.astro';
   @media (min-width: 768px) {
     .header { padding: 12px 40px; }
     .header__logo img { height: 36px; }
-    .page-hero { padding: 60px 40px; }
-    .page-hero__title { font-size: 42px; }
+    .page-hero { padding: 72px 40px; }
+    .page-hero__title { font-size: 58px; font-weight: 600; }
     .services {
       display: flex;
       flex-wrap: wrap;
-      gap: 24px;
-      padding: 0 40px 48px;
+      gap: 40px;
+      padding: 48px 40px 72px;
       justify-content: center;
     }
     .service-card {
-      flex: 1;
-      min-width: 280px;
-      max-width: 380px;
+      flex: 0 1 380px;
+      min-width: 300px;
+      max-width: 430px;
       margin-bottom: 0;
     }
+    .service-card__img { height: 240px; }
+    .service-card__title { font-size: 28px; }
+    .service-card__text { font-size: 15.5px; }
+    .service-card__btn { font-size: 13px; padding: 14px 32px; }
   }
 </style>

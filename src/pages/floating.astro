@@ -13,7 +13,7 @@ import Footer from '../components/Footer.astro';
 <!-- HEADER -->
 <Header active="teenused" />
 
-<!-- HERO SECTION -->
+<!-- HERO SECTION (vana lehe paigutus: tekst + punktid vasakul, püstine video + nupud paremal) -->
 <section class="float-hero">
   <div class="float-hero__content">
     <div class="float-hero__text">
@@ -23,33 +23,24 @@ import Footer from '../components/Footer.astro';
       <p>Sa lebad soojas, Epsomi soola ja veega täidetud vannis, mis toetab su keha ja loob tunde nagu hõljuksid.</p>
       <p>Vaikus, pimedus ja kaalutus aitavad sul igapäevasest pingest lahti lasta.</p>
       <p>Hingamiskeskus pakub floatingu kogemust Tallinnas, hubastes ja privaatsetes ruumides. Seanss kestab 60 minutit.</p>
+      <h2 class="float-benefits__title">Mida sa tunned pärast floatingut:</h2>
+      <ul class="float-benefits__list">
+        <li>stress ja pinge kaovad</li>
+        <li>lihased lõdvestuvad</li>
+        <li>mõistus rahuneb ja keha puhkab</li>
+        <li>uni paraneb</li>
+        <li>magneesiumitase kehas taastub</li>
+        <li>enesetunne on värskem, kergem ja puhanum</li>
+      </ul>
     </div>
     <div class="float-hero__media">
       <div class="float-hero__video">
         <iframe src="https://www.youtube.com/embed/JiqDwhFalXI" title="Floating Hingamiskeskus" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
+      <a href="/broneeri-aeg" class="float-cta__btn">BRONEERI AEG</a>
+      <a href="/e-pood" class="float-cta__promo">3X PROOVIPAKETT SOODUSHIND 75€ (120€)</a>
     </div>
   </div>
-</section>
-
-<!-- BENEFITS -->
-<section class="float-benefits">
-  <h2 class="float-benefits__title">Mida sa tunned pärast floatingut:</h2>
-  <ul class="float-benefits__list">
-    <li>stress ja pinge kaovad</li>
-    <li>lihased lõdvestuvad</li>
-    <li>mõistus rahuneb ja keha puhkab</li>
-    <li>uni paraneb</li>
-    <li>magneesiumitase kehas taastub</li>
-    <li>enesetunne on värskem, kergem ja puhanum</li>
-  </ul>
-</section>
-
-<!-- CTA SECTION -->
-<section class="float-cta">
-  <h2 class="float-cta__title">Floating on sügava lõõgastuse kogemus Tallinnas</h2>
-  <a href="/broneeri-aeg" class="float-cta__btn">BRONEERI AEG</a>
-  <a href="/e-pood" class="float-cta__promo">3X PROOVIPAKETT SOODUSHIND 75€ (120€)</a>
 </section>
 
 <!-- INFO SECTION -->
@@ -66,6 +57,7 @@ import Footer from '../components/Footer.astro';
 
 <!-- REVIEWS -->
 <section class="float-reviews">
+  <div class="float-reviews__inner">
   <h2 class="float-reviews__title">Tagasiside</h2>
 
   <div class="float-review">
@@ -108,6 +100,7 @@ import Footer from '../components/Footer.astro';
     <div class="float-review__stars">⭐⭐⭐⭐⭐</div>
     <p class="float-review__text">"Esimene kord floatingus ja väga meeldiv kogemus. Hea rahustav kehale ning meelele. Aeg täielikult iseendale."</p>
     <p class="float-review__author">- Priidu</p>
+  </div>
   </div>
 </section>
 
@@ -250,7 +243,9 @@ import Footer from '../components/Footer.astro';
     max-width: 1100px;
     margin: 0 auto;
   }
+  .float-hero__text { text-align: left; }
   .float-hero__title {
+    text-align: left;
     font-size: 28px;
     font-weight: 700;
     line-height: 1.3;
@@ -258,6 +253,7 @@ import Footer from '../components/Footer.astro';
     color: #1d1e20;
   }
   .float-hero__subtitle {
+    text-align: left;
     font-size: 18px;
     font-weight: 700;
     color: #1f6d85;
@@ -291,18 +287,13 @@ import Footer from '../components/Footer.astro';
     border-radius: 10px;
   }
 
-  /* BENEFITS */
-  .float-benefits {
-    background: #fff;
-    padding: 32px 24px;
-    max-width: 800px;
-    margin: 0 auto;
-  }
+  /* BENEFITS (hero vasakus veerus) */
   .float-benefits__title {
     font-size: 20px;
     font-weight: 700;
-    margin-bottom: 16px;
+    margin: 24px 0 16px;
     color: #1d1e20;
+    text-align: left;
   }
   .float-benefits__list {
     list-style: disc;
@@ -312,46 +303,38 @@ import Footer from '../components/Footer.astro';
     font-size: 15px;
     line-height: 1.8;
     color: #1d1e20;
+    margin-bottom: 10px;
   }
 
-  /* CTA */
-  .float-cta {
-    background: #1f6d85;
-    color: #fff;
-    text-align: center;
-    padding: 40px 24px;
-  }
-  .float-cta__title {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 20px;
-    line-height: 1.3;
-  }
+  /* NUPUD (hero paremas veerus, video all) */
   .float-cta__btn {
-    display: inline-block;
+    display: block;
     background: #1d1e20;
     color: #fff;
-    font-size: 12px;
-    letter-spacing: 1.5px;
+    font-size: 13px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    padding: 14px 32px;
+    text-align: center;
+    padding: 18px 32px;
     border-radius: 10px;
-    margin-bottom: 16px;
+    margin-top: 24px;
   }
   .float-cta__promo {
     display: block;
-    background: rgba(255,255,255,0.15);
+    background: #1f6d85;
     color: #fff;
     font-size: 14px;
-    letter-spacing: 1px;
-    padding: 14px 24px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 18px 24px;
     border-radius: 10px;
     margin-top: 16px;
-    border: 1px solid rgba(255,255,255,0.3);
   }
 
   /* INFO */
   .float-info__heading {
+    text-align: left;
     font-size: 20px;
     font-weight: 700;
     margin-bottom: 20px;
@@ -377,11 +360,13 @@ import Footer from '../components/Footer.astro';
     text-decoration: underline;
   }
 
-  /* REVIEWS */
+  /* REVIEWS (vanal valge taust, tsitaadid lihtsalt loeteluna) */
   .float-reviews {
-    background: #f3fcff;
+    background: #fff;
     padding: 32px 24px;
-    max-width: 800px;
+  }
+  .float-reviews__inner {
+    max-width: 1100px;
     margin: 0 auto;
   }
   .float-reviews__title {
@@ -392,10 +377,7 @@ import Footer from '../components/Footer.astro';
     color: #1d1e20;
   }
   .float-review {
-    background: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
   .float-review:last-child {
     margin-bottom: 0;
@@ -488,6 +470,7 @@ import Footer from '../components/Footer.astro';
     margin-bottom: 0;
   }
   .float-seo__heading {
+    text-align: left;
     font-size: 18px;
     font-weight: 700;
     color: #1d1e20;
@@ -563,34 +546,50 @@ import Footer from '../components/Footer.astro';
     .header { padding: 12px 40px; }
     .header__logo img { height: 36px; }
 
-    .float-hero { padding: 48px 40px; }
+    .float-hero { padding: 64px 40px; }
     .float-hero__content {
       display: flex;
-      align-items: center;
-      gap: 40px;
+      align-items: flex-start;
+      gap: 64px;
     }
     .float-hero__text {
       flex: 1;
     }
     .float-hero__media {
-      flex: 1;
+      flex: 0 0 400px;
     }
-    .float-hero__title { font-size: 36px; }
+    .float-hero__title { font-size: 44px; line-height: 1.15; margin-bottom: 20px; }
     .float-hero__subtitle { font-size: 20px; }
+    .float-hero__text p { font-size: 16px; }
+    .float-benefits__list li { font-size: 16px; }
     .float-hero__img { margin-top: 0; }
-    .float-hero__video { padding-bottom: 56.25%; }
+    .float-hero__video { margin-top: 0; }
 
-    .float-benefits { padding: 40px; }
-    .float-cta { padding: 56px 40px; }
-    .float-cta__title { font-size: 30px; }
-    .float-info { padding: 40px; }
-    .float-reviews { padding: 40px; }
-    .float-faq { padding: 40px; }
-    .float-seo { padding: 40px; }
+    .float-info {
+      padding: 48px max(40px, calc((100% - 1100px) / 2));
+      max-width: none;
+      margin: 0;
+    }
+    .float-info__heading { font-size: 24px; }
+    .float-info p { font-size: 16px; }
+    .float-reviews { padding: 56px 40px; }
+    .float-reviews__title { font-size: 30px; margin-bottom: 36px; }
+    .float-review__text { font-size: 16px; }
+    .float-faq {
+      padding: 40px max(40px, calc((100% - 1100px) / 2));
+      max-width: none;
+      margin: 0;
+    }
+    .float-seo {
+      padding: 40px max(40px, calc((100% - 1100px) / 2)) 56px;
+      max-width: none;
+      margin: 0;
+    }
   }
 
   @media (min-width: 1024px) {
-    .float-hero__title { font-size: 40px; }
-    .float-hero { padding: 56px 40px; }
+    .float-hero__title { font-size: 52px; }
+    .float-hero { padding: 72px 40px; }
+    .float-hero__content { max-width: 1200px; }
   }
 </style>

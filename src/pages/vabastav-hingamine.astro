@@ -13,53 +13,31 @@ import Footer from '../components/Footer.astro';
 <!-- HEADER -->
 <Header active="teenused" />
 
-<!-- HERO SECTION -->
+<!-- HERO SECTION (vana lehe paigutus: tekst + punktid vasakul, pilt + nupud paremal) -->
 <section class="float-hero">
   <div class="float-hero__content">
     <div class="float-hero__text">
       <h1 class="float-hero__title">Vabastav hingamine Tallinnas</h1>
       <p>Vabastav hingamine on hingamistehnika, mis kasutab pausideta katkematut hingamist, lõdvestust ja tähelepanu.</p>
+      <h2 class="float-benefits__title">Peamised kasutegurid:</h2>
+      <ul class="float-benefits__list">
+        <li>puhastab keha jääkainetest</li>
+        <li>vabastab mõtete virr-varrist</li>
+        <li>aitab vabaneda igapäeva stressist</li>
+        <li>alla surutud pinged ja emotsioonid kaovad</li>
+        <li>taastab füüsilist võimekust</li>
+        <li>parandab enesetunnet</li>
+      </ul>
+      <p>Hingamist mõjutavad kõik meie mõtted ja emotsioonid. Hingamise takistamine on üks meie kaitsemehhanisme negatiivsete välismõjude vastu, see on keha kaitsereaktsioon sisemise tasakaalutuse vastu. Vähese hingamisega piirame suhtlemist välismaailmaga ning varjume piiratud sisemaailma, mille oleme enda jaoks loonud.</p>
+      <p><strong>Vabastava hingamise grupiseansi hind on 40€. Aktiivse osa kestvus 1h ning kogu protsess kestab keskmiselt 2h 30min.</strong></p>
+      <p>Kui hingamine vabastab meelt, siis floating taastab keha. Koos loovad need süvalõõgastuse. Tule proovi <a href="/floating" class="float-info__link">floatida</a></p>
+    </div>
+    <div class="float-hero__media">
+      <img src="/images/teenus-hingamine.jpg" alt="Vabastav hingamine Hingamiskeskuses" class="float-hero__img" loading="lazy" />
+      <a href="/broneeri-aeg" class="float-cta__btn">BRONEERI AEG</a>
+      <a href="/e-pood" class="float-cta__promo">3X PROOVIPAKETT SOODUSHIND 75€ (120€)</a>
     </div>
   </div>
-</section>
-
-<!-- BENEFITS -->
-<section class="float-benefits">
-  <h2 class="float-benefits__title">Peamised kasutegurid:</h2>
-  <ul class="float-benefits__list">
-    <li>puhastab keha jääkainetest</li>
-    <li>vabastab mõtete virr-varrist</li>
-    <li>aitab vabaneda igapäeva stressist</li>
-    <li>alla surutud pinged ja emotsioonid kaovad</li>
-    <li>taastab füüsilist võimekust</li>
-    <li>parandab enesetunnet</li>
-  </ul>
-</section>
-
-<!-- TEXT PARAGRAPH -->
-<section class="float-info">
-  <p>Hingamist mõjutavad kõik meie mõtted ja emotsioonid. Hingamise takistamine on üks meie kaitsemehhanisme negatiivsete välismõjude vastu, see on keha kaitsereaktsioon sisemise tasakaalutuse vastu. Vähese hingamisega piirame suhtlemist välismaailmaga ning varjume piiratud sisemaailma, mille oleme enda jaoks loonud.</p>
-</section>
-
-<!-- PRICE INFO -->
-<section class="float-info float-info--price">
-  <p><strong>Vabastava hingamise grupiseansi hind on 40€. Aktiivse osa kestvus 1h ning kogu protsess kestab keskmiselt 2h 30min.</strong></p>
-</section>
-
-<!-- CROSS-SELL -->
-<section class="float-info float-info--crosssell">
-  <p>Kui hingamine vabastab meelt, siis floating taastab keha. Koos loovad need süvalõõgastuse. Tule proovi <a href="/floating" class="float-info__link">floatida</a></p>
-</section>
-
-<!-- CTA -->
-<section class="float-info float-info--cta">
-  <a href="/broneeri-aeg" class="float-cta__btn">BRONEERI AEG</a>
-  <a href="/e-pood" class="float-cta__promo">3X PROOVIPAKETT SOODUSHIND 75€ (120€)</a>
-</section>
-
-<!-- HERO IMAGE -->
-<section class="float-hero-img">
-  <img src="/images/teenus-hingamine.jpg" alt="Vabastav hingamine Hingamiskeskuses" class="float-hero__img" loading="lazy" />
 </section>
 
 <!-- SEO TEXT -->
@@ -124,6 +102,15 @@ import Footer from '../components/Footer.astro';
     max-width: 1100px;
     margin: 0 auto;
   }
+  .float-hero__text { text-align: left; }
+  .float-hero__title {
+    text-align: left;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 16px;
+    color: #1d1e20;
+  }
   .float-hero__text p {
     font-size: 15px;
     line-height: 1.7;
@@ -146,8 +133,9 @@ import Footer from '../components/Footer.astro';
   .float-benefits__title {
     font-size: 20px;
     font-weight: 700;
-    margin-bottom: 16px;
+    margin: 24px 0 16px;
     color: #1d1e20;
+    text-align: left;
   }
   .float-benefits__list {
     list-style: disc;
@@ -164,14 +152,16 @@ import Footer from '../components/Footer.astro';
     text-align: center;
   }
   .float-cta__btn {
-    display: inline-block;
+    display: block;
     background: #1d1e20;
     color: #fff;
-    font-size: 12px;
-    letter-spacing: 1.5px;
+    font-size: 13px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    padding: 14px 32px;
+    text-align: center;
+    padding: 18px 32px;
     border-radius: 10px;
+    margin-top: 24px;
   }
   .float-cta__promo {
     display: block;
@@ -305,29 +295,35 @@ import Footer from '../components/Footer.astro';
     .header { padding: 12px 40px; }
     .header__logo img { height: 36px; }
 
-    .float-hero { padding: 48px 40px; }
+    .float-hero { padding: 64px 40px; }
     .float-hero__content {
       display: flex;
-      align-items: center;
-      gap: 40px;
+      align-items: flex-start;
+      gap: 64px;
+      max-width: 1200px;
     }
     .float-hero__text {
-      flex: 1;
+      flex: 1.15;
     }
     .float-hero__media {
       flex: 1;
+      position: sticky;
+      top: 100px;
     }
+    .float-hero__title { font-size: 44px; line-height: 1.15; margin-bottom: 24px; }
+    .float-hero__text p { font-size: 16px; }
+    .float-benefits__list li { font-size: 16px; }
     .float-hero__img { margin-top: 0; }
 
-    .float-benefits { padding: 40px; }
-    .float-cta { padding: 56px 40px; }
-    .float-cta__title { font-size: 30px; }
-    .float-info { padding: 40px; }
-    .float-promo { padding: 40px; }
-    .float-seo { padding: 40px; }
+    .float-seo {
+      padding: 48px max(40px, calc((100% - 1100px) / 2)) 64px;
+      max-width: none;
+      margin: 0;
+    }
   }
 
   @media (min-width: 1024px) {
-    .float-hero { padding: 56px 40px; }
+    .float-hero__title { font-size: 52px; }
+    .float-hero { padding: 72px 40px; }
   }
 </style>

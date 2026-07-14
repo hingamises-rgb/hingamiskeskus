@@ -13,7 +13,7 @@ import Footer from '../components/Footer.astro';
 <!-- HEADER -->
 <Header active="teenused" />
 
-<!-- HERO SECTION -->
+<!-- HERO SECTION (tekst + punktid vasakul, pilt paremal) -->
 <section class="float-hero">
   <div class="float-hero__content">
     <div class="float-hero__text">
@@ -21,25 +21,19 @@ import Footer from '../components/Footer.astro';
       <h2 class="float-hero__subtitle">Soojas vees hingamine, tee sügava lõõgastuse ja sisemise vabaduseni</h2>
       <p>Soojas vees hingamine ühendab <a href="/vabastav-hingamine" class="float-info__link">vabastava hingamise</a> ja <a href="/floating" class="float-info__link">floatingu</a> sügavalt lõõgastava mõju. Kehatemperatuuril (ca 36,5C) vesi loob turvalise ruumi, kus saad lõdvestuda nii füüsiliselt kui emotsionaalselt. Vee kergus võimaldab kehal vabastada pinged ja meel rahuneb kiiresti.</p>
       <p>Sooja vee seanss on ainulaadne võimalus jõuda sügavale iseendasse. Ühendatud hingamine vees aitab leevendada stressi ja sünniga seotud traumasid, alateadlikke mustreid ja sisemisi pingeid, mis takistavad sul elus edasi liikumast. See on väga pehme, ent tõhus viis kogeda sisemist vabadust ja elujõudu.</p>
+      <h2 class="float-benefits__title">Kellele ja milleks soojas vees hingamine sobib?</h2>
+      <ul class="float-benefits__list">
+        <li>Kui vajad sügavat puhkust ja tasakaalu</li>
+        <li>Kui soovid taastada kontakti oma kehaga</li>
+        <li>Kui otsid tuge emotsionaalseks tervenemiseks</li>
+        <li>Või kui tahad lihtsalt midagi erilist, mis viib sind sügavasse lõdvestusse</li>
+      </ul>
+      <p style="margin-top: 16px;">Enne broneerimist võta ühendust meie terapeudiga, kirjutades <a href="mailto:Info@hingamiskeskus.ee" class="float-info__link">Info@hingamiskeskus.ee</a>.</p>
+    </div>
+    <div class="float-hero__media">
+      <img src="/images/teenus-veeshingamine.png" alt="Soojas vees hingamine Hingamiskeskuses" class="float-hero__img" loading="lazy" />
     </div>
   </div>
-</section>
-
-<!-- BENEFITS -->
-<section class="float-benefits">
-  <h2 class="float-benefits__title">Kellele ja milleks soojas vees hingamine sobib?</h2>
-  <ul class="float-benefits__list">
-    <li>Kui vajad sügavat puhkust ja tasakaalu</li>
-    <li>Kui soovid taastada kontakti oma kehaga</li>
-    <li>Kui otsid tuge emotsionaalseks tervenemiseks</li>
-    <li>Või kui tahad lihtsalt midagi erilist, mis viib sind sügavasse lõdvestusse</li>
-  </ul>
-  <p style="margin-top: 16px;">Enne broneerimist võta ühendust meie terapeudiga, kirjutades <a href="mailto:Info@hingamiskeskus.ee" class="float-info__link">Info@hingamiskeskus.ee</a>.</p>
-</section>
-
-<!-- HERO IMAGE -->
-<section class="float-hero-img">
-  <img src="/images/teenus-veeshingamine.png" alt="Soojas vees hingamine Hingamiskeskuses" class="float-hero__img" loading="lazy" />
 </section>
 
 <!-- SEO TEXT -->
@@ -112,6 +106,9 @@ import Footer from '../components/Footer.astro';
     margin-bottom: 16px;
     line-height: 1.4;
   }
+  .float-hero__text { text-align: left; }
+  .float-hero__title { text-align: left; }
+  .float-hero__subtitle { text-align: left; }
   .float-hero__text p {
     font-size: 15px;
     line-height: 1.7;
@@ -134,8 +131,9 @@ import Footer from '../components/Footer.astro';
   .float-benefits__title {
     font-size: 20px;
     font-weight: 700;
-    margin-bottom: 16px;
+    margin: 24px 0 16px;
     color: #1d1e20;
+    text-align: left;
   }
   .float-benefits__list {
     list-style: disc;
@@ -171,6 +169,7 @@ import Footer from '../components/Footer.astro';
     margin-bottom: 0;
   }
   .float-seo__heading {
+    text-align: left;
     font-size: 20px;
     font-weight: 700;
     color: #1d1e20;
@@ -255,24 +254,25 @@ import Footer from '../components/Footer.astro';
     .header { padding: 12px 40px; }
     .header__logo img { height: 36px; }
 
-    .float-hero { padding: 48px 40px; }
+    .float-hero { padding: 64px 40px; }
     .float-hero__content {
       display: flex;
-      align-items: center;
-      gap: 40px;
+      align-items: flex-start;
+      gap: 64px;
+      max-width: 1200px;
     }
-    .float-hero__text {
-      flex: 1;
-    }
-    .float-hero__media {
-      flex: 1;
-    }
-    .float-hero__title { font-size: 36px; }
+    .float-hero__text { flex: 1.15; }
+    .float-hero__media { flex: 1; position: sticky; top: 100px; }
+    .float-hero__title { font-size: 44px; line-height: 1.15; margin-bottom: 16px; }
+    .float-hero__text p { font-size: 16px; }
+    .float-benefits__list li { font-size: 16px; }
     .float-hero__img { margin-top: 0; }
 
-    .float-benefits { padding: 40px; }
-    .float-cta { padding: 56px 40px; }
-    .float-cta__title { font-size: 30px; }
+    .float-seo {
+      padding: 48px max(40px, calc((100% - 1100px) / 2)) 64px;
+      max-width: none;
+      margin: 0;
+    }
   }
 
   @media (min-width: 1024px) {
