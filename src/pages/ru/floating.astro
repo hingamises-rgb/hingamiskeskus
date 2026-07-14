@@ -1,0 +1,604 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import RelatedLinks from '../../components/RelatedLinks.astro';
+---
+
+<Layout
+  title="Флоатинг в Таллине | 1 час = 4 часа сна - Хингамискескус"
+  description="Откройте для себя флоатинг в Таллине в Hingamiskeskus. Глубокое расслабление в тёплой ванне с английской солью, снятие мышечных зажимов, улучшение сна, а также осознанное дыхание для успокоения нервной системы. Забронируйте сеанс и подарочные сертификаты!"
+  keywords="флоатинг, глубокое расслабление, осознанное дыхание"
+  lang="ru"
+  alternates={{ et: '/floating', ru: '/ru/floating' }}
+>
+
+<!-- HEADER -->
+<Header active="teenused" lang="ru" altHref="/floating" />
+
+<!-- HERO SECTION (vana lehe paigutus: tekst + punktid vasakul, püstine video + nupud paremal) -->
+<section class="float-hero">
+  <div class="float-hero__content">
+    <div class="float-hero__text">
+      <h1 class="float-hero__title">Флоатинг, опыт глубокого расслабления в Таллине</h1>
+      <p class="float-hero__subtitle">1 час флоатинга = 4 часа глубокого сна</p>
+      <p>Флоатинг это опыт глубокого расслабления для тела и ума.</p>
+      <p>Ты лежишь в тёплой ванне, наполненной водой с солью Эпсома, которая поддерживает твоё тело и создаёт ощущение парения.</p>
+      <p>Тишина, темнота и невесомость помогают отпустить повседневное напряжение.</p>
+      <p>Центр дыхания предлагает флоатинг в Таллине в уютных и приватных помещениях. Сеанс длится 60 минут.</p>
+      <h2 class="float-benefits__title">Что ты почувствуешь после флоатинга:</h2>
+      <ul class="float-benefits__list">
+        <li>стресс и напряжение уходят</li>
+        <li>мышцы расслабляются</li>
+        <li>ум успокаивается, а тело отдыхает</li>
+        <li>сон улучшается</li>
+        <li>запасы магния в организме восстанавливаются</li>
+        <li>самочувствие становится свежее, легче и отдохнувшее</li>
+      </ul>
+    </div>
+    <div class="float-hero__media">
+      <div class="float-hero__video">
+        <iframe src="https://www.youtube.com/embed/JiqDwhFalXI" title="Флоатинг Центр дыхания" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <a href="/ru/zabronirovat-vremya" class="float-cta__btn">ЗАПИСАТЬСЯ</a>
+      <a href="/ru/onlajn-shop" class="float-cta__promo">3 ПРОБНЫХ СЕАНСА ДЛЯ ТЕЛА И УМА СКИДКА 75€ (120€)</a>
+    </div>
+  </div>
+</section>
+
+<!-- INFO SECTION -->
+<section class="float-info">
+  <h2 class="float-info__heading">Стоимость сеанса флоатинга 40€, продолжительность 1 час.</h2>
+  <p>Чтобы твой сеанс флоатинга был максимально приятным и расслабляющим, рекомендуем прибыть как минимум за 15 минут до его начала. Это даст достаточно времени, чтобы мы могли спокойно объяснить, как проходит процедура флоатинга, а у тебя будет возможность принять душ перед сеансом.</p>
+  <p>Наши сеансы флоатинга проходят в тихих и приватных помещениях. Ты сам выбираешь, предпочитаешь ли полную темноту или мягкое приглушённое освещение. Нам важно, чтобы твой опыт был именно таким, как комфортно лично тебе!</p>
+  <p>Мы также рады приветствовать гостей с ограниченной подвижностью. Чтобы обеспечить максимально комфортный опыт, рекомендуем заранее связаться с нами перед визитом.</p>
+  <p><strong>Что есть на месте:</strong> полотенце, халат, тапочки, гель для душа, шампунь и фен.</p>
+  <p><strong>Кому подходит флоатинг:</strong> людям в стрессе или на грани выгорания, спортсменам для восстановления, беременным женщинам (снижает нагрузку на спину и ноги), при хронических болях в спине и мышечном напряжении, а также тем, кто хочет улучшить сон.</p>
+  <p><strong>Кому флоатинг не подходит:</strong> при неконтролируемой эпилепсии, при наличии свежих ран или царапин, при инфекционных заболеваниях, а также в состоянии алкогольного или наркотического опьянения.</p>
+  <p>Если у тебя остались вопросы о флоатинге, посмотри наши <a href="/ru/chavo" class="float-info__link">часто задаваемые вопросы</a></p>
+</section>
+
+<!-- REVIEWS -->
+<section class="float-reviews">
+  <div class="float-reviews__inner">
+  <h2 class="float-reviews__title">Отзывы</h2>
+
+  <div class="float-review">
+    <div class="float-review__stars">⭐⭐⭐⭐⭐</div>
+    <p class="float-review__text">«После флоатинга просто настолько хорошо себя чувствуешь, что даже сложно выделить что-то одно, просто супер круто! Огромное спасибо Сигне и Алариху! Обязательно вернусь сюда ещё много раз.»</p>
+    <p class="float-review__author">- Kaire</p>
+  </div>
+
+  <div class="float-review">
+    <div class="float-review__stars">⭐⭐⭐⭐⭐</div>
+    <p class="float-review__text">«Флоатинг, очень интересный опыт! Мысли рассеялись, а расслабление было невероятным! Я смогла полностью отпустить своё тело! Такого давно не случалось. Огромное спасибо!»</p>
+    <p class="float-review__author">- E.</p>
+  </div>
+
+  <div class="float-review">
+    <div class="float-review__stars">⭐⭐⭐⭐⭐</div>
+    <p class="float-review__text">«Приятный, тёплый и успокаивающий опыт!»</p>
+    <p class="float-review__author">- Sirly</p>
+  </div>
+
+  <div class="float-review">
+    <div class="float-review__stars">⭐⭐⭐⭐⭐</div>
+    <p class="float-review__text">«Флоатинг был одновременно расслабляющим и приятно удивившим опытом. На месте был владелец, который очень хорошо всё объяснил и дал полезные советы. Рекомендую всем, особенно в напряжённые периоды, когда действительно нужно замедлиться и отдохнуть.»</p>
+    <p class="float-review__author">- Kaarel</p>
+  </div>
+
+  <div class="float-review">
+    <div class="float-review__stars">⭐⭐⭐⭐⭐</div>
+    <p class="float-review__text">«Уже после первого сеанса флоатинга вечером почувствовала, как верхняя часть спины стала легче, а в плечах появилось больше свободы движения! Рекомендую!»</p>
+    <p class="float-review__author">- Liis</p>
+  </div>
+
+  <div class="float-review">
+    <div class="float-review__stars">⭐⭐⭐⭐⭐</div>
+    <p class="float-review__text">«Очень приятный и комфортный опыт, возможность взять момент для себя и позволить своим мышцам и душе отдохнуть и расслабиться. Атмосфера и окружающая обстановка также очень приятные и дружелюбные.»</p>
+    <p class="float-review__author">- Ronan</p>
+  </div>
+
+  <div class="float-review">
+    <div class="float-review__stars">⭐⭐⭐⭐⭐</div>
+    <p class="float-review__text">«Первый раз на флоатинге и очень приятный опыт. Отлично успокаивает тело и разум. Время полностью для себя.»</p>
+    <p class="float-review__author">- Priidu</p>
+  </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="float-faq">
+  <div class="float-faq__item">
+    <button class="float-faq__question" aria-expanded="false">
+      Подходит ли флоатинг в Таллине для первого опыта?
+      <span class="float-faq__icon">+</span>
+    </button>
+    <div class="float-faq__answer">
+      <p>Да. Большинство наших гостей приходят на флоатинг впервые, и перед началом сеанса терапевт спокойно объясняет весь процесс.</p>
+    </div>
+  </div>
+
+  <div class="float-faq__item">
+    <button class="float-faq__question" aria-expanded="false">
+      Сколько стоит флоатинг в Таллине?
+      <span class="float-faq__icon">+</span>
+    </button>
+    <div class="float-faq__answer">
+      <p>Стоимость одного сеанса флоатинга составляет 40 €, продолжительность 1 час. Пробный пакет из 3 посещений стоит 75 €.</p>
+    </div>
+  </div>
+
+  <div class="float-faq__item">
+    <button class="float-faq__question" aria-expanded="false">
+      Где находится флоатинг в Таллине?
+      <span class="float-faq__icon">+</span>
+    </button>
+    <div class="float-faq__answer">
+      <p>Центр дыхания находится по адресу Sõle 14c, Таллинн, недалеко от центра города. Перед зданием есть удобная парковка.</p>
+    </div>
+  </div>
+
+  <div class="float-faq__item">
+    <button class="float-faq__question" aria-expanded="false">
+      Подходит ли флоатинг беременным?
+      <span class="float-faq__icon">+</span>
+    </button>
+    <div class="float-faq__answer">
+      <p>Да. Флоатинг помогает снизить нагрузку на спину и ноги, а также даёт телу глубокое расслабление. Перед бронированием рекомендуем связаться с нами.</p>
+    </div>
+  </div>
+
+  <div class="float-faq__item">
+    <button class="float-faq__question" aria-expanded="false">
+      Нужно ли уметь плавать для флоатинга?
+      <span class="float-faq__icon">+</span>
+    </button>
+    <div class="float-faq__answer">
+      <p>Нет. Концентрация соли Эпсома в воде настолько высокая, что тело естественным образом держится на поверхности воды.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SEO TEXT -->
+<section class="float-seo">
+  <h2 class="float-seo__heading">История флоатинга</h2>
+  <p>Флоатинг это среда для расслабления, где человек парит в воде с высоким содержанием соли. Процесс проходит в специальной камере или ванне, наполненной водой и английской солью (сульфат магния). Английская соль позволяет человеку легко держаться на поверхности воды. Ванна или камера обычно находится в темноте (по желанию) и окружена тишиной. В этой среде можно полноценно отдохнуть, что способствует расширению сознания и открытию новых перспектив. Температура воды и воздуха схожа с температурой тела, что создаёт ощущение отсутствия границ между телом, водой и воздухом и позволяет полностью расслабиться.</p>
+
+  <p>Камеру для флоатинга изобрёл доктор Джон К. Лилли в 1954 году. Он лично экспериментировал с камерой и написал на эту тему несколько книг.</p>
+
+  <p>Цель флоатинга, обеспечить глубокое расслабление и психическое восстановление. Поскольку человек парит на поверхности воды, ему не нужно прикладывать усилия, чтобы двигаться или оставаться на плаву. Это позволяет мышцам полностью расслабиться и снимает напряжение в теле.</p>
+
+  <p>Плотный раствор английской соли создаёт ощущение невесомости, освобождая тело от гравитации. Гравитация, которая задействует около 90% работы центральной нервной системы, часто становится причиной различных проблем со здоровьем: боли в спине, ногах и суставах, а также мышечное напряжение, вызванное неправильной осанкой. Освобождение мозга и скелета от гравитации высвобождает значительное количество энергии, мозг может сосредоточиться на ощущениях и внутренних процессах, что повышает осознанность и улучшает связь с внутренним миром. Тишина и спокойствие, царящие в ванне, также способствуют глубокому отдыху мозга.</p>
+
+  <p>Глубокое расслабление помогает снизить уровень тревожности, а уменьшение стресса способствует улучшению качества сна. Флоатинг помогает справиться с бессонницей.</p>
+
+  <p>Уравнивание температуры воды, воздуха и тела помогает мозгу перейти от альфа-волн, характерных для состояния расслабления, к тета-волнам, которые связаны с глубокими медитативными состояниями и помогают углубить осознание себя.</p>
+
+  <p>Флоатинг часто используется для снятия стресса, уменьшения тревожности, снятия мышечного напряжения, улучшения качества сна, а также для общего улучшения благополучия и психического здоровья. Многие люди после флоатинга ощущают глубокое удовлетворение и ясность ума, а также чувствуют себя свежими как физически, так и ментально.</p>
+
+  <p>Английская соль (сульфат магния) на 98% состоит из магния, который играет важную роль в организме и необходим для многих функций и процессов.</p>
+
+  <p>Английская соль помогает смягчить кожу, уменьшить её сухость и шелушение. Это может быть особенно полезно для людей с сухой кожей или кожными проблемами, такими как дерматит или экзема. Соль также улучшает кровообращение в коже, что способствует восстановлению клеток и заживлению кожных тканей.</p>
+
+  <p>Флоатинг в воде с английской солью помогает достичь глубокого расслабления, уменьшить стресс и тревожность, а также улучшить общее самочувствие тела и разума.</p>
+
+  <p>Эффект флоатинга подтверждён научными исследованиями: систематический обзор 63 исследований (2025), исследование тревожности и депрессии (2024), исследование состояний сознания во время флоатинга (2024).</p>
+
+</section>
+
+<RelatedLinks lang="ru" links={[
+  { href: "/ru/osoznannoe-dyhanie", label: "Осознанное дыхание", desc: "Групповой сеанс дыхания под руководством терапевта" },
+  { href: "/ru/dyhanie-v-vode", label: "Дыхание в воде", desc: "Дыхание и флоатинг в одном сеансе" },
+  { href: "/ru/chlenstvo", label: "Членство", desc: "Флоатинг для членов 30€ за сеанс" },
+]} />
+
+<Footer lang="ru" />
+
+</Layout>
+
+<script>
+  document.querySelectorAll('.float-faq__question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.parentElement!;
+      const isOpen = item.classList.contains('float-faq__item--open');
+      // Close all
+      document.querySelectorAll('.float-faq__item').forEach(el => el.classList.remove('float-faq__item--open'));
+      document.querySelectorAll('.float-faq__question').forEach(el => el.setAttribute('aria-expanded', 'false'));
+      // Toggle current
+      if (!isOpen) {
+        item.classList.add('float-faq__item--open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+</script>
+
+<style>
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .header__logo img { height: 28px; width: auto; }
+  .header__right { display: flex; align-items: center; gap: 16px; }
+  .header__cart { color: #1d1e20; }
+  .header__burger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+  }
+  .header__burger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #1d1e20;
+  }
+
+  /* HERO */
+  .float-hero {
+    background: #f3fcff;
+    padding: 32px 24px;
+  }
+  .float-hero__content {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .float-hero__text { text-align: left; }
+  .float-hero__title {
+    text-align: left;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    color: #1d1e20;
+  }
+  .float-hero__subtitle {
+    text-align: left;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f6d85;
+    margin-bottom: 16px;
+  }
+  .float-hero__text p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1d1e20;
+    margin-bottom: 12px;
+  }
+  .float-hero__img {
+    width: 100%;
+    border-radius: 10px;
+    margin-top: 24px;
+  }
+  .float-hero__video {
+    position: relative;
+    width: 100%;
+    padding-bottom: 177.78%;
+    margin-top: 24px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .float-hero__video iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+  }
+
+  /* BENEFITS (hero vasakus veerus) */
+  .float-benefits__title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 24px 0 16px;
+    color: #1d1e20;
+    text-align: left;
+  }
+  .float-benefits__list {
+    list-style: disc;
+    padding-left: 20px;
+  }
+  .float-benefits__list li {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #1d1e20;
+    margin-bottom: 10px;
+  }
+
+  /* NUPUD (hero paremas veerus, video all) */
+  .float-cta__btn {
+    display: block;
+    background: #1d1e20;
+    color: #fff;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 18px 32px;
+    border-radius: 10px;
+    margin-top: 24px;
+  }
+  .float-cta__promo {
+    display: block;
+    background: #1f6d85;
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 18px 24px;
+    border-radius: 10px;
+    margin-top: 16px;
+  }
+
+  /* INFO */
+  .float-info__heading {
+    text-align: left;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #1d1e20;
+  }
+  .float-info {
+    background: #f3fcff;
+    padding: 32px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .float-info p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1d1e20;
+    margin-bottom: 16px;
+  }
+  .float-info p:last-child {
+    margin-bottom: 0;
+  }
+  .float-info__link {
+    color: #1f6d85;
+    text-decoration: underline;
+  }
+
+  /* REVIEWS (vanal valge taust, tsitaadid lihtsalt loeteluna) */
+  .float-reviews {
+    background: #fff;
+    padding: 32px 24px;
+  }
+  .float-reviews__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .float-reviews__title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    text-align: center;
+    color: #1d1e20;
+  }
+  .float-review {
+    margin-bottom: 20px;
+  }
+  .float-review:last-child {
+    margin-bottom: 0;
+  }
+  .float-review__stars {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  .float-review__text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #1d1e20;
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+  .float-review__author {
+    font-size: 13px;
+    font-weight: 500;
+    color: #555;
+  }
+
+  /* FAQ */
+  .float-faq {
+    background: #fff;
+    padding: 32px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .float-faq__item {
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .float-faq__item:last-child {
+    border-bottom: none;
+  }
+  .float-faq__question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 16px 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: #1d1e20;
+    text-align: left;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .float-faq__icon {
+    font-size: 20px;
+    font-weight: 300;
+    color: #1f6d85;
+    flex-shrink: 0;
+    margin-left: 16px;
+    transition: transform 0.2s;
+  }
+  .float-faq__answer {
+    display: none;
+    padding: 0 0 16px;
+  }
+  .float-faq__answer p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #555;
+  }
+
+  /* FAQ open state */
+  :global(.float-faq__item--open) .float-faq__answer {
+    display: block;
+  }
+  :global(.float-faq__item--open) .float-faq__icon {
+    transform: rotate(45deg);
+  }
+
+  /* SEO TEXT */
+  .float-seo {
+    background: #f3fcff;
+    padding: 32px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .float-seo p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #555;
+    margin-bottom: 16px;
+  }
+  .float-seo p:last-child {
+    margin-bottom: 0;
+  }
+  .float-seo__heading {
+    text-align: left;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1d1e20;
+    margin-top: 8px;
+  }
+
+  /* LOCATION */
+  .location {
+    background: #1f6d85;
+    padding: 20px 24px 24px;
+    color: #fff;
+    text-align: center;
+  }
+  .location__title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .location__address {
+    font-size: 14px;
+  }
+  .location__photo {
+    width: 80%;
+    max-width: 320px;
+    margin: 12px auto 0;
+    display: block;
+    border-radius: 10px;
+  }
+
+  /* FOOTER */
+  .footer__main {
+    background: #1f6d85;
+    padding: 24px;
+    color: #fff;
+  }
+  .footer__logo {
+    height: 30px;
+    width: auto;
+    margin: 0 auto 20px;
+    display: block;
+  }
+  .footer__contact h3,
+  .footer__hours h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .footer__contact p,
+  .footer__hours p {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .footer__hours {
+    margin-top: 16px;
+  }
+  .footer__social {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    color: #fff;
+  }
+  .footer__legal {
+    font-size: 11px;
+    margin-top: 16px;
+    opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 12px;
+  }
+  .footer__legal a:hover { text-decoration: underline; }
+
+  /* DESKTOP */
+  @media (min-width: 768px) {
+    .header { padding: 12px 40px; }
+    .header__logo img { height: 36px; }
+
+    .float-hero { padding: 64px 40px; }
+    .float-hero__content {
+      display: flex;
+      align-items: flex-start;
+      gap: 64px;
+    }
+    .float-hero__text {
+      flex: 1;
+    }
+    .float-hero__media {
+      flex: 0 0 400px;
+    }
+    .float-hero__title { font-size: 44px; line-height: 1.15; margin-bottom: 20px; }
+    .float-hero__subtitle { font-size: 20px; }
+    .float-hero__text p { font-size: 16px; }
+    .float-benefits__list li { font-size: 16px; }
+    .float-hero__img { margin-top: 0; }
+    .float-hero__video { margin-top: 0; }
+
+    .float-info {
+      padding: 48px max(40px, calc((100% - 1100px) / 2));
+      max-width: none;
+      margin: 0;
+    }
+    .float-info__heading { font-size: 24px; }
+    .float-info p { font-size: 16px; }
+    .float-reviews { padding: 56px 40px; }
+    .float-reviews__title { font-size: 30px; margin-bottom: 36px; }
+    .float-review__text { font-size: 16px; }
+    .float-faq {
+      padding: 40px max(40px, calc((100% - 1100px) / 2));
+      max-width: none;
+      margin: 0;
+    }
+    .float-seo {
+      padding: 40px max(40px, calc((100% - 1100px) / 2)) 56px;
+      max-width: none;
+      margin: 0;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .float-hero__title { font-size: 52px; }
+    .float-hero { padding: 72px 40px; }
+    .float-hero__content { max-width: 1200px; }
+  }
+</style>

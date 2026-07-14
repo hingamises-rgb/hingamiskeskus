@@ -1,0 +1,557 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { readdir, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { requireDb } from '../../lib/db';
+
+// Venekeelsed tootelehed + blogiartiklid (vanalt saidilt migreeritud, /ru/<slug>).
+// Ostukorvi nimi on venekeelne (title_ru) — kasutaja lisab Make'i venekeelsed read ise.
+export async function getStaticPaths() {
+  const paths = [];
+
+  // Venekeelsed blogiartiklid
+  const dir = join(process.cwd(), 'src', 'content', 'blogi-ru');
+  const files = await readdir(dir);
+  for (const file of files) {
+    if (!file.endsWith('.json')) continue;
+    const article = JSON.parse(await readFile(join(dir, file), 'utf8'));
+    paths.push({
+      params: { slug: article.slug },
+      props: { article },
+    });
+  }
+
+  const sql = requireDb();
+  const products = await sql`
+    SELECT slug, page_slug, page_slug_ru, image, cart_name,
+           COALESCE(title_ru, title) AS title,
+           COALESCE(subtitle_ru, subtitle) AS subtitle,
+           COALESCE(description_ru, description) AS description,
+           COALESCE(ribbon_ru, ribbon) AS ribbon,
+           COALESCE(alt_ru, alt) AS alt,
+           price, old_price,
+           CASE WHEN price_prefix = 'Al.' THEN 'от' ELSE price_prefix END AS price_prefix,
+           category, sold_out,
+           meta_title_ru, meta_description_ru
+    FROM products WHERE page_slug_ru IS NOT NULL AND active = true
+  `;
+  for (const product of products) {
+    paths.push({
+      params: { slug: product.page_slug_ru },
+      props: { product },
+    });
+  }
+
+  return paths;
+}
+
+const { article, product } = Astro.props;
+const publishedDate = article?.publishedTime
+  ? new Date(article.publishedTime).toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' })
+  : '';
+
+// Artiklitel title ilma lisata (nagu vanal saidil), toodetel oma meta
+const pageTitle = article ? article.title : (product.meta_title_ru || `${product.title} | Hingamiskeskus`);
+const pageDesc = article ? (article.description || article.title) : (product.meta_description_ru || product.subtitle || product.title);
+
+const cartProduct = product && !product.sold_out
+  ? { id: product.slug, name: product.title, price: Number(product.price) }
+  : null;
+
+function fmtPrice(v: unknown) {
+  return `€${Number(v).toFixed(2)}`;
+}
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDesc}
+  image={article ? article.image : product.image}
+  type={article ? 'article' : 'website'}
+  lang="ru"
+  alternates={product ? { et: `/${product.page_slug}`, ru: `/ru/${product.page_slug_ru}` } : undefined}
+>
+
+<Header active={article ? 'blogi' : 'epood'} lang="ru" altHref={product ? `/${product.page_slug}` : undefined} />
+
+{article && (
+<article class="article">
+  <div class="article__hero">
+    <h1 class="article__title">{article.title}</h1>
+    {article.description && <p class="article__lead">{article.description}</p>}
+    {publishedDate && <p class="article__meta">{publishedDate} · Центр дыхания</p>}
+  </div>
+
+  {article.image && (
+    <img src={article.image} alt={article.imageAlt || article.title} class="article__image" />
+  )}
+
+  <div class="article__body" set:html={article.body}></div>
+
+  <div class="article__cta">
+    <a href="/ru/blog" class="article__cta-link">← Назад в блог</a>
+  </div>
+</article>
+)}
+
+{product && (
+<section class="product">
+  <div class="product__grid">
+    <div class="product__image-wrap">
+      {product.ribbon && <div class="product__ribbon">{product.ribbon}</div>}
+      <img src={product.image} alt={product.alt || product.title} class="product__image" />
+    </div>
+    <div class="product__info">
+      <h1 class="product__title">{product.title}</h1>
+      {product.subtitle && <p class="product__subtitle">{product.subtitle}</p>}
+      <p class="product__price">
+        {product.price_prefix ? product.price_prefix + ' ' : ''}{product.old_price && <><span class="product__price--old">{fmtPrice(product.old_price)}</span>{' '}</>}{product.sold_out ? 'Sold out' : fmtPrice(product.price)}
+      </p>
+
+      {!product.sold_out && (
+        <div class="product__buy">
+          <div class="product__qty">
+            <button type="button" class="product__qty-btn" id="qty-minus" aria-label="Уменьшить количество">−</button>
+            <span class="product__qty-value" id="qty-value">1</span>
+            <button type="button" class="product__qty-btn" id="qty-plus" aria-label="Увеличить количество">+</button>
+          </div>
+          <button type="button" class="product__add" id="add-to-cart">ДОБАВИТЬ В КОРЗИНУ</button>
+        </div>
+      )}
+
+      {product.description && (
+        <div class="product__desc" set:html={product.description}></div>
+      )}
+
+      <a href="/ru/onlajn-shop" class="product__back">← Назад в интернет-магазин</a>
+    </div>
+  </div>
+</section>
+)}
+
+<Footer lang="ru" />
+
+</Layout>
+
+{cartProduct && (
+<script is:inline define:vars={{ cartProduct }}>
+  function getCart() {
+    try { return JSON.parse(localStorage.getItem('hk_cart') || '[]'); }
+    catch { return []; }
+  }
+  function saveCart(cart) {
+    localStorage.setItem('hk_cart', JSON.stringify(cart));
+    updateBadge();
+  }
+  function updateBadge() {
+    const cart = getCart();
+    const count = cart.reduce(function(s, i) { return s + i.qty; }, 0);
+    let badge = document.querySelector('.cart-badge');
+    if (count > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'cart-badge';
+        document.querySelector('.header__cart').appendChild(badge);
+      }
+      badge.textContent = count;
+    } else if (badge) {
+      badge.remove();
+    }
+  }
+
+  let qty = 1;
+  const qtyValue = document.getElementById('qty-value');
+  document.getElementById('qty-minus').addEventListener('click', function() {
+    if (qty > 1) { qty--; qtyValue.textContent = qty; }
+  });
+  document.getElementById('qty-plus').addEventListener('click', function() {
+    qty++; qtyValue.textContent = qty;
+  });
+
+  const addBtn = document.getElementById('add-to-cart');
+  addBtn.addEventListener('click', function() {
+    const cart = getCart();
+    const existing = cart.find(function(item) { return item.id === cartProduct.id; });
+    if (existing) existing.qty += qty;
+    else cart.push({ id: cartProduct.id, name: cartProduct.name, price: cartProduct.price, qty: qty });
+    saveCart(cart);
+    addBtn.textContent = 'ДОБАВЛЕНО ✓';
+    setTimeout(function() { addBtn.textContent = 'ДОБАВИТЬ В КОРЗИНУ'; }, 1500);
+  });
+
+  updateBadge();
+</script>
+)}
+
+<style>
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; background: #fff; position: sticky; top: 0; z-index: 100;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .header__logo img { height: 28px; width: auto; }
+  .header__nav { display: none; gap: 24px; }
+  .header__nav a { font-size: 14px; color: #1d1e20; text-decoration: none; font-weight: 500; }
+  .header__nav a.active { text-decoration: underline; text-underline-offset: 4px; }
+  .header__right { display: flex; align-items: center; gap: 16px; }
+  .header__cart { color: #1d1e20; }
+  .header__burger { display: flex; flex-direction: column; gap: 5px; padding: 4px; background: none; border: none; cursor: pointer; }
+  .header__burger span { display: block; width: 22px; height: 2px; background: #1d1e20; }
+  @media (min-width: 768px) {
+    .header__nav { display: flex; }
+    .header__burger { display: none; }
+  }
+
+  .article {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  .article__hero {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .article__title {
+    font-family: 'Libre Caslon Display', serif;
+    font-size: 32px;
+    line-height: 1.2;
+    color: #1d1e20;
+    margin-bottom: 16px;
+  }
+
+  .article__lead {
+    font-size: 17px;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 12px;
+  }
+
+  .article__meta {
+    font-size: 13px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .article__categories {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .article__category {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: #1f6d85;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .article__category:not(:last-child)::after {
+    content: '·';
+    margin-left: 8px;
+    color: #ccc;
+  }
+
+  .article__image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 32px;
+  }
+
+  .article__body {
+    font-size: 16px;
+    line-height: 1.75;
+    color: #1d1e20;
+  }
+
+  .article__body :global(h2) {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-top: 32px;
+    margin-bottom: 14px;
+    text-align: left;
+  }
+
+  .article__body :global(h3) {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    text-align: left;
+  }
+
+  .article__body :global(p) {
+    margin-bottom: 16px;
+    font-size: 16px;
+  }
+
+  .article__body :global(ul),
+  .article__body :global(ol) {
+    padding-left: 20px;
+    margin-bottom: 16px;
+  }
+
+  .article__body :global(ul li) {
+    list-style: disc;
+    margin-left: 8px;
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+
+  .article__body :global(ol li) {
+    list-style: decimal;
+    margin-left: 8px;
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+
+  .article__body :global(a) {
+    color: #1f6d85;
+    text-decoration: underline;
+  }
+
+  .article__body :global(strong) {
+    font-weight: 700;
+  }
+
+  .article__body :global(img) {
+    border-radius: 10px;
+    margin: 20px 0;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .article__body p {
+    margin-bottom: 16px;
+    font-size: 16px;
+  }
+
+  .article__body ul, .article__body ol {
+    padding-left: 20px;
+    margin-bottom: 16px;
+    list-style: disc;
+  }
+
+  .article__body ul li, .article__body ol li {
+    margin-bottom: 8px;
+    font-size: 16px;
+    list-style: disc;
+    margin-left: 8px;
+  }
+
+  .article__body ol li {
+    list-style: decimal;
+  }
+
+  .article__body a {
+    color: #1f6d85;
+    text-decoration: underline;
+  }
+
+  .article__body a:hover {
+    color: #164a5c;
+  }
+
+  .article__body strong {
+    font-weight: 700;
+  }
+
+  .article__body img {
+    border-radius: 10px;
+    margin: 20px 0;
+  }
+
+  .article__cta {
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid #eee;
+    text-align: center;
+  }
+
+  .article__cta-btn {
+    display: inline-block;
+    background: #1d1e20;
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    text-decoration: none;
+    margin-bottom: 20px;
+  }
+
+  .article__cta-link {
+    display: block;
+    color: #1f6d85;
+    font-size: 14px;
+    text-decoration: none;
+  }
+
+  @media (min-width: 768px) {
+    .article__title { font-size: 42px; }
+    .article { padding: 60px 40px; }
+  }
+
+  /* TOOTELEHT */
+  .product {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+  .product__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  @media (min-width: 768px) {
+    .product__grid { grid-template-columns: 1fr 1fr; gap: 56px; }
+    .product { padding: 60px 40px 80px; }
+  }
+  .product__image-wrap { position: relative; }
+  .product__image {
+    width: 100%;
+    border-radius: 10px;
+  }
+  .product__ribbon {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #1d1e20;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 999px;
+    z-index: 1;
+  }
+  .product__title {
+    font-family: 'Libre Caslon Display', serif;
+    font-size: 34px;
+    font-weight: 400;
+    line-height: 1.15;
+    color: #1d1e20;
+    text-align: left;
+    margin-bottom: 12px;
+  }
+  .product__subtitle {
+    font-family: 'Libre Caslon Display', serif;
+    font-size: 20px;
+    line-height: 1.4;
+    color: #1d1e20;
+    margin-bottom: 20px;
+  }
+  .product__price {
+    font-size: 18px;
+    color: #1d1e20;
+    margin-bottom: 24px;
+  }
+  .product__price--old {
+    text-decoration: line-through;
+    color: #999;
+    margin-right: 6px;
+  }
+  .product__buy {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+  .product__qty {
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .product__qty-btn {
+    width: 44px;
+    height: 48px;
+    font-size: 18px;
+    background: #fff;
+    border: none;
+    color: #1d1e20;
+    cursor: pointer;
+  }
+  .product__qty-btn:hover { background: #f3fcff; }
+  .product__qty-value {
+    min-width: 40px;
+    text-align: center;
+    font-size: 15px;
+  }
+  .product__add {
+    background: #1d1e20;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 16px 36px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  .product__add:hover { opacity: 0.88; }
+  .product__desc { font-size: 15px; line-height: 1.7; color: #333; }
+  .product__desc :global(p) { margin-bottom: 14px; font-size: 15px; }
+  .product__desc :global(a) { color: #1f6d85; text-decoration: underline; }
+  .product__desc :global(strong) { font-weight: 700; }
+  .product__desc :global(ul), .product__desc :global(ol) { padding-left: 20px; margin-bottom: 14px; }
+  .product__desc :global(li) { font-size: 15px; margin-bottom: 6px; list-style: disc; }
+  .product__back {
+    display: inline-block;
+    margin-top: 24px;
+    color: #1f6d85;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  :global(.cart-badge) {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: #1f6d85;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+  }
+  .header__cart { position: relative; }
+
+  .location {
+    background: #1f6d85;
+    padding: 20px 24px 24px;
+    color: #fff;
+    text-align: center;
+  }
+  .location__title { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+  .location__address { font-size: 14px; }
+  .location__photo { width: 80%; max-width: 320px; margin: 12px auto 0; display: block; border-radius: 10px; }
+  .footer__main { background: #1f6d85; padding: 24px; color: #fff; }
+  .footer__logo { height: 30px; width: auto; margin: 0 auto 20px; display: block; }
+  .footer__contact h3, .footer__hours h3 { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+  .footer__contact p, .footer__hours p { font-size: 13px; line-height: 1.8; }
+  .footer__hours { margin-top: 16px; }
+  .footer__social { display: flex; gap: 16px; margin-top: 16px; color: #fff; }
+  .footer__legal { font-size: 11px; margin-top: 16px; opacity: 0.7; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px; }
+  .footer__legal a { color: #fff; text-decoration: none; }
+  .footer__legal a:hover { text-decoration: underline; }
+</style>

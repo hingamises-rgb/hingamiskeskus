@@ -1,20 +1,48 @@
 ---
 // Ühine jalus (vana saidi kujundus): Aadress + maja pilt | logo + lahtiolekuajad + FB/IG | Kontakt.
 // Asendab varasema 18 lehel dubleeritud jalusemarkupi.
+interface Props {
+  lang?: 'et' | 'ru';
+}
+const { lang = 'et' } = Astro.props;
+const ru = lang === 'ru';
+const t = ru
+  ? {
+      address: 'Адрес',
+      hours: 'Часы работы',
+      hoursWeek: 'Пн–Пт 8.30 – 20.00',
+      hoursWeekend: 'Сб–Вс 11.00 – 18.00',
+      contact: 'Контакты',
+      email: 'Эл. почта:',
+      phone: 'Телефон:',
+      support: '(клиентская поддержка 10.00–17.00)',
+      legal: 'Политика конфиденциальности и условия продажи',
+    }
+  : {
+      address: 'Aadress',
+      hours: 'Lahtiolekuajad',
+      hoursWeek: 'E-R 8.30 - 20.00',
+      hoursWeekend: 'L-P 11.00 - 18.00',
+      contact: 'Kontakt',
+      email: 'E-post:',
+      phone: 'Telefoninumber:',
+      support: '(klienditugi 10.00-17.00)',
+      legal: 'Privaatsuspoliitika & Müügitingimused',
+    };
 ---
 <footer class="ftr">
   <div class="ftr__grid">
     <div class="ftr__col ftr__col--address">
-      <h3>Aadress</h3>
+      <h3>{t.address}</h3>
       <p>Söle 14c, Tallinn</p>
       <img src="/images/hoone.jpg" alt="Hingamiskeskus Söle 14c" class="ftr__photo" loading="lazy" />
-      <p class="ftr__legal"><a href="/privaatsuspoliitika">Privaatsuspoliitika &amp; Müügitingimused</a></p>
+      <p class="ftr__legal"><a href="/privaatsuspoliitika">{t.legal}</a></p>
     </div>
     <div class="ftr__col ftr__col--center">
       <img src="/images/logo-valge.png" alt="Hingamiskeskus" class="ftr__logo" />
-      <h3>Lahtiolekuajad</h3>
-      <p>E-R 8.30 - 20.00</p>
-      <p>L-P 11.00 - 18.00</p>
+      <h3>{t.hours}</h3>
+      <p>{t.hoursWeek}</p>
+      <p>{t.hoursWeekend}</p>
       <div class="ftr__social">
         <a href="https://www.facebook.com/Hingamiskeskus" aria-label="Facebook" target="_blank" rel="noopener">
           <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
@@ -25,11 +53,11 @@
       </div>
     </div>
     <div class="ftr__col ftr__col--contact">
-      <h3>Kontakt</h3>
-      <p>E-post:<br />Info@hingamiskeskus.ee</p>
-      <p>Telefoninumber:<br />+372 56695898</p>
+      <h3>{t.contact}</h3>
+      <p>{t.email}<br />Info@hingamiskeskus.ee</p>
+      <p>{t.phone}<br />+372 56695898</p>
       <p>+372 56497689</p>
-      <p>(klienditugi 10.00-17.00)</p>
+      <p>{t.support}</p>
       <p>Hingamises OÜ<br />EE147700771009732310</p>
     </div>
   </div>

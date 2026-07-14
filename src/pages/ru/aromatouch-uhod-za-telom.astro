@@ -1,0 +1,323 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import ContactForm from '../../components/ContactForm.astro';
+import Footer from '../../components/Footer.astro';
+import RelatedLinks from '../../components/RelatedLinks.astro';
+---
+
+<Layout
+  title="Aromatouch уход за телом | Хингамискескус Таллин"
+  description="Aromatouch уход за телом в Хингамискескус в Таллине. Расслабляющий массаж с эфирными маслами doTERRA снимает стресс и восстанавливает гармонию тела и разума!"
+  keywords="Aromatouch уход за телом"
+  lang="ru"
+  alternates={{ et: '/aromatouch-kehahooldus', ru: '/ru/aromatouch-uhod-za-telom' }}
+>
+
+<!-- HEADER -->
+<Header active="teenused" lang="ru" altHref="/aromatouch-kehahooldus" />
+
+<!-- HERO SECTION (kogu tekst vasakul, pildid paremal) -->
+<section class="float-hero">
+  <div class="float-hero__content">
+    <div class="float-hero__text">
+      <h1 class="float-hero__title">Aromatouch уход за телом</h1>
+      <h2 class="float-hero__subtitle">Терапевтический массаж с эфирными маслами doTERRA</h2>
+      <p>Техника Aromatouch это нежный и расслабляющий уход за телом, который сочетает в себе полезные свойства эфирных масел doTERRA со специальными техниками прикосновений. Эта техника, напоминающая массаж, была разработана доктором Дэвидом Хиллом, специалистом в области эфирных масел и интегративной медицины.</p>
+      <h2 class="float-info__heading">Основные характеристики и цели:</h2>
+      <p><strong>Нежное прикосновение:</strong> Aromatouch это не интенсивный массаж, а мягкая и плавная техника прикосновений, направленная на расслабление нервной системы и всего тела.</p>
+      <p><strong>Использование эфирных масел:</strong> Применяется специальный набор из 8 различных эфирных масел или их смесей от doTERRA. Эти масла отобраны за их терапевтические свойства и помогают сбалансировать тело как на физическом, так и на эмоциональном уровне.</p>
+      <p>Масла оказывают успокаивающее, противовоспалительное, расслабляющее действие, а также поддерживают иммунную систему и улучшают настроение.</p>
+      <p><strong>Балансировка тела:</strong> техника Aromatouch направлена на следующие эффекты:</p>
+      <ul class="float-info__list">
+        <li>Снижение стресса и тревожности.</li>
+        <li>Укрепление иммунной системы и повышение устойчивости организма.</li>
+        <li>Устранение воспалений и поддержка естественного восстановления организма.</li>
+        <li>Расслабление мышц и улучшение кровообращения.</li>
+      </ul>
+      <p><strong>Работа с точками тела:</strong> в технике основное внимание уделяется позвоночнику, голове и ступням. Техника прикосновения стимулирует движение энергии в теле и активирует нервную систему.</p>
+      <p><strong>Для тела и разума:</strong> Aromatouch это не только физический опыт, но и способ достичь ментального и эмоционального баланса. Эфирные масла в сочетании с мягкими прикосновениями создают чувство удовлетворения и глубокого расслабления.</p>
+      <p>В итоге техника Aromatouch это деликатный способ расслабления и поддержки целительных процессов в организме. Она идеально подходит для тех, кто хочет улучшить своё самочувствие с помощью естественных и мягких методов. Эфирные масла проникают во все клетки тела всего за 20 секунд, воздействуя на лимфу, ткани и нервную систему, начиная оздоровление на клеточном уровне. Масла мягкими движениями наносятся на спину и ступни, вы сами можете выбрать, для поддержки какой системы организма вы хотите испытать ароматерапию. Несомненно, после сеанса вы почувствуете глубокое расслабление и спокойствие, а тело начнёт восстанавливать внутренний баланс.</p>
+      <p><strong>Продолжительность сеанса:</strong> 60 минут</p>
+      <p><strong>Цена:</strong> 50€</p>
+    </div>
+    <div class="float-hero__media">
+      <img src="/images/aromatouch-naine.jpg" alt="Терапевт Aromatouch в Центре дыхания" class="float-hero__img" loading="lazy" />
+      <img src="/images/aromatouch-kuunlad.jpg" alt="Массажная комната Aromatouch со свечами" class="float-hero__img" loading="lazy" style="margin-top: 24px;" />
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING FORM -->
+<ContactForm source="Aromatouch kehahooldus (RU)" lang="ru" />
+
+<RelatedLinks lang="ru" links={[
+  { href: "/ru/floating", label: "Флоатинг", desc: "Глубокое расслабление в воде с солью Эпсома" },
+  { href: "/ru/osoznannoe-dyhanie", label: "Осознанное дыхание", desc: "Групповой сеанс дыхания под руководством терапевта" },
+  { href: "/ru/onlajn-shop", label: "Интернет-магазин", desc: "Подарочные карты и пакеты" },
+]} />
+
+<Footer lang="ru" />
+
+</Layout>
+
+<style>
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .header__logo img { height: 28px; width: auto; }
+  .header__right { display: flex; align-items: center; gap: 16px; }
+  .header__cart { color: #1d1e20; }
+  .header__burger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+  }
+  .header__burger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #1d1e20;
+  }
+
+  /* HERO */
+  .float-hero {
+    background: #f3fcff;
+    padding: 32px 24px;
+  }
+  .float-hero__content {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .float-hero__title {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    color: #1d1e20;
+  }
+  .float-hero__text { text-align: left; }
+  .float-hero__title { text-align: left; }
+  .float-hero__subtitle { text-align: left; }
+  .float-hero__text p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1d1e20;
+    margin-bottom: 12px;
+  }
+  .float-hero__img {
+    width: 100%;
+    border-radius: 10px;
+    margin-top: 24px;
+  }
+
+  /* INFO / CONTENT */
+  .float-info {
+    background: #f3fcff;
+    padding: 32px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .float-info p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1d1e20;
+    margin-bottom: 16px;
+  }
+  .float-info p:last-child {
+    margin-bottom: 0;
+  }
+  .float-info__heading {
+    text-align: left;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #1d1e20;
+  }
+  .float-info__list {
+    list-style: disc;
+    padding-left: 20px;
+    margin-bottom: 16px;
+  }
+  .float-info__list li {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #1d1e20;
+  }
+
+  /* HERO IMAGE INLINE */
+  .float-hero-img {
+    margin: 16px 0;
+  }
+
+  /* SUBTITLE */
+  .float-hero__subtitle {
+    font-size: 18px;
+    font-weight: 400;
+    color: #1d1e20;
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+
+  /* BOOKING FORM */
+  .float-form {
+    background: #fff;
+    padding: 32px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .float-form__title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #1d1e20;
+  }
+  .float-form__desc {
+    font-size: 15px;
+    color: #555;
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .contact-form__label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1d1e20;
+    gap: 4px;
+  }
+  .contact-form__input,
+  .contact-form__textarea {
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: #1d1e20;
+    background: #f9f9f9;
+  }
+  .contact-form__input:focus,
+  .contact-form__textarea:focus {
+    outline: none;
+    border-color: #1f6d85;
+  }
+  .contact-form__textarea {
+    resize: vertical;
+  }
+  .contact-form__btn {
+    display: inline-block;
+    background: #1d1e20;
+    color: #fff;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 14px 32px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+
+  /* LOCATION */
+  .location {
+    background: #1f6d85;
+    padding: 20px 24px 24px;
+    color: #fff;
+    text-align: center;
+  }
+  .location__title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .location__address {
+    font-size: 14px;
+  }
+  .location__photo {
+    width: 80%;
+    max-width: 320px;
+    margin: 12px auto 0;
+    display: block;
+    border-radius: 10px;
+  }
+
+  /* FOOTER */
+  .footer__main {
+    background: #1f6d85;
+    padding: 24px;
+    color: #fff;
+  }
+  .footer__logo {
+    height: 30px;
+    width: auto;
+    margin: 0 auto 20px;
+    display: block;
+  }
+  .footer__contact h3, .footer__hours h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .footer__contact p, .footer__hours p {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .footer__hours {
+    margin-top: 16px;
+  }
+  .footer__social {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    color: #fff;
+  }
+  .footer__social a { color: #fff; }
+  .footer__legal {
+    font-size: 11px;
+    margin-top: 16px;
+    opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 12px;
+  }
+  .footer__legal a { color: #fff; text-decoration: none; }
+
+  /* DESKTOP */
+  @media (min-width: 768px) {
+    .header { padding: 12px 40px; }
+    .header__logo img { height: 36px; }
+
+    .float-hero { padding: 64px 40px; }
+    .float-hero__content {
+      display: flex;
+      align-items: flex-start;
+      gap: 64px;
+      max-width: 1200px;
+    }
+    .float-hero__text { flex: 1.15; }
+    .float-hero__media { flex: 1; position: sticky; top: 100px; }
+    .float-hero__title { font-size: 44px; line-height: 1.15; margin-bottom: 16px; }
+    .float-hero__text p { font-size: 16px; }
+    .float-info__list li { font-size: 16px; }
+    .float-hero__img { margin-top: 0; }
+  }
+
+  @media (min-width: 1024px) {
+    .float-hero__title { font-size: 40px; }
+    .float-hero { padding: 56px 40px; }
+  }
+</style>

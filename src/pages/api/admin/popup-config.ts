@@ -13,6 +13,8 @@ export const POST: APIRoute = async ({ request }) => {
 
   const heading = String(b.heading || '').trim().slice(0, 100);
   const description = String(b.description || '').trim().slice(0, 300);
+  const headingRu = String(b.heading_ru || '').trim().slice(0, 100);
+  const descriptionRu = String(b.description_ru || '').trim().slice(0, 300);
   const code = String(b.code || '').trim().slice(0, 40);
   const timer = Number(b.timer_minutes);
 
@@ -25,6 +27,8 @@ export const POST: APIRoute = async ({ request }) => {
         active = ${!!b.active},
         heading = ${heading},
         description = ${description},
+        heading_ru = ${headingRu || null},
+        description_ru = ${descriptionRu || null},
         code = ${code},
         timer_minutes = ${Number.isFinite(timer) && timer >= 1 && timer <= 60 ? timer : 3}
       WHERE id = 1

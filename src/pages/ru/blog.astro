@@ -1,0 +1,588 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import { readdir, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import Footer from '../../components/Footer.astro';
+
+const dir = join(process.cwd(), 'src', 'content', 'blogi-ru');
+const files = await readdir(dir);
+const articles = [];
+for (const f of files) {
+  if (!f.endsWith('.json')) continue;
+  articles.push(JSON.parse(await readFile(join(dir, f), 'utf8')));
+}
+
+articles.sort((a, b) => (b.publishedTime || '').localeCompare(a.publishedTime || ''));
+
+const featured = articles[0];
+const rest = articles.slice(1);
+const PAGE_SIZE = 12;
+
+const allCats = new Set();
+articles.forEach(a => (a.categories || []).forEach(c => allCats.add(c)));
+const blogCategories = [...allCats].sort();
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`;
+}
+---
+
+<Layout
+  title="Блог о флоатинге и осознанном дыхании в Таллине Хингамискескус"
+  description="Блог о флоатинге и осознанном дыхании в Таллине от центра Hingamiskeskus для снятия стресса, глубокого расслабления, восстановления сил, душевной и телесной гармонии."
+  keywords="блог о флоатинге и осознанном дыхании в Таллине"
+  lang="ru"
+  alternates={{ et: '/blogi', ru: '/ru/blog' }}
+>
+
+<!-- HEADER -->
+<Header active="blogi" lang="ru" altHref="/blogi" />
+
+<!-- PAGE TITLE -->
+<section class="page-hero">
+  <h1 class="page-hero__title">Блог</h1>
+</section>
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <input type="text" id="blog-search" placeholder="Поиск статьи..." class="search-input" />
+</div>
+
+<!-- BLOG INTRO -->
+<section class="blog-intro">
+  <h2 class="blog-intro__heading">Добро пожаловать в блог Центра дыхания!</h2>
+  <p>Здесь вы найдёте вдохновляющие статьи об осознанном, освобождающем дыхании и флоатинге в Таллине. Наша миссия обеспечить глубокое расслабление, восстановление и внутреннее равновесие посредством эффективных практик для тела и разума.</p>
+  <p><a href="/ru/floating" class="blog-intro__link"><strong>Флоатинг</strong></a> в английской солёной воде это не просто роскошный отдых, это научно обоснованная практика, используемая спортсменами, предпринимателями и людьми, ведущими напряжённый образ жизни. Исследования показали, что один час флоатинга может обеспечить такой же глубокий отдых, как 4 часа сна. В Центре дыхания флоатинг проходит в удобной ванне, а не в капсуле, что делает его особенно подходящим и для тех, кто чувствует себя некомфортно в закрытых пространствах.</p>
+  <p><a href="/ru/osoznannoe-dyhanie" class="blog-intro__link"><strong>Освобождающее дыхание</strong></a>, или осознанное дыхание, это процесс, помогающий снять эмоциональное и физическое напряжение. Это естественный способ вдохнуть больше жизненной энергии в тело, снять стресс и достичь внутренней ясности и равновесия.</p>
+  <p>Кроме того, в блоге мы делимся советами и историями о том, как осознанное дыхание способствует концентрации, спортивным достижениям, эмоциональному равновесию и улучшению сна. Все, кто ищет дыхательные практики в Таллине, найдут здесь практическую и полезную информацию.</p>
+  <p>Неважно, занимаетесь ли вы спортом, ждёте ли ребёнка, переутомлены или просто ищете тишины, блог Центра дыхания поможет вам обрести баланс, покой и восстановление. Читайте, делитесь, экспериментируйте и найдите свой собственный путь к лучшему самочувствию.</p>
+</section>
+
+<!-- FEATURED POST -->
+{featured && (
+  <section class="featured-section">
+    <a href={featured.path} class="featured" data-cats={JSON.stringify(featured.categories || [])}>
+      <div class="featured__image-wrap">
+        {featured.image && (
+          <img src={featured.image} alt={featured.imageAlt || featured.title} class="featured__image" />
+        )}
+      </div>
+      <div class="featured__content">
+        <p class="featured__badge">Новая статья</p>
+        <h2 class="featured__title">{featured.title}</h2>
+        <p class="featured__desc">{featured.description}</p>
+        <p class="featured__meta">{formatDate(featured.publishedTime)}</p>
+      </div>
+    </a>
+  </section>
+)}
+
+<!-- BLOG GRID -->
+<section class="blog-grid-section">
+  <div class="blog-grid">
+    {rest.map((post, i) => (
+      <a href={post.path} class={`blog-card ${i >= PAGE_SIZE ? 'blog-card--paged' : ''}`} data-cats={JSON.stringify(post.categories || [])} data-title={post.title.toLowerCase()} data-desc={(post.description || '').toLowerCase()}>
+        <div class="blog-card__image-wrap">
+          {post.image && (
+            <img src={post.image} alt={post.imageAlt || post.title} class="blog-card__image" loading="lazy" />
+          )}
+        </div>
+        <h3 class="blog-card__title">{post.title}</h3>
+        <p class="blog-card__desc">{post.description}</p>
+        <div class="blog-card__meta">
+          <span class="blog-card__date">{formatDate(post.publishedTime)}</span>
+        </div>
+      </a>
+    ))}
+  </div>
+  <div class="load-more-wrap">
+    <button class="load-more-btn" id="load-more">Показать ещё</button>
+  </div>
+  <p class="no-results" id="no-results">Статьи не найдены.</p>
+</section>
+
+<Footer lang="ru" />
+
+</Layout>
+
+<script>
+  const PAGE_SIZE = 12;
+  let currentCat = 'all';
+  let currentSearch = '';
+  let visibleCount = PAGE_SIZE;
+
+  function applyFilters() {
+    const cards = document.querySelectorAll('.blog-card');
+    let matched = 0;
+    let shown = 0;
+    cards.forEach(card => {
+      const el = card as HTMLElement;
+      const cats: string[] = JSON.parse(el.dataset.cats || '[]');
+      const title = el.dataset.title || '';
+      const desc = el.dataset.desc || '';
+      const matchesCat = currentCat === 'all' || cats.includes(currentCat);
+      const matchesSearch = !currentSearch || title.includes(currentSearch) || desc.includes(currentSearch);
+      const matches = matchesCat && matchesSearch;
+      if (matches) {
+        matched++;
+        if (shown < visibleCount) {
+          el.classList.remove('blog-card--hidden');
+          shown++;
+        } else {
+          el.classList.add('blog-card--hidden');
+        }
+      } else {
+        el.classList.add('blog-card--hidden');
+      }
+    });
+    const loadBtn = document.getElementById('load-more');
+    if (loadBtn) loadBtn.style.display = matched > visibleCount ? 'inline-block' : 'none';
+    const noResults = document.getElementById('no-results');
+    if (noResults) noResults.style.display = matched === 0 ? 'block' : 'none';
+  }
+
+  document.querySelectorAll('.cat-nav__btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentCat = (btn as HTMLElement).dataset.cat!;
+      visibleCount = PAGE_SIZE;
+      document.querySelectorAll('.cat-nav__btn').forEach(b => b.classList.remove('cat-nav__btn--active'));
+      btn.classList.add('cat-nav__btn--active');
+      applyFilters();
+    });
+  });
+
+  const searchInput = document.getElementById('blog-search') as HTMLInputElement | null;
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      currentSearch = searchInput.value.trim().toLowerCase();
+      visibleCount = PAGE_SIZE;
+      applyFilters();
+    });
+  }
+
+  const loadMoreBtn = document.getElementById('load-more');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', () => {
+      visibleCount += PAGE_SIZE;
+      applyFilters();
+    });
+  }
+
+  applyFilters();
+</script>
+
+<style>
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .header__logo img { height: 28px; width: auto; }
+  .header__nav { display: none; gap: 24px; }
+  .header__nav a { font-size: 14px; color: #1d1e20; text-decoration: none; font-weight: 500; }
+  .header__nav a.active { text-decoration: underline; text-underline-offset: 4px; }
+  .header__right { display: flex; align-items: center; gap: 16px; }
+  .header__cart { color: #1d1e20; }
+  .header__burger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+  }
+  .header__burger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #1d1e20;
+  }
+
+  /* PAGE HERO */
+  .page-hero {
+    background: #f3fcff;
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .page-hero__title {
+    font-size: 32px;
+    font-weight: 400;
+  }
+
+  /* SEARCH */
+  .search-wrap {
+    padding: 24px 16px 0;
+    background: #fff;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .search-input {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    padding: 12px 18px;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    border-radius: 999px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus {
+    border-color: #1f6d85;
+  }
+
+  /* CATEGORY NAV */
+  .cat-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 16px 16px 8px;
+    background: #fff;
+    justify-content: center;
+  }
+  .cat-nav__btn {
+    display: inline-block;
+    background: transparent;
+    color: #1f6d85;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    letter-spacing: 1.5px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1.5px solid #1f6d85;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .cat-nav__btn:hover {
+    background: rgba(31, 109, 133, 0.08);
+  }
+
+  /* BLOG INTRO */
+  .blog-intro {
+    background: #f3fcff;
+    padding: 0 24px 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .blog-intro__heading {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .blog-intro p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1d1e20;
+    margin-bottom: 16px;
+  }
+  .blog-intro p:last-child {
+    margin-bottom: 0;
+  }
+  .blog-intro__link {
+    color: #1f6d85;
+    text-decoration: underline;
+  }
+
+  /* BLOG GRID */
+  .blog-grid-section {
+    padding: 32px 16px 48px;
+  }
+  .blog-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* FEATURED */
+  .featured-section {
+    padding: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .featured {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: #f3fcff;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .featured__image-wrap {
+    overflow: hidden;
+  }
+  .featured__image {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+  }
+  .featured:hover .featured__image {
+    transform: scale(1.03);
+  }
+  .featured__content {
+    padding: 24px;
+  }
+  .featured__badge {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: #1f6d85;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .featured__title {
+    font-family: 'Libre Caslon Display', serif;
+    font-size: 26px;
+    line-height: 1.2;
+    color: #1d1e20;
+    margin-bottom: 12px;
+    text-align: left;
+  }
+  .featured__desc {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 16px;
+  }
+  .featured__meta {
+    font-size: 12px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* LOAD MORE */
+  .load-more-wrap {
+    text-align: center;
+    padding: 24px 0 0;
+  }
+  .load-more-btn {
+    display: inline-block;
+    background: #1d1e20;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 14px 32px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .load-more-btn:hover { opacity: 0.85; }
+  .no-results {
+    display: none;
+    text-align: center;
+    font-size: 15px;
+    color: #888;
+    padding: 40px 0;
+  }
+
+  /* BLOG CARD */
+  .blog-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+  .blog-card__image-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    background: #f3fcff;
+  }
+  .blog-card__image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+  }
+  .blog-card:hover .blog-card__image {
+    transform: scale(1.05);
+  }
+  .blog-card__pills {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-width: calc(100% - 24px);
+  }
+  .blog-card__pill {
+    display: inline-block;
+    background: rgba(31, 109, 133, 0.95);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 999px;
+    backdrop-filter: blur(6px);
+  }
+  .blog-card__title {
+    font-family: 'Libre Caslon Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.25;
+    margin-bottom: 10px;
+    color: #1d1e20;
+    text-align: left;
+  }
+  .blog-card__desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .blog-card__meta {
+    font-size: 12px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* FOOTER */
+  .location {
+    background: #1f6d85;
+    padding: 20px 24px 24px;
+    color: #fff;
+    text-align: center;
+  }
+  .location__title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .location__address {
+    font-size: 14px;
+  }
+  .location__photo {
+    width: 80%;
+    max-width: 320px;
+    margin: 12px auto 0;
+    display: block;
+    border-radius: 10px;
+  }
+  .footer__main {
+    background: #1f6d85;
+    padding: 24px;
+    color: #fff;
+  }
+  .footer__logo {
+    height: 30px;
+    width: auto;
+    margin: 0 auto 20px;
+    display: block;
+  }
+  .footer__contact h3, .footer__hours h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .footer__contact p, .footer__hours p {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .footer__hours {
+    margin-top: 16px;
+  }
+  .footer__social {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    color: #fff;
+  }
+  .footer__social a { color: #fff; }
+  .footer__legal {
+    font-size: 11px;
+    margin-top: 16px;
+    opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 12px;
+  }
+  .footer__legal a { color: #fff; text-decoration: none; }
+
+  :global(.cat-nav__btn--active) {
+    background: #1f6d85 !important;
+    color: #fff !important;
+  }
+  :global(.blog-card--hidden) {
+    display: none !important;
+  }
+
+  /* DESKTOP */
+  @media (min-width: 768px) {
+    .page-hero { padding: 72px 40px; }
+    .page-hero__title { font-size: 58px; font-weight: 600; }
+
+    .header__nav { display: flex; }
+    .header__burger { display: none; }
+    .search-wrap { padding-top: 32px; }
+    .cat-nav {
+      padding: 20px 40px 16px;
+      gap: 10px;
+    }
+    .featured-section { padding: 24px 40px; }
+    .featured { display: grid; grid-template-columns: 1.2fr 1fr; align-items: center; }
+    .featured__image { height: 380px; }
+    .featured__content { padding: 40px; }
+    .featured__title { font-size: 34px; }
+    .cat-nav__btn {
+      font-size: 12px;
+      padding: 11px 20px;
+    }
+    .blog-intro {
+      padding: 0 40px 48px;
+    }
+    .blog-grid-section {
+      padding: 40px 40px 80px;
+    }
+    .blog-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 48px 32px;
+    }
+    .blog-card__image {
+      height: 260px;
+    }
+    .blog-card__title {
+      font-size: 24px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .blog-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 56px 32px;
+    }
+    .blog-card__image {
+      height: 240px;
+    }
+    .blog-card__title {
+      font-size: 22px;
+    }
+  }
+</style>

@@ -30,6 +30,11 @@
       "source": "/uritused",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/ru/pakety",
+      "destination": "/ru/onlajn-shop",
+      "permanent": true
     }
   ]
 }

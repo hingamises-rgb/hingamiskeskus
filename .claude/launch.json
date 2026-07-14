@@ -5,7 +5,7 @@
       "name": "astro-dev",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["astro", "dev"],
-      "port": 4321
+      "autoPort": true
     }
   ]
 }

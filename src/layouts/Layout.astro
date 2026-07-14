@@ -8,6 +8,9 @@ interface Props {
   image?: string;
   type?: string;
   noindex?: boolean;
+  lang?: 'et' | 'ru';
+  /** Sama lehe teiste keelte URL-id hreflang jaoks, nt { et: '/teenused', ru: '/ru/uslugi' } */
+  alternates?: Partial<Record<'et' | 'ru', string>>;
 }
 const {
   title,
@@ -16,14 +19,17 @@ const {
   image = '/images/hero-bg.jpg',
   type = 'website',
   noindex = false,
+  lang = 'et',
+  alternates,
 } = Astro.props;
 
 const SITE = 'https://www.hingamiskeskus.ee';
 const canonicalUrl = SITE + Astro.url.pathname;
 const ogImage = image.startsWith('http') ? image : SITE + image;
+const ogLocale = lang === 'ru' ? 'ru_RU' : 'et_EE';
 ---
 <!doctype html>
-<html lang="et">
+<html lang={lang}>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -33,6 +39,9 @@ const ogImage = image.startsWith('http') ? image : SITE + image;
   {keywords && <meta name="keywords" content={keywords} />}
   <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
   <link rel="canonical" href={canonicalUrl} />
+  {alternates?.et && <link rel="alternate" hreflang="et" href={SITE + alternates.et} />}
+  {alternates?.ru && <link rel="alternate" hreflang="ru" href={SITE + alternates.ru} />}
+  {alternates?.et && <link rel="alternate" hreflang="x-default" href={SITE + alternates.et} />}
 
   <!-- Open Graph (Facebook, WhatsApp jt jagamised) -->
   <meta property="og:title" content={title} />
@@ -41,7 +50,7 @@ const ogImage = image.startsWith('http') ? image : SITE + image;
   <meta property="og:type" content={type} />
   <meta property="og:image" content={ogImage} />
   <meta property="og:site_name" content="Hingamiskeskus" />
-  <meta property="og:locale" content="et_EE" />
+  <meta property="og:locale" content={ogLocale} />
   <meta name="twitter:card" content="summary_large_image" />
 
   <!-- Meta Pixel -->

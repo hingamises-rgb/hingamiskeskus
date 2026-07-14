@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
 export const GET: APIRoute = async () => {
   if (!sql) return json({ active: false }, 200);
   try {
-    const [cfg] = await sql`SELECT active, heading, description, timer_minutes FROM popup_config WHERE id = 1`;
+    const [cfg] = await sql`SELECT active, heading, description, heading_ru, description_ru, timer_minutes FROM popup_config WHERE id = 1`;
     return json(cfg || { active: false }, 200, { 'Cache-Control': 'public, max-age=300' });
   } catch {
     return json({ active: false }, 200);
@@ -48,9 +48,10 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (b.action === 'lead') {
     if (b.veebileht) return json({ ok: true }, 200); // honeypot
+    const ru = b.lang === 'ru';
 
     const email = String(b.email || '').trim().slice(0, 200);
-    if (!email || !email.includes('@')) return json({ error: 'Sisesta korrektne e-post' }, 400);
+    if (!email || !email.includes('@')) return json({ error: ru ? 'Введите корректный адрес почты' : 'Sisesta korrektne e-post' }, 400);
 
     const source = String(b.source || 'Otse').slice(0, 60);
     const device = String(b.device || '').slice(0, 20);
@@ -69,8 +70,19 @@ export const POST: APIRoute = async ({ request }) => {
       await transporter.sendMail({
         from: `"Hingamiskeskus" <info@hingamiskeskus.ee>`,
         to: email,
-        subject: 'Sinu sooduskood — Hingamiskeskus',
-        html: `
+        subject: ru ? 'Твой промокод — Центр дыхания Hingamiskeskus' : 'Sinu sooduskood — Hingamiskeskus',
+        html: ru
+          ? `
+          <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto;">
+            <h2 style="color: #1f6d85;">Спасибо за интерес!</h2>
+            <p>Твой промокод:</p>
+            <p style="font-size: 28px; font-weight: bold; letter-spacing: 2px; background: #f3fcff; padding: 16px 24px; border-radius: 10px; display: inline-block;">${code}</p>
+            <p>Промокод действует на одно посещение. Введи его в поле промокода при бронировании.</p>
+            <p><a href="https://www.hingamiskeskus.ee/ru/zabronirovat-vremya" style="color: #1f6d85;">Забронировать время здесь</a></p>
+            <p style="color: #888; font-size: 13px;">Центр дыхания Hingamiskeskus · Sõle 14c, Таллинн · info@hingamiskeskus.ee</p>
+          </div>
+        `
+          : `
           <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto;">
             <h2 style="color: #1f6d85;">Aitäh huvi eest!</h2>
             <p>Sinu sooduskood on:</p>

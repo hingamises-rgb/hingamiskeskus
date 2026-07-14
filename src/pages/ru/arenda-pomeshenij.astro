@@ -1,0 +1,278 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import ContactForm from '../../components/ContactForm.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<Layout
+  title="Аренда помещений Таллин | Хингамискескус"
+  description="Аренда помещений Таллин в Хингамискескус. Зал 38 м² для мастер-классов от 25€/ч и уютная комната 11 м² для индивидуальных сеансов от 7€/ч. Свяжитесь с нами!"
+  keywords="аренда помещений Таллин"
+  lang="ru"
+  alternates={{ et: '/ruumide-rent', ru: '/ru/arenda-pomeshenij' }}
+>
+
+<!-- HEADER -->
+<Header active="teenused" lang="ru" altHref="/ruumide-rent" />
+
+<!-- HERO SECTION -->
+<section class="float-hero">
+  <div class="float-hero__content">
+    <div class="float-hero__text">
+      <h1 class="float-hero__title">Аренда помещений</h1>
+      <p>В Центре дыхания мы предлагаем уютные и гармоничные помещения, созданные для поддержки глубокого расслабления, внутреннего спокойствия и связи с самим собой. Атмосфера нашего центра идеально подходит для различных практик осознанности и личностного развития.</p>
+      <p>Аренда помещений осуществляется по договорённости. Если вы хотите арендовать помещения, пожалуйста, заполните контактную форму ниже, указав свои пожелания и предпочтительные даты. Мы отдаём предпочтение долгосрочным клиентам, которые планируют регулярно использовать помещения.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="float-info float-info--cta">
+  <a href="#kontaktivorm" class="float-cta__btn">ЗАПОЛНИТЬ ФОРМУ</a>
+</section>
+
+<!-- ROOMS -->
+<section class="float-info">
+  <h2 class="float-info__heading">Большой зал 38 м²</h2>
+  <p>Наш зал площадью 38 м² идеально подходит для различных мероприятий, обеспечивая простор и комфорт. В помещении есть пледы, подушки и матрасы, что позволяет создать уютную и расслабляющую обстановку как для сидячих, так и для лежачих активностей. Этот зал отлично подходит для проведения мастер-классов, тренингов и групповых встреч, где важны комфорт и возможность расслабиться.</p>
+  <p><strong>Цена: 25€/ч + НДС.</strong></p>
+
+  <div class="room-gallery">
+    <img src="/images/ruum-suur-1.jpg" alt="Большой зал Центр дыхания с ширмой и шторами" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-suur-2.jpg" alt="Большой зал с матрасами для групповой работы" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-suur-3.jpg" alt="Большой зал со стеной с логотипом Центр дыхания" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-suur-4.jpg" alt="Большой зал со шторами и полкой для подушек" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-suur-5.jpg" alt="Большой зал с матрасами и полкой для пледов" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-suur-6.jpg" alt="Большой зал с логотипом и японской ширмой" class="room-gallery__img" loading="lazy" />
+  </div>
+
+  <h2 class="float-info__heading float-info__heading--spaced">Маленькая комната 11 м²</h2>
+  <p>Наша комната площадью 11 м² это уютное и приватное пространство, идеально подходящее для индивидуальных сеансов или небольших встреч. В комнате есть небольшая кровать, два стула, стол и полки. Уютное освещение создаёт тёплую и приятную атмосферу, способствующую концентрации и внутреннему спокойствию.</p>
+  <p><strong>Цена: 7€/ч + НДС.</strong></p>
+
+  <div class="room-gallery">
+    <img src="/images/ruum-vaike-1.jpg" alt="Маленькая комната с кроватью, креслом и чайным подносом" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-vaike-2.jpg" alt="Маленькая комната с креслом и полкой" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-vaike-3.jpg" alt="Маленькая комната с двумя креслами и мандалой" class="room-gallery__img" loading="lazy" />
+    <img src="/images/ruum-vaike-4.jpg" alt="Маленькая комната с креслом и стеллажом" class="room-gallery__img" loading="lazy" />
+  </div>
+
+  <p style="margin-top: 24px;">Чтобы забронировать время, оставьте свои контактные данные, и мы сами свяжемся с вами: <a href="mailto:Info@hingamiskeskus.ee" class="float-info__link">Info@hingamiskeskus.ee</a></p>
+</section>
+
+<!-- KONTAKTIVORM -->
+<ContactForm source="Ruumide rent (RU)" lang="ru" title="Запрос на аренду помещений" description="Опишите свои пожелания и предпочтительные даты, мы сами свяжемся с вами" />
+
+<Footer lang="ru" />
+
+</Layout>
+
+<style>
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .header__logo img { height: 28px; width: auto; }
+  .header__right { display: flex; align-items: center; gap: 16px; }
+  .header__cart { color: #1d1e20; }
+  .header__burger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+  }
+  .header__burger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #1d1e20;
+  }
+
+  /* HERO */
+  .float-hero {
+    background: #f3fcff;
+    padding: 32px 24px;
+  }
+  .float-hero__content {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .float-hero__title {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    color: #1d1e20;
+  }
+  .float-hero__text p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1d1e20;
+    margin-bottom: 12px;
+  }
+  .float-hero__img {
+    width: 100%;
+    border-radius: 10px;
+    margin-top: 24px;
+  }
+
+  /* CTA */
+  .float-info--cta {
+    text-align: center;
+  }
+  .float-cta__btn {
+    display: inline-block;
+    background: #1d1e20;
+    color: #fff;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 14px 32px;
+    border-radius: 10px;
+  }
+
+  /* INFO / CONTENT */
+  .float-info {
+    background: #f3fcff;
+    padding: 32px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .float-info p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1d1e20;
+    margin-bottom: 16px;
+  }
+  .float-info p:last-child {
+    margin-bottom: 0;
+  }
+  .float-info__heading {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #1d1e20;
+  }
+  .float-info__heading--spaced {
+    margin-top: 32px;
+  }
+  .float-info__link {
+    color: #1f6d85;
+    text-decoration: underline;
+  }
+
+  /* ROOM GALLERY */
+  .room-gallery {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 16px;
+    margin-bottom: 8px;
+  }
+  .room-gallery__img {
+    width: 100%;
+    border-radius: 10px;
+    clip-path: inset(0 round 10px);
+  }
+
+  /* LOCATION */
+  .location {
+    background: #1f6d85;
+    padding: 20px 24px 24px;
+    color: #fff;
+    text-align: center;
+  }
+  .location__title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .location__address {
+    font-size: 14px;
+  }
+  .location__photo {
+    width: 80%;
+    max-width: 320px;
+    margin: 12px auto 0;
+    display: block;
+    border-radius: 10px;
+  }
+
+  /* FOOTER */
+  .footer__main {
+    background: #1f6d85;
+    padding: 24px;
+    color: #fff;
+  }
+  .footer__logo {
+    height: 30px;
+    width: auto;
+    margin: 0 auto 20px;
+    display: block;
+  }
+  .footer__contact h3, .footer__hours h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .footer__contact p, .footer__hours p {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .footer__hours {
+    margin-top: 16px;
+  }
+  .footer__social {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    color: #fff;
+  }
+  .footer__social a { color: #fff; }
+  .footer__legal {
+    font-size: 11px;
+    margin-top: 16px;
+    opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 12px;
+  }
+  .footer__legal a { color: #fff; text-decoration: none; }
+
+  /* DESKTOP */
+  @media (min-width: 768px) {
+    .header { padding: 12px 40px; }
+    .header__logo img { height: 36px; }
+
+    .float-hero { padding: 48px 40px; }
+    .float-hero__content {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+    .float-hero__text {
+      flex: 1;
+    }
+    .float-hero__media {
+      flex: 1;
+    }
+    .float-hero__title { font-size: 36px; }
+    .float-hero__img { margin-top: 0; }
+
+    .float-info { padding: 40px; }
+    .room-gallery { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (min-width: 1024px) {
+    .float-hero__title { font-size: 40px; }
+    .float-hero { padding: 56px 40px; }
+  }
+</style>

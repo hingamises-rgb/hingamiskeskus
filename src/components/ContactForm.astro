@@ -4,8 +4,29 @@ interface Props {
   source: string;   // mis lehelt päring tuli (läheb meili teemasse)
   title?: string;
   description?: string;
+  lang?: 'et' | 'ru';
 }
-const { source, title = 'Aja broneerimine', description = 'Aja broneerimiseks jäta meile oma kontaktandmed ja võtame Sinuga ise ühendust' } = Astro.props;
+const { source, lang = 'et' } = Astro.props;
+const ru = lang === 'ru';
+const t = ru
+  ? {
+      title: 'Бронирование времени',
+      description: 'Чтобы забронировать время, оставьте свои контактные данные, и мы сами свяжемся с вами',
+      name: 'Имя', lastname: 'Фамилия', phone: 'Телефон', email: 'Ваш адрес электронной почты', message: 'Сообщение',
+      send: 'ОТПРАВИТЬ', sending: 'ОТПРАВКА...',
+      ok: 'Спасибо! Ваше сообщение отправлено, мы скоро свяжемся с вами.',
+      fail: 'Не удалось отправить, попробуйте позже.',
+    }
+  : {
+      title: 'Aja broneerimine',
+      description: 'Aja broneerimiseks jäta meile oma kontaktandmed ja võtame Sinuga ise ühendust',
+      name: 'Nimi', lastname: 'Perekonnanimi', phone: 'Telefon', email: 'Sinu email', message: 'Sõnum',
+      send: 'SAADA', sending: 'SAADAN...',
+      ok: 'Aitäh! Sinu sõnum on saadetud, võtame peagi ühendust.',
+      fail: 'Saatmine ebaõnnestus, proovi hiljem uuesti.',
+    };
+const title = Astro.props.title ?? t.title;
+const description = Astro.props.description ?? t.description;
 const formId = `cf-${Math.random().toString(36).slice(2, 8)}`;
 ---
 
@@ -13,28 +34,28 @@ const formId = `cf-${Math.random().toString(36).slice(2, 8)}`;
   <h2 class="cform__title">{title}</h2>
   <p class="cform__desc">{description}</p>
   <form class="cform__form" id={formId} data-source={source}>
-    <label class="cform__label">Nimi
+    <label class="cform__label">{t.name}
       <input type="text" name="nimi" class="cform__input" />
     </label>
-    <label class="cform__label">Perekonnanimi
+    <label class="cform__label">{t.lastname}
       <input type="text" name="perekonnanimi" class="cform__input" />
     </label>
-    <label class="cform__label">Telefon
+    <label class="cform__label">{t.phone}
       <input type="tel" name="telefon" class="cform__input" />
     </label>
-    <label class="cform__label">Sinu email
+    <label class="cform__label">{t.email}
       <input type="email" name="email" class="cform__input" required />
     </label>
-    <label class="cform__label">Sõnum
+    <label class="cform__label">{t.message}
       <textarea name="sonum" class="cform__textarea" rows="4" required></textarea>
     </label>
     <input type="text" name="veebileht" class="cform__hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
-    <button type="submit" class="cform__btn">SAADA</button>
+    <button type="submit" class="cform__btn">{t.send}</button>
     <p class="cform__status" data-status></p>
   </form>
 </section>
 
-<script is:inline define:vars={{ formId }}>
+<script is:inline define:vars={{ formId, txt: { send: t.send, sending: t.sending, ok: t.ok, fail: t.fail } }}>
 (function() {
   const form = document.getElementById(formId);
   const status = form.querySelector('[data-status]');
@@ -42,7 +63,7 @@ const formId = `cf-${Math.random().toString(36).slice(2, 8)}`;
     e.preventDefault();
     const btn = form.querySelector('.cform__btn');
     btn.disabled = true;
-    btn.textContent = 'SAADAN...';
+    btn.textContent = txt.sending;
     status.textContent = '';
     try {
       const res = await fetch('/api/kontakt', {
@@ -60,19 +81,19 @@ const formId = `cf-${Math.random().toString(36).slice(2, 8)}`;
       });
       if (res.ok) {
         form.reset();
-        status.textContent = 'Aitäh! Sinu sõnum on saadetud, võtame peagi ühendust.';
+        status.textContent = txt.ok;
         status.style.color = '#1a7f37';
       } else {
         const d = await res.json().catch(function() { return {}; });
-        status.textContent = d.error || 'Saatmine ebaõnnestus, proovi hiljem uuesti.';
+        status.textContent = d.error || txt.fail;
         status.style.color = '#b3261e';
       }
     } catch (err) {
-      status.textContent = 'Saatmine ebaõnnestus, proovi hiljem uuesti.';
+      status.textContent = txt.fail;
       status.style.color = '#b3261e';
     }
     btn.disabled = false;
-    btn.textContent = 'SAADA';
+    btn.textContent = txt.send;
   });
 })();
 </script>

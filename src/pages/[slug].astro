@@ -24,7 +24,7 @@ export async function getStaticPaths() {
   // Tooted (vanad URL-id säilivad page_slug kaudu)
   const sql = requireDb();
   const products = await sql`
-    SELECT slug, page_slug, title, subtitle, description, ribbon, alt, image, cart_name,
+    SELECT slug, page_slug, page_slug_ru, title, subtitle, description, ribbon, alt, image, cart_name,
            price, old_price, price_prefix, category, sold_out,
            meta_title, meta_description, keywords
     FROM products WHERE page_slug IS NOT NULL AND active = true
@@ -65,9 +65,10 @@ function fmtPrice(v: unknown) {
   keywords={pageKeywords}
   image={article ? article.image : product.image}
   type={article ? 'article' : 'website'}
+  alternates={product?.page_slug_ru ? { et: `/${product.page_slug}`, ru: `/ru/${product.page_slug_ru}` } : undefined}
 >
 
-<Header active={article ? 'blogi' : 'epood'} />
+<Header active={article ? 'blogi' : 'epood'} altHref={product?.page_slug_ru ? `/ru/${product.page_slug_ru}` : undefined} />
 
 {article && (
 <article class="article">

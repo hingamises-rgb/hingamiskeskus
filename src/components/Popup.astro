@@ -59,6 +59,11 @@
   } catch (e) {}
 
   // --- Popup ---
+  // Vene lehtedel venekeelsed tekstid (heading_ru/description_ru administ)
+  var RU = path === '/ru' || path.indexOf('/ru/') === 0;
+  var T = RU
+    ? { min: 'Минут', sec: 'Секунд', btn: 'ХОЧУ КУПОН', ok: 'Код уже летит на твою почту!', fail: 'Что-то пошло не так', retry: 'Что-то пошло не так, попробуй ещё раз', device: window.innerWidth < 768 ? 'mobiil' : 'arvuti' }
+    : { min: 'Minutit', sec: 'Sekundit', btn: 'SOOVIN KUPONGI', ok: 'Kood on teel Sinu emailile!', fail: 'Midagi läks valesti', retry: 'Midagi läks valesti, proovi uuesti', device: window.innerWidth < 768 ? 'mobiil' : 'arvuti' };
   // Ära näita: kui juba konverteerus, või suleti viimase 3 päeva jooksul
   if (localStorage.getItem('hk_popup_done')) return;
   var closedAt = parseInt(localStorage.getItem('hk_popup_closed') || '0', 10);
@@ -96,8 +101,11 @@
   setTimeout(function() {
     fetch('/api/popup').then(function(r) { return r.json(); }).then(function(cfg) {
       if (!cfg || !cfg.active) return;
-      document.getElementById('hk-popup-heading').textContent = cfg.heading;
-      document.getElementById('hk-popup-desc').textContent = cfg.description;
+      document.getElementById('hk-popup-heading').textContent = (RU && cfg.heading_ru) || cfg.heading;
+      document.getElementById('hk-popup-desc').textContent = (RU && cfg.description_ru) || cfg.description;
+      document.querySelectorAll('.hk-popup__timer-label')[0].textContent = T.min;
+      document.querySelectorAll('.hk-popup__timer-label')[1].textContent = T.sec;
+      document.querySelector('.hk-popup__btn').textContent = T.btn;
       var mins = cfg.timer_minutes || 3;
       document.getElementById('hk-timer-min').textContent = String(mins).padStart(2, '0');
       popup.hidden = false;
@@ -130,23 +138,24 @@
         email: form.email.value,
         veebileht: form.veebileht.value,
         source: classifySource(),
-        device: window.innerWidth < 768 ? 'mobiil' : 'arvuti',
-        referrer: (JSON.parse(localStorage.getItem('hk_entry') || '{}').ref) || ''
+        device: T.device,
+        referrer: (JSON.parse(localStorage.getItem('hk_entry') || '{}').ref) || '',
+        lang: RU ? 'ru' : 'et'
       })
     }).then(function(r) { return r.json().then(function(d) { return { ok: r.ok, d: d }; }); })
       .then(function(res) {
         if (res.ok) {
-          status.textContent = 'Kood on teel Sinu emailile!';
+          status.textContent = T.ok;
           status.style.color = '#c8f5d0';
           localStorage.setItem('hk_popup_done', '1');
           setTimeout(function() { popup.hidden = true; }, 3000);
         } else {
-          status.textContent = (res.d && res.d.error) || 'Midagi läks valesti';
+          status.textContent = (res.d && res.d.error) || T.fail;
           status.style.color = '#ffd4d4';
           btn.disabled = false;
         }
       }).catch(function() {
-        status.textContent = 'Midagi läks valesti, proovi uuesti';
+        status.textContent = T.retry;
         status.style.color = '#ffd4d4';
         btn.disabled = false;
       });

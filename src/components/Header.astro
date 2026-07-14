@@ -2,32 +2,62 @@
 // Ühine päis: desktop nav + mobiilne täisekraani menüü (originaali järgi)
 interface Props {
   active?: string; // avaleht | teenused | broneeri | epood | liikmeks | paketid | blogi | kkk
+  lang?: 'et' | 'ru';
+  /** Sama lehe URL teises keeles (keelevahetaja sihtkoht). Vaikimisi avaleht. */
+  altHref?: string;
 }
-const { active = '' } = Astro.props;
+const { active = '', lang = 'et', altHref } = Astro.props;
+const ru = lang === 'ru';
 
-const SERVICES = [
-  { href: '/vabastav-hingamine', label: 'Vabastav hingamine' },
-  { href: '/floating', label: 'Floating' },
-  { href: '/neurovizr', label: 'Neurovizr' },
-  { href: '/soojas-vees-hingamine', label: 'Soojas vees hingamine' },
-  { href: '/aromatouch-kehahooldus', label: 'Aromatouch kehahooldus' },
-  { href: '/ruumide-rent', label: 'Ruumide rent' },
-  { href: '/terapeudid', label: 'Terapeudid' },
-];
+const SERVICES = ru
+  ? [
+      { href: '/ru/osoznannoe-dyhanie', label: 'Осознанное дыхание' },
+      { href: '/ru/floating', label: 'Флоатинг' },
+      { href: '/ru/neurovizr', label: 'Neurovizr' },
+      { href: '/ru/dyhanie-v-vode', label: 'Дыхание в воде' },
+      { href: '/ru/aromatouch-uhod-za-telom', label: 'Aromatouch уход за телом' },
+      { href: '/ru/arenda-pomeshenij', label: 'Аренда помещений' },
+      { href: '/ru/nashi-terapevty', label: 'Наши терапевты' },
+    ]
+  : [
+      { href: '/vabastav-hingamine', label: 'Vabastav hingamine' },
+      { href: '/floating', label: 'Floating' },
+      { href: '/neurovizr', label: 'Neurovizr' },
+      { href: '/soojas-vees-hingamine', label: 'Soojas vees hingamine' },
+      { href: '/aromatouch-kehahooldus', label: 'Aromatouch kehahooldus' },
+      { href: '/ruumide-rent', label: 'Ruumide rent' },
+      { href: '/terapeudid', label: 'Terapeudid' },
+    ];
 
-const NAV = [
-  { href: '/', key: 'avaleht', label: 'Avaleht' },
-  { href: '/teenused', key: 'teenused', label: 'Teenused' },
-  { href: '/broneeri-aeg', key: 'broneeri', label: 'Broneeri aeg' },
-  { href: '/e-pood', key: 'epood', label: 'E-pood' },
-  { href: '/hakka-liikmeks', key: 'liikmeks', label: 'Hakka liikmeks' },
-  { href: '/blogi', key: 'blogi', label: 'Blogi' },
-  { href: '/kkk', key: 'kkk', label: 'KKK' },
-];
+const NAV = ru
+  ? [
+      { href: '/ru', key: 'avaleht', label: 'Главная' },
+      { href: '/ru/uslugi', key: 'teenused', label: 'Услуги' },
+      { href: '/ru/zabronirovat-vremya', key: 'broneeri', label: 'Забронировать время' },
+      { href: '/ru/onlajn-shop', key: 'epood', label: 'Интернет-магазин' },
+      { href: '/ru/chlenstvo', key: 'liikmeks', label: 'Членство' },
+      { href: '/ru/blog', key: 'blogi', label: 'Блог' },
+      { href: '/ru/chavo', key: 'kkk', label: 'ЧаВо' },
+    ]
+  : [
+      { href: '/', key: 'avaleht', label: 'Avaleht' },
+      { href: '/teenused', key: 'teenused', label: 'Teenused' },
+      { href: '/broneeri-aeg', key: 'broneeri', label: 'Broneeri aeg' },
+      { href: '/e-pood', key: 'epood', label: 'E-pood' },
+      { href: '/hakka-liikmeks', key: 'liikmeks', label: 'Hakka liikmeks' },
+      { href: '/blogi', key: 'blogi', label: 'Blogi' },
+      { href: '/kkk', key: 'kkk', label: 'KKK' },
+    ];
+
+const homeHref = ru ? '/ru' : '/';
+const servicesLabel = ru ? 'Услуги' : 'Teenused';
+const langSwitchHref = altHref || (ru ? '/' : '/ru');
+const langSwitchLabel = ru ? 'EST' : 'RUS';
+const langSwitchAria = ru ? 'Eesti keeles' : 'На русском';
 ---
 
-<header class="header" id="site-header">
-  <a href="/" class="header__logo">
+<header class={ru ? 'header header--ru' : 'header'} id="site-header">
+  <a href={homeHref} class="header__logo">
     <img src="/images/logo.svg" alt="Hingamiskeskus" height="30" />
   </a>
   <nav class="header__nav">
@@ -36,7 +66,8 @@ const NAV = [
     ))}
   </nav>
   <div class="header__right">
-    <a href="/checkout" class="header__cart" aria-label="Ostukorv">
+    <a href={langSwitchHref} class="header__lang" aria-label={langSwitchAria}>{langSwitchLabel}</a>
+    <a href={ru ? '/ru/checkout' : '/checkout'} class="header__cart" aria-label={ru ? 'Корзина' : 'Ostukorv'}>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
       </svg>
@@ -49,20 +80,19 @@ const NAV = [
 
 <div class="mobile-menu" id="mobile-menu" hidden>
   <nav class="mobile-menu__nav">
-    <a href="/" class={active === 'avaleht' ? 'mobile-menu__link mobile-menu__link--active' : 'mobile-menu__link'}>Avaleht</a>
+    <a href={homeHref} class={active === 'avaleht' ? 'mobile-menu__link mobile-menu__link--active' : 'mobile-menu__link'}>{NAV[0].label}</a>
     <button type="button" class="mobile-menu__link mobile-menu__toggle" id="services-toggle" aria-expanded="false">
-      Teenused <span class="mobile-menu__arrow" id="services-arrow">▾</span>
+      {servicesLabel} <span class="mobile-menu__arrow" id="services-arrow">▾</span>
     </button>
     <div class="mobile-menu__sub" id="services-sub" hidden>
       {SERVICES.map(s => (
         <a href={s.href} class="mobile-menu__sublink">{s.label}</a>
       ))}
     </div>
-    <a href="/broneeri-aeg" class={active === 'broneeri' ? 'mobile-menu__link mobile-menu__link--active' : 'mobile-menu__link'}>Broneeri aeg</a>
-    <a href="/e-pood" class={active === 'epood' ? 'mobile-menu__link mobile-menu__link--active' : 'mobile-menu__link'}>E-pood</a>
-    <a href="/hakka-liikmeks" class={active === 'liikmeks' ? 'mobile-menu__link mobile-menu__link--active' : 'mobile-menu__link'}>Hakka liikmeks</a>
-    <a href="/blogi" class={active === 'blogi' ? 'mobile-menu__link mobile-menu__link--active' : 'mobile-menu__link'}>Blogi</a>
-    <a href="/kkk" class={active === 'kkk' ? 'mobile-menu__link mobile-menu__link--active' : 'mobile-menu__link'}>KKK</a>
+    {NAV.filter(i => !['avaleht', 'teenused'].includes(i.key)).map(item => (
+      <a href={item.href} class={active === item.key ? 'mobile-menu__link mobile-menu__link--active' : 'mobile-menu__link'}>{item.label}</a>
+    ))}
+    <a href={langSwitchHref} class="mobile-menu__link mobile-menu__lang">{ru ? 'Eesti keeles' : 'На русском'}</a>
   </nav>
 </div>
 
@@ -128,6 +158,20 @@ const NAV = [
     text-underline-offset: 4px;
   }
   .header__right { display: flex; align-items: center; gap: 16px; }
+  .header__lang {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #1d1e20;
+    padding: 3px 8px;
+    border: 1px solid rgba(0,0,0,0.25);
+    border-radius: 4px;
+  }
+  :global(.mobile-menu__lang) {
+    margin-top: 18px;
+    font-size: 16px !important;
+    color: #1f6d85 !important;
+  }
   .header__cart { color: #1d1e20; position: relative; display: flex; }
   .header__burger {
     display: flex;
@@ -158,6 +202,15 @@ const NAV = [
     .header__logo img { height: 36px; }
     .header__nav { display: flex; }
     .header__burger { display: none; }
+  }
+
+  /* Vene nav-sildid on pikemad: nav on alati nähtav nagu ET lehel,
+     kitsamal ekraanil tihedam paigutus, et kõik ühele reale mahuks */
+  .header--ru .header__nav a { white-space: nowrap; }
+  @media (min-width: 768px) and (max-width: 1279px) {
+    .header--ru { padding-left: 16px; padding-right: 16px; }
+    .header--ru .header__nav { gap: 12px; }
+    .header--ru .header__nav a { font-size: 12.5px; }
   }
 
   /* Mobiilne täisekraani menüü */

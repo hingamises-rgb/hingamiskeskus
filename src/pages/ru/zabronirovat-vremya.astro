@@ -1,0 +1,139 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+const HOPITUDE_URL = 'https://app.hopitude.com/ru/calendar?cl=2376';
+---
+
+<Layout
+  title="Запишись на освобождающее дыхание и флоатинг в Хингамискескус"
+  description="Запишись на освобождающее дыхание и флоатинг в Хингамискескус в Таллине, чтобы снять стресс, улучшить самочувствие и восстановить внутренний баланс. Забронируй своё время онлайн."
+  keywords="Broneeri-aeg, Teadlik vabastav hingamine, запишись на освобождающее дыхание и флоатинг"
+  lang="ru"
+  alternates={{ et: '/broneeri-aeg', ru: '/ru/zabronirovat-vremya' }}
+>
+
+<Header active="broneeri" lang="ru" altHref="/broneeri-aeg" />
+
+<section class="booking">
+  <h1 class="booking__title">Сеансы флоатинга и дыхания, забронируй время</h1>
+
+  <h2>Как забронировать?</h2>
+  <p>1. Выбери в календаре подходящее время и услугу</p>
+  <p>2. Создай аккаунт в нашей системе бронирования</p>
+  <p>3. Выбери способ оплаты, оплати в интернет-банке или наличными на месте</p>
+  <p>После подтверждения бронирования мы отправим подтверждение на твою электронную почту.</p>
+
+  <div class="booking__calendar">
+    <iframe
+      src={HOPITUDE_URL}
+      title="Календарь бронирования"
+      loading="lazy"
+      frameborder="0"
+    ></iframe>
+  </div>
+
+  <h2>Забронируй время на освобождающее дыхание или флоатинг в Таллине</h2>
+  <p>Центр дыхания предлагает освобождающее дыхание и флоатинг. Наши опытные терапевты безопасно сопровождают тебя на протяжении всего процесса, независимо от того, приходишь ли ты впервые или уже постоянный гость. Центр дыхания, единственное место в Таллине, где можно испытать дыхание в тёплой воде.</p>
+  <p><a href="/ru/osoznannoe-dyhanie">Освобождающее дыхание</a> помогает избавиться от эмоционального и телесного напряжения, снять стресс и тревожность и обрести внутреннюю ясность. Сеанс длится 2 часа и проходит в приватном и спокойном помещении.</p>
+  <p><a href="/ru/floating">Флоатинг</a>, парение в воде с солью Эпсома, расслабляет мышцы, успокаивает нервную систему и улучшает сон. Один час флоатинга даёт телу такой же глубокий отдых, как 4 часа сна.</p>
+  <p>Все сеансы проходят в Центре дыхания недалеко от центра Таллина по адресу Sõle 14c. Парковка возможна перед зданием и на улице Mulla.</p>
+
+  <h2>Что происходит после бронирования?</h2>
+  <p>После бронирования мы отправим на электронную почту подтверждение с практическими инструкциями. Просим прибыть за 15 минут до начала сеанса. При первом посещении терапевт познакомит тебя с услугой и ответит на все вопросы.</p>
+  <p>Если есть вопросы, смело свяжись с нами, мы всегда рады помочь!</p>
+
+  <a href={HOPITUDE_URL} target="_blank" rel="noopener" class="booking__btn">ЗАБРОНИРОВАТЬ ВРЕМЯ</a>
+</section>
+
+<Footer lang="ru" />
+
+</Layout>
+
+<style>
+  .booking {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+    background: #f3fcff;
+  }
+  @media (min-width: 768px) {
+    .booking { padding: 60px 40px 80px; }
+  }
+
+  .booking__title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #1d1e20;
+    text-align: left;
+    margin-bottom: 32px;
+  }
+  @media (min-width: 768px) {
+    .booking__title { font-size: 42px; }
+  }
+
+  .booking h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1d1e20;
+    text-align: left;
+    margin: 32px 0 14px;
+  }
+
+  .booking p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1d1e20;
+    margin-bottom: 10px;
+  }
+
+  .booking a { color: #1f6d85; text-decoration: underline; }
+
+  .booking__calendar {
+    margin: 28px 0 8px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(31, 109, 133, 0.08);
+  }
+  .booking__calendar iframe {
+    width: 100%;
+    height: 680px;
+    display: block;
+    border: 0;
+  }
+
+  .booking__btn {
+    display: inline-block;
+    background: #1d1e20;
+    color: #fff !important;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 16px 36px;
+    border-radius: 10px;
+    text-decoration: none !important;
+    margin-top: 20px;
+  }
+  .booking__btn:hover { opacity: 0.88; }
+
+  .location {
+    background: #1f6d85;
+    padding: 20px 24px 24px;
+    color: #fff;
+    text-align: center;
+  }
+  .location__title { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+  .location__address { font-size: 14px; }
+  .location__photo { width: 80%; max-width: 320px; margin: 12px auto 0; display: block; border-radius: 10px; }
+  .footer__main { background: #1f6d85; padding: 24px; color: #fff; }
+  .footer__logo { height: 30px; width: auto; margin: 0 auto 20px; display: block; }
+  .footer__contact h3, .footer__hours h3 { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+  .footer__contact p, .footer__hours p { font-size: 13px; line-height: 1.8; }
+  .footer__hours { margin-top: 16px; }
+  .footer__social { display: flex; gap: 16px; margin-top: 16px; color: #fff; }
+  .footer__legal { font-size: 11px; margin-top: 16px; opacity: 0.7; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px; }
+  .footer__legal a { color: #fff; text-decoration: none; }
+</style>

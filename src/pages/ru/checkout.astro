@@ -1,0 +1,702 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Оформление заказа | Hingamiskeskus" lang="ru" noindex={true}>
+
+<div class="checkout-page">
+  <header class="checkout-header">
+    <a href="/">
+      <img src="/images/logo.svg" alt="Hingamiskeskus" height="36" />
+    </a>
+  </header>
+
+  <div class="checkout-layout">
+    <!-- LEFT: FORM -->
+    <div class="checkout-left">
+      <a href="/ru/onlajn-shop" class="checkout-back">← Назад в интернет-магазин</a>
+
+      <!-- CONTACT -->
+      <h2 class="checkout-section__title">Контакт</h2>
+      <div class="checkout-field">
+        <input type="email" id="f-email" class="checkout-input" placeholder="Эл. почта" required />
+      </div>
+
+      <!-- DELIVERY -->
+      <h2 class="checkout-section__title">Доставка</h2>
+      <div class="checkout-field">
+        <input type="text" id="f-fullname" class="checkout-input" placeholder="Имя и фамилия" required />
+      </div>
+      <div class="checkout-field">
+        <select id="f-country" class="checkout-input">
+          <option value="EE" selected>Эстония</option>
+        </select>
+      </div>
+      <div class="checkout-field">
+        <input type="text" id="f-address" class="checkout-input" placeholder="Адрес" />
+      </div>
+      <div class="checkout-row">
+        <div class="checkout-field checkout-field--half">
+          <input type="text" id="f-city" class="checkout-input" placeholder="Город" />
+        </div>
+        <div class="checkout-field checkout-field--half">
+          <input type="text" id="f-postal" class="checkout-input" placeholder="Почтовый индекс" />
+        </div>
+      </div>
+      <div class="checkout-field">
+        <input type="tel" id="f-phone" class="checkout-input" placeholder="Номер телефона" />
+      </div>
+
+      <!-- SHIPPING METHOD -->
+      <h2 class="checkout-section__title">Способ доставки</h2>
+      <div class="checkout-options">
+        <label class="checkout-option">
+          <input type="radio" name="shipping" value="pickup" checked />
+          <span class="checkout-option__text">Заберу сам (Sõle 14C, Таллинн)</span>
+          <span class="checkout-option__price">Бесплатно</span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="shipping" value="dpd" />
+          <span class="checkout-option__text">Пакомат DPD</span>
+          <span class="checkout-option__price">€3.10</span>
+        </label>
+        <div class="parcel-select" id="dpd-select" style="display:none;">
+          <div class="parcel-search-wrap">
+            <input type="text" class="checkout-input parcel-search" id="dpd-search" placeholder="Поиск пакомата..." />
+          </div>
+          <div class="parcel-list" id="dpd-list"></div>
+          <input type="hidden" id="dpd-machine" />
+        </div>
+        <label class="checkout-option">
+          <input type="radio" name="shipping" value="omniva" />
+          <span class="checkout-option__text">Пакомат Omniva</span>
+          <span class="checkout-option__price">€3.46</span>
+        </label>
+        <div class="parcel-select" id="omniva-select" style="display:none;">
+          <div class="parcel-search-wrap">
+            <input type="text" class="checkout-input parcel-search" id="omniva-search" placeholder="Поиск пакомата..." />
+          </div>
+          <div class="parcel-list" id="omniva-list"></div>
+          <input type="hidden" id="omniva-machine" />
+        </div>
+      </div>
+
+      <!-- PAYMENT -->
+      <h2 class="checkout-section__title">Способ оплаты</h2>
+      <div class="checkout-options">
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="popular" checked />
+          <span class="checkout-option__text">Оплата картой</span>
+          <span class="checkout-option__logos">
+            <img src="/images/payments/cards.svg" alt="Visa / MasterCard" height="20" />
+          </span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="swedbank" />
+          <span class="checkout-option__text">Swedbank</span>
+          <span class="checkout-option__logos">
+            <img src="/images/payments/hanzaee.png" alt="Swedbank" height="20" />
+          </span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="seb" />
+          <span class="checkout-option__text">SEB</span>
+          <span class="checkout-option__logos">
+            <img src="/images/payments/sebee.png" alt="SEB" height="20" />
+          </span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="luminor" />
+          <span class="checkout-option__text">Luminor</span>
+          <span class="checkout-option__logos">
+            <img src="/images/payments/nordeaee.png" alt="Luminor" height="20" />
+          </span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="citadele" />
+          <span class="checkout-option__text">Citadele</span>
+          <span class="checkout-option__logos">
+            <img src="/images/payments/citadele_ee.png" alt="Citadele" height="20" />
+          </span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="coop" />
+          <span class="checkout-option__text">Coop Pank</span>
+          <span class="checkout-option__logos">
+            <img src="/images/payments/krediidi_ee.png" alt="Coop Pank" height="20" />
+          </span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="lhv" />
+          <span class="checkout-option__text">LHV</span>
+          <span class="checkout-option__logos">
+            <img src="/images/payments/lhv_ee.png" alt="LHV" height="20" />
+          </span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="revolut" />
+          <span class="checkout-option__text">Revolut</span>
+          <span class="checkout-option__logos">
+            <img src="/images/payments/revolut.png" alt="Revolut" height="20" />
+          </span>
+        </label>
+        <label class="checkout-option">
+          <input type="radio" name="payment" value="transfer" />
+          <span class="checkout-option__text">Банковский перевод</span>
+        </label>
+      </div>
+
+      <!-- TERMS -->
+      <label class="checkout-terms">
+        <input type="checkbox" id="f-terms" required />
+        <span>Соглашаюсь с <a href="/muugitingimused">условиями продажи</a> и <a href="/privaatsuspoliitika">политикой конфиденциальности</a></span>
+      </label>
+
+      <button type="button" class="checkout-btn" id="pay-btn">ОПЛАТИТЬ</button>
+    </div>
+
+    <!-- RIGHT: ORDER SUMMARY -->
+    <div class="checkout-right">
+      <div id="cart-items" class="order-items"></div>
+
+      <div class="order-discount">
+        <input type="text" id="f-discount" class="checkout-input" placeholder="Промокод" />
+        <button type="button" class="discount-btn">Применить</button>
+      </div>
+
+      <div class="order-totals">
+        <div class="order-totals__row">
+          <span>Промежуточная сумма</span>
+          <span id="subtotal-price">€0.00</span>
+        </div>
+        <div class="order-totals__row">
+          <span>Доставка</span>
+          <span id="shipping-price">Бесплатно</span>
+        </div>
+        <div class="order-totals__row order-totals__row--total">
+          <strong>Итого</strong>
+          <strong id="total-price">€0.00</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form id="paysera-form" method="POST" action="https://www.paysera.com/pay/" style="display:none;">
+    <input type="hidden" name="data" id="paysera-data" />
+    <input type="hidden" name="sign" id="paysera-sign" />
+  </form>
+</div>
+
+</Layout>
+
+<script is:inline>
+  var SHIPPING_PRICES = { pickup: 0, dpd: 3.10, omniva: 3.46 };
+
+  function getCart() {
+    try { return JSON.parse(localStorage.getItem('hk_cart') || '[]'); }
+    catch { return []; }
+  }
+
+  function getShippingPrice() {
+    var selected = document.querySelector('input[name="shipping"]:checked');
+    return selected ? (SHIPPING_PRICES[selected.value] || 0) : 0;
+  }
+
+  function updateTotals() {
+    var cart = getCart();
+    var subtotal = cart.reduce(function(s, i) { return s + i.price * i.qty; }, 0);
+    var shipping = getShippingPrice();
+    var total = subtotal + shipping;
+
+    document.getElementById('subtotal-price').textContent = '€' + subtotal.toFixed(2);
+    document.getElementById('shipping-price').textContent = shipping === 0 ? 'Бесплатно' : '€' + shipping.toFixed(2);
+    document.getElementById('total-price').textContent = '€' + total.toFixed(2);
+  }
+
+  function renderCheckout() {
+    var cart = getCart();
+    var container = document.getElementById('cart-items');
+
+    if (!cart.length) {
+      container.innerHTML = '<p class="cart-empty">Корзина пуста. <a href="/ru/onlajn-shop">Назад в интернет-магазин</a></p>';
+      document.querySelector('.checkout-left').style.display = 'none';
+      return;
+    }
+
+    var html = '';
+    cart.forEach(function(item, i) {
+      html += '<div class="order-item">' +
+        '<div class="order-item__info">' +
+          '<span class="order-item__name">' + item.name + '</span>' +
+          '<span class="order-item__qty">× ' + item.qty + '</span>' +
+        '</div>' +
+        '<span class="order-item__price">€' + (item.price * item.qty).toFixed(2) + '</span>' +
+        '<button class="order-item__remove" data-index="' + i + '">✕</button>' +
+        '</div>';
+    });
+
+    container.innerHTML = html;
+    updateTotals();
+
+    container.querySelectorAll('.order-item__remove').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(this.getAttribute('data-index'));
+        var c = getCart();
+        c.splice(idx, 1);
+        localStorage.setItem('hk_cart', JSON.stringify(c));
+        renderCheckout();
+      });
+    });
+  }
+
+  renderCheckout();
+
+  document.querySelectorAll('input[name="shipping"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      updateTotals();
+      toggleParcelSelect();
+    });
+  });
+
+  var parcelData = { dpd: null, omniva: null };
+
+  function toggleParcelSelect() {
+    var selected = document.querySelector('input[name="shipping"]:checked');
+    var val = selected ? selected.value : 'pickup';
+    document.getElementById('dpd-select').style.display = val === 'dpd' ? 'block' : 'none';
+    document.getElementById('omniva-select').style.display = val === 'omniva' ? 'block' : 'none';
+    if (val === 'dpd' && !parcelData.dpd) loadParcelData('dpd');
+    if (val === 'omniva' && !parcelData.omniva) loadParcelData('omniva');
+  }
+
+  function loadParcelData(type) {
+    fetch('/data/' + type + '.json')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        parcelData[type] = data;
+        renderParcelList(type, '');
+      });
+  }
+
+  function renderParcelList(type, query) {
+    var list = document.getElementById(type + '-list');
+    var data = parcelData[type] || [];
+    var q = query.toLowerCase();
+    var filtered = q ? data.filter(function(d) {
+      var searchStr = (d.name || '') + ' ' + (d.address || '') + ' ' + (d.city || '');
+      return searchStr.toLowerCase().indexOf(q) !== -1;
+    }) : data;
+    var shown = filtered.slice(0, 50);
+    var html = '';
+    shown.forEach(function(d) {
+      var label = d.name + ', ' + d.address + ', ' + d.city;
+      html += '<div class="parcel-item" data-value="' + label.replace(/"/g, '&quot;') + '">' + label + '</div>';
+    });
+    if (filtered.length > 50) html += '<div class="parcel-more">Ещё ' + (filtered.length - 50) + ' результатов, уточните поиск</div>';
+    if (!filtered.length) html = '<div class="parcel-more">Ничего не найдено</div>';
+    list.innerHTML = html;
+
+    list.querySelectorAll('.parcel-item').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var val = this.getAttribute('data-value');
+        document.getElementById(type + '-machine').value = val;
+        document.getElementById(type + '-search').value = val;
+        list.innerHTML = '';
+      });
+    });
+  }
+
+  document.getElementById('dpd-search').addEventListener('input', function() {
+    renderParcelList('dpd', this.value);
+  });
+  document.getElementById('omniva-search').addEventListener('input', function() {
+    renderParcelList('omniva', this.value);
+  });
+  document.getElementById('dpd-search').addEventListener('focus', function() {
+    if (parcelData.dpd) renderParcelList('dpd', this.value);
+  });
+  document.getElementById('omniva-search').addEventListener('focus', function() {
+    if (parcelData.omniva) renderParcelList('omniva', this.value);
+  });
+
+  document.getElementById('pay-btn').addEventListener('click', async function() {
+    var email = document.getElementById('f-email').value;
+    var fullname = document.getElementById('f-fullname').value;
+    var terms = document.getElementById('f-terms').checked;
+
+    if (!email) { alert('Пожалуйста, введите адрес электронной почты'); return; }
+    if (!fullname) { alert('Пожалуйста, введите имя'); return; }
+
+    var shippingVal = document.querySelector('input[name="shipping"]:checked').value;
+    if (shippingVal === 'dpd' && !document.getElementById('dpd-machine').value) {
+      alert('Пожалуйста, выберите пакомат DPD'); return;
+    }
+    if (shippingVal === 'omniva' && !document.getElementById('omniva-machine').value) {
+      alert('Пожалуйста, выберите пакомат Omniva'); return;
+    }
+
+    if (!terms) { alert('Пожалуйста, согласитесь с условиями продажи'); return; }
+
+    var btn = this;
+    btn.textContent = 'ПОДОЖДИТЕ...';
+    btn.disabled = true;
+
+    var cart = getCart();
+    var subtotal = cart.reduce(function(s, i) { return s + i.price * i.qty; }, 0);
+    var shipping = getShippingPrice();
+    var total = subtotal + shipping;
+
+    var payment = document.querySelector('input[name="payment"]:checked').value;
+    var description = cart.map(function(i) { return i.name + ' x' + i.qty; }).join(', ');
+    var orderid = 'HK-' + Date.now();
+
+    var phone = document.getElementById('f-phone').value;
+    var address = document.getElementById('f-address').value;
+    var city = document.getElementById('f-city').value;
+    var postal = document.getElementById('f-postal').value;
+    var parcelMachine = '';
+    if (shippingVal === 'dpd') parcelMachine = document.getElementById('dpd-machine').value;
+    if (shippingVal === 'omniva') parcelMachine = document.getElementById('omniva-machine').value;
+
+    try {
+      var res = await fetch('/api/paysera-create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderid: orderid,
+          amount: total,
+          email: email,
+          description: description,
+          payment: payment,
+          fullname: fullname,
+          phone: phone,
+          address: address,
+          city: city,
+          postal: postal,
+          shipping: shippingVal,
+          parcel: parcelMachine,
+          lang: 'ru'
+        })
+      });
+
+      var result = await res.json();
+      if (result.error) {
+        alert('Ошибка: ' + result.error);
+        btn.textContent = 'ОПЛАТИТЬ';
+        btn.disabled = false;
+        return;
+      }
+
+      // Jäta ostusumma meelde makse-tehtud lehe jaoks (Meta Pixel / GA Purchase sündmus)
+      try {
+        localStorage.setItem('hk_last_order', JSON.stringify({ orderid: orderid, total: total, ts: Date.now() }));
+      } catch (e) {}
+      localStorage.removeItem('hk_cart');
+
+      document.getElementById('paysera-data').value = result.data;
+      document.getElementById('paysera-sign').value = result.sign;
+      document.getElementById('paysera-form').submit();
+    } catch (err) {
+      alert('Ошибка соединения. Пожалуйста, попробуйте ещё раз.');
+      btn.textContent = 'ОПЛАТИТЬ';
+      btn.disabled = false;
+    }
+  });
+</script>
+
+<style>
+  .checkout-page {
+    min-height: 100vh;
+    background: #fff;
+  }
+
+  .checkout-header {
+    text-align: center;
+    padding: 24px;
+    border-bottom: 1px solid #eee;
+  }
+  .checkout-header img { height: 36px; display: inline-block; }
+
+  .checkout-layout {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .checkout-left {
+    padding: 24px;
+    flex: 1;
+  }
+
+  .checkout-right {
+    padding: 24px;
+    background: #f9f9f9;
+    flex: 1;
+  }
+
+  .checkout-back {
+    display: inline-block;
+    font-size: 14px;
+    color: #1f6d85;
+    margin-bottom: 24px;
+  }
+
+  .checkout-section__title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 28px;
+    margin-bottom: 12px;
+    text-align: left;
+  }
+
+  .checkout-field {
+    margin-bottom: 12px;
+  }
+  .checkout-field--half {
+    flex: 1;
+  }
+
+  .checkout-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .checkout-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: #1d1e20;
+    background: #fff;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .checkout-input:focus {
+    outline: none;
+    border-color: #1d1e20;
+  }
+  select.checkout-input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23333' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+  }
+
+  /* SHIPPING & PAYMENT OPTIONS */
+  .checkout-options {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .checkout-option {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    gap: 12px;
+    font-size: 15px;
+  }
+  .checkout-option:last-child {
+    border-bottom: none;
+  }
+  .checkout-option input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #1d1e20;
+    flex-shrink: 0;
+  }
+  .checkout-option__text {
+    flex: 1;
+  }
+  .checkout-option__price {
+    font-size: 14px;
+    color: #555;
+  }
+  .checkout-option__logos {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .checkout-option__logos img {
+    height: 20px;
+    width: auto;
+    display: inline-block;
+  }
+
+  /* PARCEL SELECT */
+  .parcel-select {
+    padding: 0 16px 14px;
+    border-bottom: 1px solid #eee;
+  }
+  .parcel-search-wrap {
+    margin-bottom: 0;
+  }
+  .parcel-search {
+    font-size: 14px !important;
+    padding: 10px 12px !important;
+  }
+  .parcel-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+  }
+  .parcel-item {
+    padding: 10px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  .parcel-item:hover {
+    background: #f0f8ff;
+  }
+  .parcel-more {
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #999;
+    text-align: center;
+  }
+
+  /* TERMS */
+  .checkout-terms {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 24px;
+    font-size: 14px;
+    color: #555;
+    cursor: pointer;
+  }
+  .checkout-terms input {
+    margin-top: 2px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .checkout-terms a {
+    color: #1f6d85;
+    text-decoration: underline;
+  }
+
+  /* PAY BUTTON */
+  .checkout-btn {
+    display: block;
+    width: 100%;
+    background: #1d1e20;
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 16px 32px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 20px;
+  }
+  .checkout-btn:disabled {
+    background: #999;
+    cursor: not-allowed;
+  }
+
+  /* ORDER SUMMARY */
+  .order-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    gap: 12px;
+  }
+  .order-item__info {
+    flex: 1;
+  }
+  .order-item__name {
+    font-size: 14px;
+    display: block;
+  }
+  .order-item__qty {
+    font-size: 13px;
+    color: #888;
+  }
+  .order-item__price {
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .order-item__remove {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .cart-empty {
+    color: #555;
+    font-size: 15px;
+    padding: 20px 0;
+  }
+  .cart-empty a {
+    color: #1f6d85;
+    text-decoration: underline;
+  }
+
+  .order-discount {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .order-discount .checkout-input {
+    flex: 1;
+  }
+  .discount-btn {
+    padding: 12px 20px;
+    background: #eee;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: #555;
+    cursor: pointer;
+  }
+
+  .order-totals {
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 16px;
+  }
+  .order-totals__row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 15px;
+  }
+  .order-totals__row--total {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #ddd;
+    font-size: 17px;
+  }
+
+  /* DESKTOP */
+  @media (min-width: 768px) {
+    .checkout-layout {
+      flex-direction: row;
+    }
+    .checkout-left {
+      padding: 32px 48px;
+      flex: 3;
+    }
+    .checkout-right {
+      padding: 32px;
+      flex: 2;
+      border-left: 1px solid #eee;
+    }
+  }
+</style>
