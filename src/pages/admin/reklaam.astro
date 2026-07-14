@@ -4,12 +4,17 @@ export const prerender = false;
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import { requireDb } from '../../lib/db';
 import { fetchMetaMonthlySpend, metaConfigured } from '../../lib/meta';
+import { fetchGoogleMonthlySpend, googleAdsConfigured } from '../../lib/google-ads';
 
 const sql = requireDb();
 
-// Meta kulud otse API-st (kui seadistatud); null = kasuta käsitsi sisestust
-const metaSpend = await fetchMetaMonthlySpend();
+// Meta ja Google kulud otse API-st (kui seadistatud); null = kasuta käsitsi sisestust
+const [metaSpend, googleSpend] = await Promise.all([
+  fetchMetaMonthlySpend(),
+  fetchGoogleMonthlySpend(),
+]);
 const metaAuto = new Map((metaSpend || []).map(m => [m.month, m.spend]));
+const googleAuto = new Map((googleSpend || []).map(m => [m.month, m.spend]));
 
 // Kulud + käive kuude lõikes (viimased 12 kuud)
 // NB: kuu võti tuleb SQL-ist tekstina (to_char), et vältida ajavööndi nihkeid
@@ -40,12 +45,19 @@ for (const c of costs) {
   m.spend += Number(c.amount);
 }
 
-// Meta API kulud kirjutavad käsitsi sisestatud Meta summad üle
+// API kulud kirjutavad käsitsi sisestatud summad üle
 for (const [key, spend] of metaAuto) {
   if (!monthMap.has(key)) monthMap.set(key, { revenue: 0, orders: 0, channels: {}, spend: 0 });
   const m = monthMap.get(key)!;
   if (m.channels.meta != null) m.spend -= m.channels.meta;
   m.channels.meta = spend;
+  m.spend += spend;
+}
+for (const [key, spend] of googleAuto) {
+  if (!monthMap.has(key)) monthMap.set(key, { revenue: 0, orders: 0, channels: {}, spend: 0 });
+  const m = monthMap.get(key)!;
+  if (m.channels.google != null) m.spend -= m.channels.google;
+  m.channels.google = spend;
   m.spend += spend;
 }
 const months = [...monthMap.entries()].sort((a, b) => b[0].localeCompare(a[0]));
@@ -65,8 +77,12 @@ const currentMonth = new Date().toISOString().slice(0, 7);
   <div class="panel">
     <h2>Lisa kuu reklaamikulu</h2>
     <p style="font-size:13px; color:#888; margin-bottom:16px;">
-      {metaConfigured
-        ? <>Meta kulud tulevad automaatselt otse Meta API-st{metaSpend === null && <strong style="color:#b3261e;"> (API päring ebaõnnestus, näitan käsitsi sisestatut)</strong>}. Google Ads summad sisesta käsitsi kord kuus, kuni API ühendus on loodud.</>
+      {metaConfigured || googleAdsConfigured
+        ? <>
+            {metaConfigured && <>Meta kulud tulevad automaatselt Meta API-st{metaSpend === null && <strong style="color:#b3261e;"> (päring ebaõnnestus, näitan käsitsi sisestatut)</strong>}. </>}
+            {googleAdsConfigured && <>Google Ads kulud tulevad automaatselt Google API-st{googleSpend === null && <strong style="color:#b3261e;"> (päring ebaõnnestus, näitan käsitsi sisestatut)</strong>}. </>}
+            Käsitsi sisesta ainult muud kanalid.
+          </>
         : <>Võta summad Google Ads ja Meta Ads Manageri aruannetest ja sisesta siia kord kuus. Sama kuu ja kanali uuesti sisestamine kirjutab vana summa üle.</>}
     </p>
     <form id="cost-form" class="cost-form">
