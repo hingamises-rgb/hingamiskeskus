@@ -1,0 +1,229 @@
+---
+// Kliendi detailvaade (Hopitude eeskujul): profiil, statistika, paketid, ajalugu, e-poe ostud.
+export const prerender = false;
+
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { requireDb } from '../../../../lib/db';
+import { nowTallinn, dateStr, hhmm } from '../../../../lib/booking';
+
+const sql = requireDb();
+const now = nowTallinn();
+const id = Number(Astro.params.id);
+if (!Number.isFinite(id)) return Astro.redirect('/admin/broneerimine/kliendid');
+
+const [client] = await sql`SELECT * FROM bk_clients WHERE id = ${id}`;
+if (!client) return Astro.redirect('/admin/broneerimine/kliendid');
+
+const packages = await sql`SELECT * FROM bk_packages WHERE client_id = ${id} ORDER BY valid_until DESC`;
+const bookings = await sql`
+  SELECT b.*, r.name AS room_name, s.name AS session_name
+  FROM bk_bookings b
+  LEFT JOIN bk_rooms r ON r.id = b.room_id
+  LEFT JOIN bk_sessions s ON s.id = b.session_id
+  WHERE b.client_id = ${id}
+  ORDER BY b.date DESC, b.start_time DESC
+  LIMIT 200
+`;
+const [credit] = await sql`SELECT COALESCE(SUM(amount_cents),0) AS c FROM bk_credits WHERE client_id = ${id}`;
+const orders = await sql`
+  SELECT orderid, amount, status, items, created_at FROM orders
+  WHERE lower(email) = lower(${client.email}) ORDER BY created_at DESC LIMIT 50
+`;
+
+const isFuture = (b: any) => {
+  const d = dateStr(b.date);
+  return d > now.date || (d === now.date && hhmm(b.start_time) > now.time);
+};
+const activePkgs = (packages as any[]).filter((p: any) =>
+  dateStr(p.valid_until) >= now.date && p.used_sessions < p.total_sessions);
+const futureBookings = (bookings as any[]).filter((b: any) => b.status === 'active' && isFuture(b));
+const pastVisits = (bookings as any[]).filter((b: any) => b.status === 'active' && !isFuture(b));
+const totalVisits = Number(client.visits || 0) + pastVisits.length;
+const lastVisit = pastVisits[0] ? dateStr(pastVisits[0].date) : null;
+const shopTotal = (orders as any[]).filter((o: any) => o.status === 'paid')
+  .reduce((s: number, o: any) => s + Number(o.amount), 0);
+
+const fmtD = (d: any) => dateStr(d).split('-').reverse().join('.');
+const typeLabel = (b: any) =>
+  b.type === 'group' ? (b.session_name || 'Grupihingamine')
+  : b.type === 'rent' ? `Ruumi rent${b.purpose ? ' — ' + b.purpose : ''}`
+  : `Floating ${b.room_name || ''}`;
+const statusBadge = (b: any) =>
+  b.status !== 'active' ? { txt: 'Tühistatud', style: 'background:#fdecea;color:#b3261e' }
+  : isFuture(b) ? { txt: 'Tulevane', style: 'background:#e6f4ea;color:#137333' }
+  : { txt: 'Möödunud', style: 'background:#f1f3f4;color:#5f6368' };
+---
+
+<AdminLayout title={client.name || client.email} active="booking">
+  <p style="margin:0 0 16px"><a href="/admin/broneerimine/kliendid" style="color:#1f6d85">‹ Kõik kliendid</a></p>
+
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+      <div>
+        <h1 style="margin:0 0 4px">{client.name || '—'}</h1>
+        <div style="color:#666;font-size:14px">
+          {client.email} · {client.phone || 'telefon puudub'} · klient alates {fmtD(client.created_at)}
+        </div>
+      </div>
+      <div>
+        {client.member_until && dateStr(client.member_until) >= now.date &&
+          <span class="badge badge--paid">liige kuni {fmtD(client.member_until)}</span>}
+        {client.blocked && <span class="badge" style="background:#fdecea;color:#b3261e">BLOKEERITUD</span>}
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:14px;align-items:start" data-cid={client.id}>
+      <textarea class="c-notes" placeholder="Märkmed (nt eelistused, hilinemised...)"
+        style="width:100%;min-height:56px;padding:9px 11px;border:1px solid #eee;border-radius:8px;font:inherit;font-size:13.5px">{client.notes}</textarea>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <button class="btn btn--outline c-save">Salvesta märkmed</button>
+        <button class="btn btn--outline c-block" style={client.blocked ? '' : 'color:#b3261e;border-color:#b3261e'}>
+          {client.blocked ? 'Eemalda blokeering' : 'Blokeeri'}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:0 0 20px">
+    <div class="panel" style="margin:0">
+      <div style="font-size:12px;letter-spacing:0.5px;color:#888;text-transform:uppercase">Aktiivsed paketid</div>
+      <div style="font-size:28px;font-weight:600">{activePkgs.length}</div>
+      <div style="font-size:13px;color:#888">{activePkgs.length
+        ? activePkgs.map((p: any) => `${p.total_sessions - p.used_sessions} korda alles`).join(', ')
+        : 'Aktiivseid pakette pole'}</div>
+    </div>
+    <div class="panel" style="margin:0">
+      <div style="font-size:12px;letter-spacing:0.5px;color:#888;text-transform:uppercase">Tulevased broneeringud</div>
+      <div style="font-size:28px;font-weight:600">{futureBookings.length}</div>
+      <div style="font-size:13px;color:#888">{futureBookings[0]
+        ? `Järgmine: ${fmtD(futureBookings[futureBookings.length - 1].date)}`
+        : 'Tulevasi broneeringuid ei ole'}</div>
+    </div>
+    <div class="panel" style="margin:0">
+      <div style="font-size:12px;letter-spacing:0.5px;color:#888;text-transform:uppercase">Külastusi kokku</div>
+      <div style="font-size:28px;font-weight:600">{totalVisits}</div>
+      <div style="font-size:13px;color:#888">{lastVisit
+        ? `Viimane: ${lastVisit.split('-').reverse().join('.')}`
+        : Number(client.visits) > 0 ? 'Hopitude ajast' : '—'}</div>
+    </div>
+    <div class="panel" style="margin:0">
+      <div style="font-size:12px;letter-spacing:0.5px;color:#888;text-transform:uppercase">E-poe ostud</div>
+      <div style="font-size:28px;font-weight:600">{(orders as any[]).length}</div>
+      <div style="font-size:13px;color:#888">{shopTotal ? `Kokku ${shopTotal.toFixed(2)}€` : '—'}</div>
+    </div>
+    <div class="panel" style="margin:0">
+      <div style="font-size:12px;letter-spacing:0.5px;color:#888;text-transform:uppercase">Ettemaks</div>
+      <div style="font-size:28px;font-weight:600">{(Number(credit.c) / 100).toFixed(2)}€</div>
+      <div style="font-size:13px;color:#888">{Number(credit.c) ? 'Kasutatav broneerimisel' : '—'}</div>
+    </div>
+  </div>
+
+  <div class="panel" data-cid={client.id}>
+    <h2 style="margin:0 0 10px">Paketid</h2>
+    {(packages as any[]).length === 0 && <p style="color:#888;font-size:14px">Pakette pole.</p>}
+    <table class="admin-table" style={(packages as any[]).length ? '' : 'display:none'}>
+      <thead><tr><th>Pakett</th><th>Kordi</th><th>Kehtivus</th><th>Allikas</th><th></th></tr></thead>
+      <tbody>
+        {(packages as any[]).map((p: any) => (
+          <tr style={dateStr(p.valid_until) < now.date || p.used_sessions >= p.total_sessions ? 'opacity:0.5' : ''}>
+            <td>{p.name}</td>
+            <td>{p.total_sessions - p.used_sessions} / {p.total_sessions} alles</td>
+            <td>kuni {fmtD(p.valid_until)}</td>
+            <td><small>{p.source}</small></td>
+            <td style="white-space:nowrap">
+              <button class="p-use" data-pid={p.id} data-delta="1" title="Kasuta 1 kord" style="border:1px solid #ddd;background:none;border-radius:6px;padding:2px 8px;font-size:12px">−1 kord</button>
+              <button class="p-use" data-pid={p.id} data-delta="-1" title="Tagasta 1 kord" style="border:1px solid #ddd;background:none;border-radius:6px;padding:2px 8px;font-size:12px">+1 kord</button>
+              <button class="p-del" data-pid={p.id} style="background:none;border:none;color:#b3261e;font-size:12px">Kustuta</button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2 style="margin:0 0 10px">Broneeringute ajalugu</h2>
+    {(bookings as any[]).length === 0 && <p style="color:#888;font-size:14px">
+      Broneeringuid meie süsteemis veel pole.
+      {Number(client.visits) > 0 && ` Hopitude ajast on kirjas ${client.visits} külastust (detailid sealt kaasa ei tulnud).`}
+    </p>}
+    <table class="admin-table" style={(bookings as any[]).length ? '' : 'display:none'}>
+      <thead><tr><th>Kuupäev</th><th>Aeg</th><th>Teenus</th><th>Staatus</th><th>Makse</th></tr></thead>
+      <tbody>
+        {(bookings as any[]).map((b: any) => (
+          <tr>
+            <td>{fmtD(b.date)}</td>
+            <td>{hhmm(b.start_time)}</td>
+            <td>{typeLabel(b)}{b.seats > 1 ? ` (${b.seats} kohta)` : ''}</td>
+            <td><span class="badge" style={statusBadge(b).style}>{statusBadge(b).txt}</span></td>
+            <td><small>{b.package_id ? 'pakett' : b.payment || '—'}{b.paid === false && b.payment === 'paysera' ? ' (maksmata)' : ''}</small></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    {Number(client.visits) > 0 && (bookings as any[]).length > 0 &&
+      <p style="color:#888;font-size:12.5px;margin-top:8px">+ {client.visits} külastust Hopitude ajast (detailid sealt kaasa ei tulnud).</p>}
+  </div>
+
+  <div class="panel">
+    <h2 style="margin:0 0 10px">E-poe ostud</h2>
+    {(orders as any[]).length === 0 && <p style="color:#888;font-size:14px">E-poe oste pole.</p>}
+    <table class="admin-table" style={(orders as any[]).length ? '' : 'display:none'}>
+      <thead><tr><th>Kuupäev</th><th>Tellimus</th><th>Tooted</th><th>Summa</th><th>Staatus</th></tr></thead>
+      <tbody>
+        {(orders as any[]).map((o: any) => (
+          <tr>
+            <td>{fmtD(o.created_at)}</td>
+            <td>{o.orderid}</td>
+            <td>{o.items}</td>
+            <td>{Number(o.amount).toFixed(2)}€</td>
+            <td><span class={`badge ${o.status === 'paid' ? 'badge--paid' : ''}`}>{o.status}</span></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>
+
+<script>
+async function act(body: any) {
+  const res = await fetch('/api/admin/booking-action', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  });
+  return { ok: res.ok, data: await res.json().catch(() => ({})) };
+}
+
+document.querySelectorAll('[data-cid]').forEach((panel) => {
+  const id = Number((panel as HTMLElement).dataset.cid);
+  const q = (cls: string) => panel.querySelector(cls) as HTMLInputElement;
+  const blockBtn = q('.c-block');
+  const notes = () => (document.querySelector('.c-notes') as HTMLTextAreaElement).value;
+
+  q('.c-save')?.addEventListener('click', async () => {
+    const blocked = blockBtn?.textContent!.includes('Eemalda') || false;
+    const { ok } = await act({ action: 'client_update', id, notes: notes(), blocked });
+    if (ok) location.reload();
+  });
+  blockBtn?.addEventListener('click', async () => {
+    const blocked = blockBtn.textContent!.includes('Eemalda');
+    const msg = blocked ? 'Eemaldan blokeeringu?' : 'Blokeerin kliendi? Ta ei saa enam veebis broneerida.';
+    if (!confirm(msg)) return;
+    const { ok } = await act({ action: 'client_update', id, notes: notes(), blocked: !blocked });
+    if (ok) location.reload();
+  });
+
+  panel.querySelectorAll('.p-use').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const el = btn as HTMLElement;
+      const { ok } = await act({ action: 'package_use', id: Number(el.dataset.pid), delta: Number(el.dataset.delta) });
+      if (ok) location.reload();
+    });
+  });
+  panel.querySelectorAll('.p-del').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Kustutan paketi?')) return;
+      const { ok } = await act({ action: 'package_delete', id: Number((btn as HTMLElement).dataset.pid) });
+      if (ok) location.reload();
+    });
+  });
+});
+</script>

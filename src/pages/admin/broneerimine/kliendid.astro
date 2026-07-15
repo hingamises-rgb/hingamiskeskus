@@ -10,18 +10,31 @@ import { nowTallinn, dateStr } from '../../../lib/booking';
 const sql = requireDb();
 const now = nowTallinn();
 const q = (Astro.url.searchParams.get('q') || '').trim();
+const PER_PAGE = 30;
+const page = Math.max(1, Number(Astro.url.searchParams.get('lk')) || 1);
+const offset = (page - 1) * PER_PAGE;
 
 let clients: any[] = [];
+let total = 0;
 if (q) {
   const like = `%${q}%`;
   clients = await sql`
     SELECT * FROM bk_clients
     WHERE email ILIKE ${like} OR name ILIKE ${like} OR phone ILIKE ${like}
-    ORDER BY created_at DESC LIMIT 50
+    ORDER BY name NULLS LAST, email LIMIT ${PER_PAGE} OFFSET ${offset}
   `;
+  const [cnt] = await sql`
+    SELECT count(*) AS n FROM bk_clients
+    WHERE email ILIKE ${like} OR name ILIKE ${like} OR phone ILIKE ${like}
+  `;
+  total = Number(cnt.n);
 } else {
-  clients = await sql`SELECT * FROM bk_clients ORDER BY created_at DESC LIMIT 30`;
+  clients = await sql`SELECT * FROM bk_clients ORDER BY name NULLS LAST, email LIMIT ${PER_PAGE} OFFSET ${offset}`;
+  const [cnt] = await sql`SELECT count(*) AS n FROM bk_clients`;
+  total = Number(cnt.n);
 }
+const pages = Math.max(1, Math.ceil(total / PER_PAGE));
+const pageHref = (p: number) => `?q=${encodeURIComponent(q)}&lk=${p}`;
 
 const ids = clients.map((c: any) => c.id);
 const packages = ids.length ? await sql`
@@ -51,16 +64,22 @@ const fmtD = (d: any) => dateStr(d).split('-').reverse().join('.');
       <button class="btn" type="submit">Otsi</button>
       <button class="btn btn--outline" type="button" id="new-client">+ Uus klient</button>
     </form>
+    <p style="margin:10px 0 0;font-size:13.5px;color:#666">
+      {q ? `Leitud ${total} klienti` : `Kliente kokku: ${total}`}
+      {pages > 1 && ` · leht ${page}/${pages}`}
+    </p>
   </div>
 
   {clients.map((c: any) => (
     <div class="panel" data-cid={c.id}>
       <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
-        <h2 style="margin:0">{c.name || '—'} <small style="font-weight:400;color:#888">{c.email} · {c.phone || '—'}</small></h2>
+        <h2 style="margin:0"><a href={`/admin/broneerimine/kliendid/${c.id}`} style="color:inherit;text-decoration:none">{c.name || '—'}</a> <small style="font-weight:400;color:#888">{c.email} · {c.phone || '—'}</small></h2>
         <div>
           {c.member_until && dateStr(c.member_until) >= now.date && <span class="badge badge--paid">liige kuni {fmtD(c.member_until)}</span>}
           {c.blocked && <span class="badge" style="background:#fdecea;color:#b3261e">BLOKEERITUD</span>}
           <span class="badge badge--fulfilled">{bookingsOf(c.id)} broneeringut</span>
+          {Number(c.visits) > 0 && <span class="badge" style="background:#f1f3f4;color:#5f6368">{c.visits} külastust</span>}
+          <a href={`/admin/broneerimine/kliendid/${c.id}`} class="badge" style="background:#e8f0fe;color:#1a56db;text-decoration:none">Ava →</a>
           {creditOf(c.id) !== 0 && <span class="badge badge--unfulfilled">ettemaks {(creditOf(c.id) / 100).toFixed(2)}€</span>}
         </div>
       </div>
@@ -119,6 +138,14 @@ const fmtD = (d: any) => dateStr(d).split('-').reverse().join('.');
   ))}
 
   {clients.length === 0 && <div class="panel">Kliente ei leitud.</div>}
+
+  {pages > 1 && (
+    <div class="panel" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      {page > 1 && <a class="btn btn--outline" href={pageHref(page - 1)}>‹ Eelmised</a>}
+      <span style="align-self:center;font-size:13.5px;color:#666">leht {page} / {pages}</span>
+      {page < pages && <a class="btn btn--outline" href={pageHref(page + 1)}>Järgmised ›</a>}
+    </div>
+  )}
 </AdminLayout>
 
 <script>
