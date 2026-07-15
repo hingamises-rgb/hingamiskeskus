@@ -89,9 +89,16 @@ const autoAlts: Partial<Record<Lang, string>> = etPath
   : {};
 // Dünaamilistel lehtedel (tooted, blogi) võetakse alts propist; see kirjutab automaatse üle.
 const effectiveAlts: Partial<Record<Lang, string>> = { ...autoAlts, ...alts };
+const LANG_LABEL: Record<Lang, string> = { et: 'EST', ru: 'RUS', en: 'EN' };
+// Lipud SVG-na (emoji-lipud ei renderdu Windowsis)
+const LANG_FLAG: Record<Lang, string> = {
+  et: '<svg viewBox="0 0 60 39" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="13" fill="#0072ce"/><rect y="13" width="60" height="13" fill="#000"/><rect y="26" width="60" height="13" fill="#fff"/></svg>',
+  ru: '<svg viewBox="0 0 60 39" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="13" fill="#fff"/><rect y="13" width="60" height="13" fill="#0039a6"/><rect y="26" width="60" height="13" fill="#d52b1e"/></svg>',
+  en: '<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="3"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg>',
+};
 const otherLangs = (['et', 'ru', 'en'] as Lang[])
   .filter((l) => l !== lang)
-  .map((l) => ({ code: l, label: l.toUpperCase(), href: effectiveAlts[l] || LANG_HOME[l], aria: LANG_ARIA[l] }));
+  .map((l) => ({ code: l, label: LANG_LABEL[l], flag: LANG_FLAG[l], href: effectiveAlts[l] || LANG_HOME[l], aria: LANG_ARIA[l] }));
 
 const headerClass = ru ? 'header header--ru' : en ? 'header header--en' : 'header';
 const cartHref = ru ? '/ru/checkout' : en ? '/en/checkout' : '/checkout';
@@ -111,7 +118,9 @@ const menuAria = ru ? 'Меню' : en ? 'Menu' : 'Menüü';
   <div class="header__right">
     <div class="header__langs">
       {otherLangs.map((l) => (
-        <a href={l.href} class="header__lang" aria-label={l.aria}>{l.label}</a>
+        <a href={l.href} class="header__lang" aria-label={l.aria}>
+          <span class="header__flag" set:html={l.flag} />{l.label}
+        </a>
       ))}
     </div>
     <a href={cartHref} class="header__cart" aria-label={cartAria}>
@@ -140,7 +149,9 @@ const menuAria = ru ? 'Меню' : en ? 'Menu' : 'Menüü';
       <a href={item.href} class={active === item.key ? 'mobile-menu__link mobile-menu__link--active' : 'mobile-menu__link'}>{item.label}</a>
     ))}
     {otherLangs.map((l) => (
-      <a href={l.href} class="mobile-menu__link mobile-menu__lang">{l.aria}</a>
+      <a href={l.href} class="mobile-menu__link mobile-menu__lang">
+        <span class="header__flag header__flag--menu" set:html={l.flag} />{l.label}
+      </a>
     ))}
   </nav>
 </div>
@@ -209,19 +220,31 @@ const menuAria = ru ? 'Меню' : en ? 'Menu' : 'Menüü';
   .header__right { display: flex; align-items: center; gap: 16px; }
   .header__langs { display: flex; align-items: center; gap: 6px; }
   .header__lang {
+    display: flex;
+    align-items: center;
+    gap: 5px;
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.5px;
     color: #1d1e20;
-    padding: 3px 7px;
-    border: 1px solid rgba(0,0,0,0.25);
-    border-radius: 4px;
+    padding: 3px 4px;
   }
-  .header__lang:hover { border-color: #1f6d85; color: #1f6d85; }
+  .header__lang:hover { color: #1f6d85; }
+  .header__flag :global(svg) {
+    display: block;
+    width: 20px;
+    height: 13px;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+  }
+  .header__flag--menu :global(svg) { width: 24px; height: 16px; }
   :global(.mobile-menu__lang) {
     margin-top: 18px;
     font-size: 16px !important;
     color: #1f6d85 !important;
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
   }
   .header__cart { color: #1d1e20; position: relative; display: flex; }
   .header__burger {
@@ -305,6 +328,8 @@ const menuAria = ru ? 'Меню' : en ? 'Menu' : 'Menüü';
     align-items: flex-end;
     gap: 2px;
   }
+  /* hidden-atribuut peab võitma display: flex'i — muidu on teenused alati lahti */
+  .mobile-menu__sub[hidden] { display: none; }
   .mobile-menu__sublink {
     display: block;
     font-size: 18px;
