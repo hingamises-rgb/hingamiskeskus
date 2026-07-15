@@ -129,7 +129,7 @@ const S: any = {
   dateKey: null, calOff: 0, slots: [], sessions: [], groupIdx: null, seats: 1,
   rentRoom: 'suur-saal', rentHours: [],
   name: '', email: '', phone: '', purpose: '', remember: true,
-  pay: 'paysera', promoCode: '', flags: null, assets: null, selPackage: null,
+  pay: 'paysera', promoCode: '', giftCode: '', flags: null, assets: null, selPackage: null,
   codeSent: false, busy: false, error: null, result: null,
 };
 let CFG: any = { floatCents: 4000, memberCents: 3000, rentSuurCents: 2500, rentVaikeCents: 700, horizonDays: 92 };
@@ -398,6 +398,12 @@ function vPay() {
   ${assetBlock}${pkgOpts}
   ${payopt('paysera', _.payNow, _.payNowD)}
   ${payopt('cash', _.paySpot, _.paySpotD)}
+  ${payopt('gift', _.payGift, _.payGiftD)}
+  ${S.pay === 'gift' ? `<div class="card" style="margin-top:-2px">
+    <label for="f-gift">${_.giftLabel}</label>
+    <input type="text" id="f-gift" placeholder="${esc(_.giftPh)}" value="${esc(S.giftCode)}" autocomplete="off" style="text-transform:uppercase">
+    <div class="field-err" id="e-gift">${_.giftErr}</div>
+  </div>` : ''}
   <label>${_.promoQ}</label><div class="promo">
     <input type="text" id="f-promo" placeholder="${_.promoPh}" value="${esc(S.promoCode)}">
   </div>
@@ -428,8 +434,10 @@ function vDone() {
   for (const bk of r.bookings) {
     lines += `<div class="row"><span class="l">${fmtDate(bk.date)}</span><span>${bk.time} · ${esc(bk.roomName)}</span></div>`;
   }
-  h(`<div class="center" style="margin-top:14px"><div class="done-icon">✓</div><h1>${_.doneH}</h1>
-  <p class="sub">${_.doneSent(esc(S.email))}<br>${_.doneRemind}</p></div>
+  const doneHead = r.giftPending
+    ? `<h1>${_.giftPendingH}</h1><p class="sub">${_.giftPendingP(esc(S.email))}</p>`
+    : `<h1>${_.doneH}</h1><p class="sub">${_.doneSent(esc(S.email))}<br>${_.doneRemind}</p>`;
+  h(`<div class="center" style="margin-top:14px"><div class="done-icon">✓</div>${doneHead}</div>
   <div class="sumbox">${lines}
   <div class="row total"><span>${_.sPrice}</span><span>${eur(r.amountCents)}</span></div></div>
   ${S.pay === 'paysera' ? `<div class="notice">${_.payLater}</div>` : ''}
@@ -489,6 +497,12 @@ async function doConfirm() {
   const _ = t();
   const promoEl = document.getElementById('f-promo') as HTMLInputElement | null;
   if (promoEl) S.promoCode = promoEl.value.trim();
+  const giftEl = document.getElementById('f-gift') as HTMLInputElement | null;
+  if (giftEl) S.giftCode = giftEl.value.trim().toUpperCase();
+  if (S.service !== 'rent' && S.pay === 'gift' && !S.giftCode) {
+    const e = document.getElementById('e-gift'); if (e) e.style.display = 'block';
+    return;
+  }
   S.busy = true; S.error = null; render();
 
   const body: any = {
@@ -505,6 +519,7 @@ async function doConfirm() {
     body.payment = 'package'; body.packageId = Number(S.pay.slice(4));
   } else {
     body.payment = S.pay;
+    if (S.pay === 'gift') body.giftCode = S.giftCode;
   }
 
   const { status, data } = await api('create', body);

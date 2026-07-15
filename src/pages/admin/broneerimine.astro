@@ -32,6 +32,15 @@ const pendingRents = await sql`
   WHERE b.type = 'rent' AND b.status = 'pending' AND b.date >= ${now.date}
   ORDER BY b.date, b.start_time
 `;
+
+// Kinkekaardiga broneeringud, mille koodi süsteem ei tundnud — vajavad käsitsi kontrolli
+const pendingGifts = await sql`
+  SELECT b.*, c.name AS client_name, c.email, c.phone, r.name AS room_name, s.name AS session_name
+  FROM bk_bookings b JOIN bk_clients c ON c.id = b.client_id JOIN bk_rooms r ON r.id = b.room_id
+  LEFT JOIN bk_sessions s ON s.id = b.session_id
+  WHERE b.payment = 'gift' AND b.status = 'pending' AND b.date >= ${now.date}
+  ORDER BY b.date, b.start_time
+`;
 // grupeeri tokeni juure järgi (mitu tundi = mitu rida sama juurega)
 const rentGroups: Record<string, any[]> = {};
 for (const r of pendingRents) {
@@ -100,6 +109,31 @@ const fmtD = (d: any) => dateStr(d).split('-').reverse().slice(0, 2).join('.');
     <a class="btn btn--outline" href="/admin/broneerimine/kliendid">Kliendid ja paketid</a>
     <a class="btn btn--outline" href="/admin/broneerimine/seaded">Seaded</a>
   </div>
+
+  {pendingGifts.length > 0 && (
+    <div class="panel" style="border-color:#8ecae6;background:#f2fbff">
+      <h2>Kinkekaardi kontrolli ootel ({pendingGifts.length})</h2>
+      <table class="admin-table">
+        <thead><tr><th>Kuupäev</th><th>Aeg</th><th>Teenus</th><th>Klient</th><th>Kinkekaardi kood</th><th></th></tr></thead>
+        <tbody>
+          {pendingGifts.map((g: any) => (
+            <tr>
+              <td>{fmtD(g.date)}</td>
+              <td>{hhmm(g.start_time)}</td>
+              <td>{g.session_name || (g.type === 'float' ? 'Floating' : g.room_name)}{g.seats > 1 ? ` · ${g.seats} kohta` : ''}</td>
+              <td>{g.client_name}<br /><small>{g.email} · {g.phone}</small></td>
+              <td><b style="letter-spacing:1px">{g.gift_code}</b></td>
+              <td style="white-space:nowrap">
+                <button class="btn" data-gift={g.token} data-approve="1">Kinnita</button>
+                <button class="btn btn--outline" data-gift={g.token} data-approve="">Lükka tagasi</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p style="font-size:13px;color:#666;margin:8px 0 0">Kinnitamisel saab klient kinnitusmeili. Tagasilükkamisel broneering tühistatakse (meili ei saadeta — helista kliendile).</p>
+    </div>
+  )}
 
   {Object.keys(rentGroups).length > 0 && (
     <div class="panel" style="border-color:#f0c36d;background:#fffbf2">
@@ -240,6 +274,15 @@ document.querySelectorAll('[data-rent]').forEach((btn) => {
     const approve = !!(btn as HTMLElement).dataset.approve;
     if (!confirm(approve ? 'Kinnitan rendisoovi? Klient saab meili.' : 'Lükkan rendisoovi tagasi? Klient saab meili.')) return;
     const { ok } = await act({ action: 'rent_decision', token: (btn as HTMLElement).dataset.rent, approve });
+    if (ok) location.reload(); else alert('Ebaõnnestus');
+  });
+});
+
+document.querySelectorAll('[data-gift]').forEach((btn) => {
+  btn.addEventListener('click', async () => {
+    const approve = !!(btn as HTMLElement).dataset.approve;
+    if (!confirm(approve ? 'Kinnitan kinkekaardi-broneeringu? Klient saab kinnitusmeili.' : 'Lükkan tagasi? Broneering tühistatakse, klient meili EI saa.')) return;
+    const { ok } = await act({ action: 'gift_decision', token: (btn as HTMLElement).dataset.gift, approve });
     if (ok) location.reload(); else alert('Ebaõnnestus');
   });
 });

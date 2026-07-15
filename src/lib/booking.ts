@@ -352,7 +352,7 @@ function newToken(): string {
 }
 
 export type CreateResult =
-  | { ok: true; bookings: { id: number; token: string; date: string; time: string; roomName: string }[]; amountCents: number }
+  | { ok: true; bookings: { id: number; token: string; date: string; time: string; roomName: string }[]; amountCents: number; giftPending?: boolean }
   | { ok: false; error: string; conflictTimes?: string[] };
 
 /**
@@ -366,9 +366,10 @@ export async function createBooking(input: {
   sessionId?: number; seats?: number;          // group
   rentRoom?: string; rentDate?: string; rentHours?: string[]; purpose?: string; // rent
   name: string; email: string; phone: string; locale: string;
-  payment: 'paysera' | 'cash' | 'package' | 'credit';
+  payment: 'paysera' | 'cash' | 'package' | 'credit' | 'gift';
   packageId?: number;
   promoCode?: string;
+  giftCode?: string;        // kinkekaardi kood (payment='gift')
   emailVerified: boolean;   // kood või seadmeküpsis kontrollitud (pakett/krediit/liikmehind)
 }): Promise<CreateResult> {
   const sql = requireDb();
@@ -439,15 +440,18 @@ export async function createBooking(input: {
     if (!grabbed.length) return { ok: false, error: 'full' };
 
     const token = newToken();
+    let payDone: any = null;
     try {
       const pay = await settlePayment(sql, client.id, input, price.totalCents, seats);
       if (!pay.ok) throw new Error(pay.error);
+      payDone = pay;
+      const status = pay.giftPending ? 'pending' : 'active';
       const rows = await sql`
         INSERT INTO bk_bookings (type, room_id, session_id, date, start_time, duration_min, seats,
-          client_id, status, payment, amount_cents, paid, package_id, promo_code, token, locale)
+          client_id, status, payment, amount_cents, paid, package_id, promo_code, gift_code, token, locale)
         VALUES ('group', ${sess.room_id}, ${sess.id}, ${date}, ${time}, ${sess.duration_min}, ${seats},
-          ${client.id}, 'active', ${input.payment}, ${price.totalCents}, ${pay.paid},
-          ${pay.packageId}, ${price.promo?.code || null}, ${token}, ${input.locale})
+          ${client.id}, ${status}, ${input.payment}, ${price.totalCents}, ${pay.paid},
+          ${pay.packageId}, ${price.promo?.code || null}, ${input.payment === 'gift' ? String(input.giftCode || '').trim().toUpperCase() : null}, ${token}, ${input.locale})
         RETURNING id
       `;
       if (pay.packageId) {
@@ -455,13 +459,14 @@ export async function createBooking(input: {
       }
       if (price.promo) await sql`UPDATE bk_promos SET used = used + 1 WHERE upper(code) = upper(${price.promo.code})`;
       return {
-        ok: true, amountCents: price.totalCents,
+        ok: true, amountCents: price.totalCents, giftPending: !!pay.giftPending,
         bookings: [{ id: rows[0].id, token, date, time, roomName: sess.name }],
       };
     } catch (e) {
       await sql`UPDATE bk_sessions SET booked = GREATEST(0, booked - ${seats}) WHERE id = ${sess.id}`;
+      if (payDone) await rollbackPayment(sql, client.id, payDone, seats);
       const msg = e instanceof Error ? e.message : 'error';
-      return { ok: false, error: ['no_package', 'no_credit'].includes(msg) ? msg : 'error' };
+      return { ok: false, error: ['no_package', 'no_credit', 'gift_code_required'].includes(msg) ? msg : 'error' };
     }
   }
 
@@ -473,9 +478,11 @@ export async function createBooking(input: {
     type: 'float', units: slots.length, member: !!isMember, promoCode: input.promoCode,
   });
 
-  // Makse enne (pakett/krediit); paysera/cash puhul paid=false / kohapeal
+  // Makse enne (pakett/krediit/kinkekaart); paysera/cash puhul paid=false / kohapeal
   const pay = await settlePayment(sql, client.id, input, price.totalCents, slots.length);
   if (!pay.ok) return { ok: false, error: pay.error };
+  const floatStatus = pay.giftPending ? 'pending' : 'active';
+  const giftCodeVal = input.payment === 'gift' ? String(input.giftCode || '').trim().toUpperCase() : null;
 
   const created: any[] = [];
   const conflicts: string[] = [];
@@ -489,10 +496,10 @@ export async function createBooking(input: {
     try {
       const rows = await sql`
         INSERT INTO bk_bookings (type, room_id, date, start_time, duration_min, client_id,
-          status, payment, amount_cents, paid, package_id, promo_code, token, locale)
+          status, payment, amount_cents, paid, package_id, promo_code, gift_code, token, locale)
         VALUES ('float', ${match.roomId}, ${slot.date}, ${slot.time}, 60, ${client.id},
-          'active', ${input.payment}, ${Math.round(price.totalCents / slots.length)}, ${pay.paid},
-          ${pay.packageId}, ${price.promo?.code || null}, ${token}, ${input.locale})
+          ${floatStatus}, ${input.payment}, ${Math.round(price.totalCents / slots.length)}, ${pay.paid},
+          ${pay.packageId}, ${price.promo?.code || null}, ${giftCodeVal}, ${token}, ${input.locale})
         RETURNING id
       `;
       if (pay.packageId) {
@@ -513,13 +520,17 @@ export async function createBooking(input: {
     // osa aegu ebaõnnestus: tagasta kasutamata paketikorrad
     await sql`UPDATE bk_packages SET used_sessions = GREATEST(0, used_sessions - ${conflicts.length}) WHERE id = ${pay.packageId}`;
   }
+  if (conflicts.length && pay.kind === 'gift' && pay.giftId) {
+    // osa aegu ebaõnnestus: tagasta kasutamata kinkekaardi korrad
+    await sql`UPDATE bk_giftcards SET sessions_used = GREATEST(0, sessions_used - ${conflicts.length}), used_at = NULL WHERE id = ${pay.giftId}`;
+  }
   if (price.promo) await sql`UPDATE bk_promos SET used = used + 1 WHERE upper(code) = upper(${price.promo.code})`;
-  return { ok: true, bookings: created, amountCents: price.totalCents };
+  return { ok: true, bookings: created, amountCents: price.totalCents, giftPending: !!pay.giftPending };
 }
 
-/** Paketi/krediidi "maksmine". paysera → paid=false (makse kinnitab callback), cash → kohapeal. */
+/** Paketi/krediidi/kinkekaardi "maksmine". paysera → paid=false (makse kinnitab callback), cash → kohapeal. */
 async function settlePayment(sql: any, clientId: number, input: any, totalCents: number, units: number):
-  Promise<{ ok: true; paid: boolean; packageId: number | null } | { ok: false; error: string }> {
+  Promise<{ ok: true; paid: boolean; packageId: number | null; kind: string; giftId?: number | null; giftPending?: boolean } | { ok: false; error: string }> {
   if (input.payment === 'package') {
     const now = nowTallinn();
     const rows = await sql`
@@ -529,22 +540,37 @@ async function settlePayment(sql: any, clientId: number, input: any, totalCents:
       RETURNING id
     `;
     if (!rows.length) return { ok: false, error: 'no_package' };
-    return { ok: true, paid: true, packageId: rows[0].id };
+    return { ok: true, paid: true, packageId: rows[0].id, kind: 'package' };
   }
   if (input.payment === 'credit') {
     const bal = await sql`SELECT COALESCE(SUM(amount_cents),0) AS c FROM bk_credits WHERE client_id = ${clientId}`;
     if (Number(bal[0].c) < totalCents) return { ok: false, error: 'no_credit' };
     await sql`INSERT INTO bk_credits (client_id, amount_cents, note) VALUES (${clientId}, ${-totalCents}, 'Broneeringu eest')`;
-    return { ok: true, paid: true, packageId: null };
+    return { ok: true, paid: true, packageId: null, kind: 'credit' };
+  }
+  if (input.payment === 'gift') {
+    // Kinkekaart: kood on Make'i kaudu bk_giftcards tabelis → lunasta aatomiliselt.
+    // Tundmatu/ammendunud kood EI blokeeri broneerimist: läheb 'pending' olekusse
+    // ja admin kontrollib käsitsi (koodid ei pruugi veel DB-s olla).
+    const code = String(input.giftCode || '').trim().toUpperCase();
+    if (!code) return { ok: false, error: 'gift_code_required' };
+    const rows = await sql`
+      UPDATE bk_giftcards SET sessions_used = sessions_used + ${units},
+        used_at = CASE WHEN sessions_used + ${units} >= sessions THEN now() ELSE used_at END
+      WHERE upper(code) = ${code} AND sessions_used + ${units} <= sessions
+      RETURNING id
+    `;
+    if (rows.length) return { ok: true, paid: true, packageId: null, kind: 'gift', giftId: rows[0].id };
+    return { ok: true, paid: false, packageId: null, kind: 'gift', giftId: null, giftPending: true };
   }
   // paysera: makse algatatakse eraldi sammuna; cash: kohapeal
-  return { ok: true, paid: false, packageId: null };
+  return { ok: true, paid: false, packageId: null, kind: input.payment };
 }
 
 async function rollbackPayment(sql: any, clientId: number, pay: any, units: number) {
-  if (pay.packageId) {
+  if (pay.kind === 'package' && pay.packageId) {
     await sql`UPDATE bk_packages SET used_sessions = GREATEST(0, used_sessions - ${units}) WHERE id = ${pay.packageId}`;
-  } else {
+  } else if (pay.kind === 'credit') {
     // krediidi tagastus: leia viimane negatiivne rida ja kompenseeri
     const last = await sql`
       SELECT id, amount_cents FROM bk_credits
@@ -553,7 +579,10 @@ async function rollbackPayment(sql: any, clientId: number, pay: any, units: numb
     if (last[0]) {
       await sql`INSERT INTO bk_credits (client_id, amount_cents, note) VALUES (${clientId}, ${-last[0].amount_cents}, 'Tagastus: ajad läksid kinni')`;
     }
+  } else if (pay.kind === 'gift' && pay.giftId) {
+    await sql`UPDATE bk_giftcards SET sessions_used = GREATEST(0, sessions_used - ${units}), used_at = NULL WHERE id = ${pay.giftId}`;
   }
+  // paysera/cash: midagi tagastada pole (makset ei toimunud)
 }
 
 // ---------- Tühistamine ----------
@@ -611,6 +640,11 @@ export async function cancelByToken(token: string):
         INSERT INTO bk_credits (client_id, amount_cents, booking_id, note)
         VALUES (${b.client_id}, ${b.amount_cents}, ${b.id}, 'Tühistatud broneeringu ettemaks')
       `;
+    }
+    // kinkekaardiga makstud → korrad kaardile tagasi
+    if (b.paid && b.payment === 'gift' && b.gift_code) {
+      const n = b.type === 'group' ? (b.seats || 1) : 1;
+      await sql`UPDATE bk_giftcards SET sessions_used = GREATEST(0, sessions_used - ${n}), used_at = NULL WHERE upper(code) = ${String(b.gift_code).toUpperCase()}`;
     }
   }
   if (!cancelled) return { ok: false, error: 'too_late' };
@@ -721,6 +755,10 @@ export async function adminCancelBooking(bookingId: number) {
       VALUES (${b.client_id}, ${b.amount_cents}, ${b.id}, 'Admini tühistatud broneeringu ettemaks')
     `;
   }
+  if (b.paid && b.payment === 'gift' && b.gift_code) {
+    const n = b.type === 'group' ? (b.seats || 1) : 1;
+    await sql`UPDATE bk_giftcards SET sessions_used = GREATEST(0, sessions_used - ${n}), used_at = NULL WHERE upper(code) = ${String(b.gift_code).toUpperCase()}`;
+  }
   return { ok: true as const, booking: b };
 }
 
@@ -732,6 +770,26 @@ export async function rentDecision(token: string, approve: boolean) {
   if (!pend.length) return { ok: false as const, error: 'not_found' };
   for (const b of pend) {
     await sql`UPDATE bk_bookings SET status = ${approve ? 'active' : 'rejected'} WHERE id = ${b.id}`;
+  }
+  return { ok: true as const, rows: pend };
+}
+
+/** Kinkekaardi-broneeringu otsus: admin kontrollis koodi käsitsi.
+ * Kinnita (pending→active, paid=true) või lükka tagasi (pending→rejected; grupil vabasta kohad). */
+export async function giftDecision(token: string, approve: boolean) {
+  const sql = requireDb();
+  const rows = await getBookingByToken(token);
+  const pend = rows.filter((r: any) => r.status === 'pending' && r.payment === 'gift');
+  if (!pend.length) return { ok: false as const, error: 'not_found' };
+  for (const b of pend) {
+    if (approve) {
+      await sql`UPDATE bk_bookings SET status = 'active', paid = true WHERE id = ${b.id}`;
+    } else {
+      await sql`UPDATE bk_bookings SET status = 'rejected' WHERE id = ${b.id}`;
+      if (b.type === 'group' && b.session_id) {
+        await sql`UPDATE bk_sessions SET booked = GREATEST(0, booked - ${b.seats || 1}) WHERE id = ${b.session_id}`;
+      }
+    }
   }
   return { ok: true as const, rows: pend };
 }

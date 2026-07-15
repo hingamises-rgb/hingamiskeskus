@@ -5,10 +5,10 @@ export const prerender = false;
 import type { APIRoute } from 'astro';
 import { requireDb } from '../../../lib/db';
 import {
-  adminCancelBooking, rentDecision, adminManualBooking, generateSessions, cancelSession,
-  hhmm, dateStr, nowTallinn,
+  adminCancelBooking, rentDecision, giftDecision, adminManualBooking, generateSessions, cancelSession,
+  hhmm, dateStr, nowTallinn, minToTime, timeToMin,
 } from '../../../lib/booking';
-import { sendCancelled, sendRentDecision, humanDate } from '../../../lib/booking-emails';
+import { sendCancelled, sendRentDecision, sendConfirmation, humanDate } from '../../../lib/booking-emails';
 
 export const POST: APIRoute = async ({ request }) => {
   let b: any;
@@ -62,6 +62,30 @@ export const POST: APIRoute = async ({ request }) => {
             humanDate(dateStr(first.date), first.locale || 'et'), hours, approve,
           );
         } catch (e) { console.error('rent decision email failed', e); }
+        return json({ ok: true });
+      }
+
+      // --- kinkekaart ---
+      case 'gift_decision': {
+        const approve = !!b.approve;
+        const res = await giftDecision(String(b.token || ''), approve);
+        if (!res.ok) return json(res, 404);
+        // kinnitamisel saada tavaline kinnitusmeil (loomisel jäi saatmata)
+        if (approve) {
+          for (const bk of res.rows) {
+            try {
+              const time = hhmm(bk.start_time);
+              const end = minToTime(timeToMin(time) + (bk.type === 'group' ? 120 : 60));
+              await sendConfirmation({
+                to: bk.email, name: bk.client_name || '', locale: bk.locale || 'et',
+                serviceName: bk.session_name || (bk.type === 'float' ? 'floating' : bk.room_name),
+                type: bk.type, roomName: bk.room_name,
+                dateHuman: humanDate(dateStr(bk.date), bk.locale || 'et'),
+                timeRange: `${time} - ${end}`, token: bk.token,
+              });
+            } catch (e) { console.error('gift confirm email failed', e); }
+          }
+        }
         return json({ ok: true });
       }
 

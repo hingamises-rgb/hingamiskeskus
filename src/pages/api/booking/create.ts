@@ -26,7 +26,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return json({ error: 'invalid_contact' }, 400);
   }
 
-  const payment = ['paysera', 'cash', 'package', 'credit'].includes(b.payment) ? b.payment : 'cash';
+  const payment = ['paysera', 'cash', 'package', 'credit', 'gift'].includes(b.payment) ? b.payment : 'cash';
+  const giftCode = payment === 'gift' ? String(b.giftCode || '').trim().slice(0, 60) : undefined;
+  if (payment === 'gift' && !giftCode) return json({ error: 'gift_code_required' }, 400);
   const emailVerified = verifyDeviceToken(cookies.get('hk_bk_dev')?.value, email);
 
   // sisendi valideerimine tüübi kaupa
@@ -58,6 +60,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       name, email, phone, locale,
       payment, packageId: b.packageId ? Number(b.packageId) : undefined,
       promoCode: b.promoCode ? String(b.promoCode).slice(0, 40) : undefined,
+      giftCode,
       emailVerified,
     });
 
@@ -68,9 +71,13 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       return json(result, status);
     }
 
-    // Meilid (ebaõnnestumine ei nurja broneeringut — logime)
+    // Meilid (ebaõnnestumine ei nurja broneeringut — logime).
+    // Ootel kinkekaardi-broneeringule kinnitust EI saadeta — admin kontrollib koodi enne.
     try {
-      if (type === 'rent') {
+      if (result.giftPending) {
+        // teavita adminit, et on käsitsi kontrollitav kinkekaardi kood
+        console.log('gift pending booking', result.bookings.map((x) => x.token).join(','));
+      } else if (type === 'rent') {
         const hours = rentHours!.sort().join(', ');
         const roomName = rentRoom === 'suur-saal' ? 'Suur saal' : 'Väike tuba';
         await sendRentReceived(email, locale, roomName, humanDate(rentDate!, locale), hours);

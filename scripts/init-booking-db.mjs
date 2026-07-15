@@ -121,6 +121,7 @@ await sql`
     paid BOOLEAN NOT NULL DEFAULT false,
     package_id INT REFERENCES bk_packages(id),
     promo_code TEXT,
+    gift_code TEXT,                  -- kinkekaardi kood (payment='gift')
     token TEXT UNIQUE NOT NULL,      -- tühistamislingi salajane token
     purpose TEXT,                    -- rendi otstarve
     locale TEXT NOT NULL DEFAULT 'et',
@@ -181,6 +182,22 @@ await sql`
     max_uses INT,
     used INT NOT NULL DEFAULT 0,
     active BOOLEAN NOT NULL DEFAULT true
+  )
+`;
+
+// Kinkekaardid (Make registreerib genereeritud koodid /api/booking/giftcard-register kaudu;
+// broneerimisel lunastatakse aatomiliselt, tundmatu kood → broneering 'pending' + admini kontroll)
+await sql`
+  CREATE TABLE IF NOT EXISTS bk_giftcards (
+    id SERIAL PRIMARY KEY,
+    code TEXT UNIQUE NOT NULL,           -- suurtähtedena normaliseeritud
+    sessions INT NOT NULL DEFAULT 1,     -- 40€=1, 80€=2, 120€=3 seanssi
+    sessions_used INT NOT NULL DEFAULT 0,
+    amount_cents INT,
+    source TEXT DEFAULT 'make',
+    note TEXT,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    used_at TIMESTAMPTZ
   )
 `;
 
