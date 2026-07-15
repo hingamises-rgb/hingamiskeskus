@@ -296,7 +296,12 @@ for (const p of allProducts) {
     text-align: center;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
+  /* Nupp alati kaardi allservas — kahe reaga pealkiri ei aja rida paigast */
+  .product-card__btn { margin-top: auto; align-self: center; }
+  .product-card__title { min-height: calc(2 * 1.4em + 16px); }
   .product-card__ribbon {
     position: absolute;
     top: 12px;
