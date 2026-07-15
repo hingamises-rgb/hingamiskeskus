@@ -255,7 +255,7 @@ for (const p of allProducts) {
     margin-bottom: 6px;
   }
   .shop-intro p {
-    font-size: 14px;
+    font-size: 18px;
     color: #333;
     line-height: 1.7;
     margin-bottom: 8px;
@@ -312,6 +312,19 @@ for (const p of allProducts) {
   }
   #paketid .product-card__img {
     aspect-ratio: 768/431;
+    object-fit: cover;
+  }
+  /* Kindel kõrgus, et lazy-load ei nihutaks ankruhüpet (soolad→vitamiinid viga) */
+  #kinkekaardid .product-card__img {
+    aspect-ratio: 768/431;
+    object-fit: cover;
+  }
+  #vitamiinid .product-card__img {
+    aspect-ratio: 400/768;
+    object-fit: cover;
+  }
+  #epsomi-sool .product-card__img {
+    aspect-ratio: 1/1;
     object-fit: cover;
   }
   .product-card--sold-out .product-card__img {
@@ -397,7 +410,7 @@ for (const p of allProducts) {
   }
   .footer__contact p,
   .footer__hours p {
-    font-size: 13px;
+    font-size: 18px;
     line-height: 1.8;
   }
   .footer__hours {
