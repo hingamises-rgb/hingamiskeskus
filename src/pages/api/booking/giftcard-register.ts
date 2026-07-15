@@ -17,7 +17,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   const code = String(b.code || '').trim().toUpperCase().slice(0, 60);
   const amount = Number(b.amount) || 0;
-  if (!code || code.length < 4) return json({ error: 'invalid_code' }, 400);
+  if (!code || code.length < 3) return json({ error: 'invalid_code' }, 400);
 
   // 40€ = 1 seanss, 80€ = 2, 120€ = 3; muu summa → vähemalt 1 seanss
   const sessions = Math.max(1, Math.min(10, Math.round(amount / 40)));
