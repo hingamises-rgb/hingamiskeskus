@@ -8,18 +8,18 @@ import Footer from '../../components/Footer.astro';
 // muudatused jõustuvad e-poes järgmise deploy'ga.
 const sql = requireDb();
 const allProducts = await sql`
-  SELECT slug, page_slug_ru, COALESCE(title_ru, title) AS title, COALESCE(alt_ru, alt) AS alt,
-         image, cart_name, price, old_price,
-         CASE WHEN price_prefix = 'Al.' THEN 'от' ELSE price_prefix END AS price_prefix,
+  SELECT slug, page_slug_en, COALESCE(title_en, title) AS title, COALESCE(alt_en, alt) AS alt,
+         image, title_en, price, old_price,
+         CASE WHEN price_prefix = 'Al.' THEN 'From' ELSE price_prefix END AS price_prefix,
          category, sold_out
   FROM products WHERE active = true ORDER BY sort, slug
 `;
 
 const CATEGORIES = [
-  { id: 'kinkekaardid', title: 'Подарочные карты' },
-  { id: 'paketid', title: 'Пакеты' },
-  { id: 'vitamiinid', title: 'Витамины' },
-  { id: 'epsomi-sool', title: 'Соль Эпсома' },
+  { id: 'kinkekaardid', title: 'Gift cards' },
+  { id: 'paketid', title: 'Packages' },
+  { id: 'vitamiinid', title: 'Vitamins' },
+  { id: 'epsomi-sool', title: 'Epsom salt' },
 ];
 
 const byCategory = new Map(CATEGORIES.map(c => [c.id, []]));
@@ -31,8 +31,8 @@ function fmtPrice(v: unknown) {
   return `€${Number(v).toFixed(2)}`;
 }
 
-// Ostukorvi jaoks: slug -> { name, price }. Nimi venekeelne (title_ru) —
-// kasutaja lisab Make'i kinkekaardi-automaatikasse venekeelsed read ise.
+// Ostukorvi jaoks: slug -> { name, price }. Nimi ingliskeelne (title_en) —
+// kasutaja lisab Make'i kinkekaardi-automaatikasse ingliskeelsed read ise.
 const PRODUCTS_DATA: Record<string, { name: string; price: number }> = {};
 for (const p of allProducts) {
   if (!p.sold_out) PRODUCTS_DATA[p.slug] = { name: p.title, price: Number(p.price) };
@@ -40,40 +40,40 @@ for (const p of allProducts) {
 ---
 
 <Layout
-  title="Интернет-магазин Хингамискескус: соль Эпсома, витамины и пакеты"
-  description="Интернет-магазин Хингамискескус предлагает соль Эпсома, витамины и пакеты для расслабления. У нас есть подарочные карты и товары для восстановления тела и снятия стресса."
-  keywords="соль Эпсома, пакеты, интернет-магазин Хингамискескус"
-  lang="ru"
+  title="Hingamiskeskus Shop – Epsom Salt & Gift Cards"
+  description="Hingamiskeskus shop offers Epsom salt, vitamins, gift cards and session packages. Order online and support your wellbeing with our carefully selected products!"
+  keywords="Hingamiskeskus shop"
+  lang="en"
   alternates={{ et: '/e-pood', ru: '/ru/onlajn-shop', en: '/en/shop' }}
 >
 
 <!-- HEADER -->
-<Header active="epood" lang="ru" altHref="/e-pood" />
+<Header active="epood" lang="en" />
 
 <!-- PAGE TITLE -->
 <section class="page-hero">
-  <h1 class="page-hero__title">Интернет-магазин</h1>
+  <h1 class="page-hero__title">Shop</h1>
 </section>
 
 <!-- CATEGORY NAV -->
 <nav class="cat-nav">
-  <a href="#kinkekaardid" class="cat-nav__btn">ПОДАРОЧНЫЕ КАРТЫ</a>
-  <a href="#paketid" class="cat-nav__btn">ПАКЕТЫ</a>
-  <a href="#vitamiinid" class="cat-nav__btn">ВИТАМИНЫ</a>
-  <a href="#epsomi-sool" class="cat-nav__btn">СОЛЬ ЭПСОМА</a>
+  <a href="#kinkekaardid" class="cat-nav__btn">GIFT CARDS</a>
+  <a href="#paketid" class="cat-nav__btn">PACKAGES</a>
+  <a href="#vitamiinid" class="cat-nav__btn">VITAMINS</a>
+  <a href="#epsomi-sool" class="cat-nav__btn">EPSOM SALT</a>
 </nav>
 
 <!-- INTRO TEXT -->
 <section class="shop-intro">
-  <h2 class="shop-intro__heading">Интернет-магазин Центра дыхания</h2>
-  <p>В интернет-магазине Центра дыхания ты найдёшь всё, что поддерживает твоё благополучие и расслабление как дома, так и в нашем центре.</p>
+  <h2 class="shop-intro__heading">Hingamiskeskus shop</h2>
+  <p>In the Hingamiskeskus shop you will find everything that supports your well-being and relaxation, both at home and at our center.</p>
 
-  <h3 class="shop-intro__subheading">Подарочные карты и пакеты</h3>
-  <p>Все наши подарочные карты и пакеты можно гибко использовать как для сеансов флоатинга, так и для сеансов освобождающего дыхания. Каждый раз ты сам выбираешь, какой опыт тебе нужен. Карты на несколько сеансов можно использовать внутри семьи, по одной карте сеансы могут бронировать и другие члены семьи.</p>
-  <p><strong>Подарочные карты</strong> это отличный подарок близким. Отправим карту на электронную почту, или при желании можешь сам забрать физическую карту. Карты действительны 6 месяцев.</p>
+  <h3 class="shop-intro__subheading">Gift cards and packages</h3>
+  <p>All our gift cards and packages can be used flexibly for both floating sessions and breathwork sessions. Each time you choose which experience you need. Session cards can also be used within the household, meaning that other family members can book sessions with a single card.</p>
+  <p><strong>Gift cards</strong> are a great gift for loved ones. We send the card by email, or if you wish you can pick up a physical card yourself. The cards are valid for 6 months.</p>
 
-  <h3 class="shop-intro__subheading">Соль Эпсома</h3>
-  <p>В нашем магазине пять разных видов соли Эпсома: чистая соль и варианты с эфирными маслами, которые делают домашнюю ванну особенно расслабляющей и приятно пахнущей. Соль Эпсома содержит магний, который помогает расслабить мышцы, успокаивает нервную систему и способствует лучшему сну. Идеальный выбор для ежедневного восстановления и расслабления дома.</p>
+  <h3 class="shop-intro__subheading">Epsom salt</h3>
+  <p>Our shop offers five different Epsom salts: pure salt and versions with essential oils that make a home bath especially relaxing and pleasantly scented. Epsom salt contains magnesium, which helps relax the muscles, calms the nervous system and supports better sleep. An ideal choice for everyday recovery and relaxation at home too.</p>
 </section>
 
 <!-- TOOTED (andmebaasist, kategooriate kaupa) -->
@@ -85,7 +85,7 @@ for (const p of allProducts) {
         p.sold_out ? (
           <div class="product-card product-card--sold-out">
             <div class="product-card__ribbon">SOLD OUT</div>
-            <a href={p.page_slug_ru ? `/ru/${p.page_slug_ru}` : '/ru/onlajn-shop'} class="product-card__link">
+            <a href={p.page_slug_en ? `/en/${p.page_slug_en}` : '/en/shop'} class="product-card__link">
               <img src={p.image} alt={p.alt} class="product-card__img" loading="lazy" />
               <h3 class="product-card__title">{p.title}</h3>
             </a>
@@ -93,12 +93,12 @@ for (const p of allProducts) {
           </div>
         ) : (
           <div class="product-card">
-            <a href={p.page_slug_ru ? `/ru/${p.page_slug_ru}` : '/ru/onlajn-shop'} class="product-card__link">
+            <a href={p.page_slug_en ? `/en/${p.page_slug_en}` : '/en/shop'} class="product-card__link">
               <img src={p.image} alt={p.alt} class="product-card__img" loading="lazy" />
               <h3 class="product-card__title">{p.title}</h3>
             </a>
             <p class="product-card__price">{p.price_prefix ? p.price_prefix + ' ' : ''}{p.old_price && <><span class="price--old">{fmtPrice(p.old_price)}</span>{' '}</>}{fmtPrice(p.price)}</p>
-            <button class="product-card__btn" data-product={p.slug}>В КОРЗИНУ</button>
+            <button class="product-card__btn" data-product={p.slug}>ADD TO CART</button>
           </div>
         )
       ))}
@@ -106,7 +106,7 @@ for (const p of allProducts) {
   </section>
 ))}
 
-<Footer lang="ru" />
+<Footer lang="en" />
 
 </Layout>
 
@@ -156,9 +156,9 @@ for (const p of allProducts) {
     btn.addEventListener('click', function() {
       var productId = this.getAttribute('data-product');
       addToCart(productId);
-      this.textContent = 'ДОБАВЛЕНО ✓';
+      this.textContent = 'ADDED ✓';
       var self = this;
-      setTimeout(function() { self.textContent = 'В КОРЗИНУ'; }, 1500);
+      setTimeout(function() { self.textContent = 'ADD TO CART'; }, 1500);
     });
   });
 

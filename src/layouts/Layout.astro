@@ -8,9 +8,9 @@ interface Props {
   image?: string;
   type?: string;
   noindex?: boolean;
-  lang?: 'et' | 'ru';
-  /** Sama lehe teiste keelte URL-id hreflang jaoks, nt { et: '/teenused', ru: '/ru/uslugi' } */
-  alternates?: Partial<Record<'et' | 'ru', string>>;
+  lang?: 'et' | 'ru' | 'en';
+  /** Sama lehe teiste keelte URL-id hreflang jaoks, nt { et: '/teenused', ru: '/ru/uslugi', en: '/en/services' } */
+  alternates?: Partial<Record<'et' | 'ru' | 'en', string>>;
   /** Lehespetsiifiline JSON-LD schema (nt FAQPage, Product, BlogPosting) */
   schema?: object | object[];
 }
@@ -29,7 +29,7 @@ const {
 const SITE = 'https://www.hingamiskeskus.ee';
 const canonicalUrl = SITE + Astro.url.pathname;
 const ogImage = image.startsWith('http') ? image : SITE + image;
-const ogLocale = lang === 'ru' ? 'ru_RU' : 'et_EE';
+const ogLocale = lang === 'ru' ? 'ru_RU' : lang === 'en' ? 'en_GB' : 'et_EE';
 
 // Saidiülene LocalBusiness JSON-LD (AI-otsingud ja Google loevad faktid otse siit).
 // NB: andmed peavad klappima jaluse ja Google Business Profile'iga (NAP-konsistentsus).
@@ -42,6 +42,8 @@ const LOCAL_BUSINESS = {
   description:
     lang === 'ru'
       ? 'Флоатинг и освобождающее дыхание в Таллине: глубокое расслабление, снятие стресса и восстановление.'
+      : lang === 'en'
+      ? 'Floating and breathwork in Tallinn: deep relaxation, stress relief and recovery.'
       : 'Floating ja vabastav hingamine Tallinnas: süvalõõgastus, stressi leevendus ja taastumine.',
   url: SITE,
   logo: `${SITE}/images/logo.svg`,
@@ -80,6 +82,7 @@ const pageSchemas = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
   <link rel="canonical" href={canonicalUrl} />
   {alternates?.et && <link rel="alternate" hreflang="et" href={SITE + alternates.et} />}
   {alternates?.ru && <link rel="alternate" hreflang="ru" href={SITE + alternates.ru} />}
+  {alternates?.en && <link rel="alternate" hreflang="en" href={SITE + alternates.en} />}
   {alternates?.et && <link rel="alternate" hreflang="x-default" href={SITE + alternates.et} />}
 
   <!-- Open Graph (Facebook, WhatsApp jt jagamised) -->

@@ -2,59 +2,35 @@
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-import { readdir, readFile } from 'node:fs/promises';
-import { join } from 'node:path';
 import { requireDb } from '../../lib/db';
 
-// Venekeelsed tootelehed + blogiartiklid (vanalt saidilt migreeritud, /ru/<slug>).
-// Ostukorvi nimi on venekeelne (title_ru) — kasutaja lisab Make'i venekeelsed read ise.
+// Ingliskeelsed tootelehed (/en/<slug>). Inglise blogi ei ole.
+// Ostukorvi nimi on ingliskeelne (title_en) — kasutaja lisab Make'i inglise read ise.
 export async function getStaticPaths() {
-  const paths = [];
-
-  // Venekeelsed blogiartiklid
-  const dir = join(process.cwd(), 'src', 'content', 'blogi-ru');
-  const files = await readdir(dir);
-  for (const file of files) {
-    if (!file.endsWith('.json')) continue;
-    const article = JSON.parse(await readFile(join(dir, file), 'utf8'));
-    paths.push({
-      params: { slug: article.slug },
-      props: { article },
-    });
-  }
-
   const sql = requireDb();
   const products = await sql`
-    SELECT slug, page_slug, page_slug_ru, page_slug_en, image, cart_name,
-           COALESCE(title_ru, title) AS title,
-           COALESCE(subtitle_ru, subtitle) AS subtitle,
-           COALESCE(description_ru, description) AS description,
-           COALESCE(ribbon_ru, ribbon) AS ribbon,
-           COALESCE(alt_ru, alt) AS alt,
+    SELECT slug, page_slug, page_slug_en, page_slug_ru, image, cart_name,
+           COALESCE(title_en, title) AS title,
+           COALESCE(subtitle_en, subtitle) AS subtitle,
+           COALESCE(description_en, description) AS description,
+           COALESCE(ribbon_en, ribbon) AS ribbon,
+           COALESCE(alt_en, alt) AS alt,
            price, old_price,
-           CASE WHEN price_prefix = 'Al.' THEN 'от' ELSE price_prefix END AS price_prefix,
+           CASE WHEN price_prefix = 'Al.' THEN 'From' ELSE price_prefix END AS price_prefix,
            category, sold_out,
-           meta_title_ru, meta_description_ru
-    FROM products WHERE page_slug_ru IS NOT NULL AND active = true
+           meta_title_en, meta_description_en
+    FROM products WHERE page_slug_en IS NOT NULL AND active = true
   `;
-  for (const product of products) {
-    paths.push({
-      params: { slug: product.page_slug_ru },
-      props: { product },
-    });
-  }
-
-  return paths;
+  return products.map((product) => ({
+    params: { slug: product.page_slug_en },
+    props: { product },
+  }));
 }
 
-const { article, product } = Astro.props;
-const publishedDate = article?.publishedTime
-  ? new Date(article.publishedTime).toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' })
-  : '';
+const { product } = Astro.props;
 
-// Artiklitel title ilma lisata (nagu vanal saidil), toodetel oma meta
-const pageTitle = article ? article.title : (product.meta_title_ru || `${product.title} | Hingamiskeskus`);
-const pageDesc = article ? (article.description || article.title) : (product.meta_description_ru || product.subtitle || product.title);
+const pageTitle = product.meta_title_en || `${product.title} | Hingamiskeskus`;
+const pageDesc = product.meta_description_en || product.subtitle || product.title;
 
 const cartProduct = product && !product.sold_out
   ? { id: product.slug, name: product.title, price: Number(product.price) }
@@ -67,69 +43,34 @@ function fmtPrice(v: unknown) {
 // JSON-LD: artiklitele BlogPosting, toodetele Product (AI-otsingud ja rich results)
 const SCHEMA_SITE = 'https://www.hingamiskeskus.ee';
 const stripHtml = (h: unknown) => String(h || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-const pageSchema = article
-  ? {
-      '@type': 'BlogPosting',
-      headline: article.title,
-      description: article.description || '',
-      image: article.image ? SCHEMA_SITE + article.image : undefined,
-      datePublished: article.publishedTime || undefined,
-      dateModified: article.modifiedTime || article.publishedTime || undefined,
-      inLanguage: 'ru',
-      mainEntityOfPage: SCHEMA_SITE + article.path,
-      author: { '@type': 'Organization', name: 'Hingamiskeskus' },
-      publisher: { '@id': `${SCHEMA_SITE}/#organization` },
-    }
-  : {
-      '@type': 'Product',
-      name: product.title,
-      image: SCHEMA_SITE + product.image,
-      description: stripHtml(product.subtitle || '') || stripHtml(product.description).slice(0, 300),
-      sku: product.slug,
-      brand: { '@type': 'Brand', name: 'Hingamiskeskus' },
-      offers: {
-        '@type': 'Offer',
-        price: Number(product.price).toFixed(2),
-        priceCurrency: 'EUR',
-        availability: product.sold_out ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
-        url: `${SCHEMA_SITE}/ru/${product.page_slug_ru}`,
-      },
-    };
+const pageSchema = {
+  '@type': 'Product',
+  name: product.title,
+  image: SCHEMA_SITE + product.image,
+  description: stripHtml(product.subtitle || '') || stripHtml(product.description).slice(0, 300),
+  sku: product.slug,
+  brand: { '@type': 'Brand', name: 'Hingamiskeskus' },
+  offers: {
+    '@type': 'Offer',
+    price: Number(product.price).toFixed(2),
+    priceCurrency: 'EUR',
+    availability: product.sold_out ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
+    url: `${SCHEMA_SITE}/en/${product.page_slug_en}`,
+  },
+};
 ---
 
 <Layout
   title={pageTitle}
   description={pageDesc}
-  image={article ? article.image : product.image}
-  type={article ? 'article' : 'website'}
-  lang="ru"
-  alternates={product ? { et: `/${product.page_slug}`, ru: `/ru/${product.page_slug_ru}`, ...(product.page_slug_en ? { en: `/en/${product.page_slug_en}` } : {}) } : undefined}
+  image={product.image}
+  lang="en"
+  alternates={{ et: `/${product.page_slug}`, en: `/en/${product.page_slug_en}`, ...(product.page_slug_ru ? { ru: `/ru/${product.page_slug_ru}` } : {}) }}
   schema={pageSchema}
 >
 
-<Header active={article ? 'blogi' : 'epood'} lang="ru" alts={product ? { et: `/${product.page_slug}`, ...(product.page_slug_en ? { en: `/en/${product.page_slug_en}` } : {}) } : undefined} />
+<Header active="epood" lang="en" alts={{ et: `/${product.page_slug}`, ...(product.page_slug_ru ? { ru: `/ru/${product.page_slug_ru}` } : {}) }} />
 
-{article && (
-<article class="article">
-  <div class="article__hero">
-    <h1 class="article__title">{article.title}</h1>
-    {article.description && <p class="article__lead">{article.description}</p>}
-    {publishedDate && <p class="article__meta">{publishedDate} · Центр дыхания</p>}
-  </div>
-
-  {article.image && (
-    <img src={article.image} alt={article.imageAlt || article.title} class="article__image" />
-  )}
-
-  <div class="article__body" set:html={article.body}></div>
-
-  <div class="article__cta">
-    <a href="/ru/blog" class="article__cta-link">← Назад в блог</a>
-  </div>
-</article>
-)}
-
-{product && (
 <section class="product">
   <div class="product__grid">
     <div class="product__image-wrap">
@@ -146,11 +87,11 @@ const pageSchema = article
       {!product.sold_out && (
         <div class="product__buy">
           <div class="product__qty">
-            <button type="button" class="product__qty-btn" id="qty-minus" aria-label="Уменьшить количество">−</button>
+            <button type="button" class="product__qty-btn" id="qty-minus" aria-label="Decrease quantity">−</button>
             <span class="product__qty-value" id="qty-value">1</span>
-            <button type="button" class="product__qty-btn" id="qty-plus" aria-label="Увеличить количество">+</button>
+            <button type="button" class="product__qty-btn" id="qty-plus" aria-label="Increase quantity">+</button>
           </div>
-          <button type="button" class="product__add" id="add-to-cart">ДОБАВИТЬ В КОРЗИНУ</button>
+          <button type="button" class="product__add" id="add-to-cart">ADD TO CART</button>
         </div>
       )}
 
@@ -158,13 +99,12 @@ const pageSchema = article
         <div class="product__desc" set:html={product.description}></div>
       )}
 
-      <a href="/ru/onlajn-shop" class="product__back">← Назад в интернет-магазин</a>
+      <a href="/en/shop" class="product__back">← Back to shop</a>
     </div>
   </div>
 </section>
-)}
 
-<Footer lang="ru" />
+<Footer lang="en" />
 
 </Layout>
 
@@ -210,8 +150,8 @@ const pageSchema = article
     if (existing) existing.qty += qty;
     else cart.push({ id: cartProduct.id, name: cartProduct.name, price: cartProduct.price, qty: qty });
     saveCart(cart);
-    addBtn.textContent = 'ДОБАВЛЕНО ✓';
-    setTimeout(function() { addBtn.textContent = 'ДОБАВИТЬ В КОРЗИНУ'; }, 1500);
+    addBtn.textContent = 'ADDED ✓';
+    setTimeout(function() { addBtn.textContent = 'ADD TO CART'; }, 1500);
   });
 
   updateBadge();

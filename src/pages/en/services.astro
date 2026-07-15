@@ -1,0 +1,256 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<Layout
+  title="Breathwork Floating Services Tallinn | Hingamiskeskus"
+  description="Discover breathwork floating services Tallinn at Hingamiskeskus. Relieve stress, improve wellbeing and find inner balance with our professional breathwork and floating!"
+  keywords="breathwork floating services Tallinn"
+  lang="en"
+  alternates={{ et: '/teenused', ru: '/ru/uslugi', en: '/en/services' }}
+>
+
+<!-- HEADER -->
+<Header active="teenused" lang="en" />
+
+<!-- PAGE TITLE -->
+<section class="page-hero">
+  <h1 class="page-hero__title">Services</h1>
+</section>
+
+<!-- SERVICE CARDS -->
+<section class="services">
+  <div class="service-card">
+    <a href="/en/breathwork" aria-label="Open service page"><img src="/images/teenus-hingamine.jpg" alt="Breathwork at Hingamiskeskus" class="service-card__img" loading="lazy" /></a>
+    <h2 class="service-card__title">Breathwork</h2>
+    <p class="service-card__text">Breath therapy helps release everyday stress, unlock creativity, and teaches you to find joy in life and relationships. Awareness of breathing clears the mind from overwhelming thoughts, allowing you to experience your deeper essence and wholeness while finding inner peace. Through deep breathing, it is possible to quiet the everyday mind and connect with both the subconscious and higher consciousness...</p>
+    <a href="/en/breathwork" class="service-card__btn">READ MORE</a>
+  </div>
+
+  <div class="service-card">
+    <a href="/en/floating" aria-label="Open service page"><img src="/images/teenus-floating.jpg" alt="Floating bath" class="service-card__img" loading="lazy" /></a>
+    <h2 class="service-card__title">Floating</h2>
+    <p class="service-card__text">The purpose of floating is to deeply relax you and bring your brain into the theta frequency. This is the state in which our wonderfully intelligent bodies know how to heal and regenerate themselves. Through the combination of darkness, silence, and floating, the sensation of gravity begins to disappear. As a result, you can reach a meditative state where your body and mind switch off for a while...</p>
+    <a href="/en/floating" class="service-card__btn">READ MORE</a>
+  </div>
+
+  <div class="service-card">
+    <a href="/en/breathwork-in-water" aria-label="Open service page"><img src="/images/teenus-veeshingamine.png" alt="Breathwork in water" class="service-card__img" loading="lazy" /></a>
+    <h2 class="service-card__title">Breathwork in water</h2>
+    <p class="service-card__text">A warm water session is a unique opportunity to reach deep within yourself. Connected breathing in water helps relieve stress and birth-related traumas, subconscious patterns, and inner tensions that prevent you from moving forward in life...</p>
+    <a href="/en/breathwork-in-water" class="service-card__btn">READ MORE</a>
+  </div>
+
+  <div class="service-card">
+    <a href="/en/neurovizr" aria-label="Open service page"><img src="/images/teenus-neurovizr.jpg" alt="A man using the NeuroVIZR device" class="service-card__img" loading="lazy" /></a>
+    <h2 class="service-card__title">NeuroVIZR</h2>
+    <p class="service-card__text">NeuroVIZR is an innovative brain- and mind-based technology that uses a combination of light and sound to support the brain's natural rhythms and promote neuroplasticity. The device is designed to help achieve deeper relaxation, improve concentration, elevate mood, and support mental recovery...</p>
+    <a href="/en/neurovizr" class="service-card__btn">READ MORE</a>
+  </div>
+
+  <div class="service-card">
+    <a href="/en/aromatouch-body-treatment" aria-label="Open service page"><img src="/images/aromatouch-kuunlad.jpg" alt="AromaTouch body treatment with essential oils" class="service-card__img" loading="lazy" /></a>
+    <h2 class="service-card__title">AromaTouch body treatment</h2>
+    <p class="service-card__text">The AromaTouch technique is a gentle and relaxing body treatment that combines the beneficial properties of doTERRA essential oils with specific touch techniques. The treatment supports deep relaxation and the balance of body and mind...</p>
+    <a href="/en/aromatouch-body-treatment" class="service-card__btn">READ MORE</a>
+  </div>
+
+  <div class="service-card">
+    <a href="/en/room-rental" aria-label="Open service page"><img src="/images/ruum-suur-1.jpg" alt="Hingamiskeskus large hall" class="service-card__img" loading="lazy" /></a>
+    <h2 class="service-card__title">Room rental</h2>
+    <p class="service-card__text">At Hingamiskeskus, we offer cozy and harmonious rooms designed to support deep relaxation, inner peace, and connection with yourself. The atmosphere of our center is ideal for various mindfulness and self-development practices...</p>
+    <a href="/en/room-rental" class="service-card__btn">READ MORE</a>
+  </div>
+
+  <div class="service-card service-card--noimg">
+    <h2 class="service-card__title">Our therapists</h2>
+    <p class="service-card__text">Get to know our experienced therapists who guide breathing sessions and support you every step of the way. Read more about their journey, training, and why they do their work with heart...</p>
+    <a href="/en/our-therapists" class="service-card__btn">READ MORE</a>
+  </div>
+</section>
+
+<Footer lang="en" />
+
+</Layout>
+
+<style>
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .header__logo img { height: 28px; width: auto; }
+  .header__right { display: flex; align-items: center; gap: 16px; }
+  .header__cart { color: #1d1e20; }
+  .header__burger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+  }
+  .header__burger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #1d1e20;
+  }
+
+  /* PAGE HERO */
+  .page-hero {
+    background: #f3fcff;
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .page-hero__title {
+    font-size: 32px;
+    font-weight: 400;
+  }
+
+  /* SERVICES */
+  .services {
+    background: #fff;
+    padding: 24px 24px 40px;
+  }
+  .service-card {
+    background: #fff;
+    text-align: center;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+  }
+  .service-card__text { flex: 1; }
+  .service-card--noimg {
+    justify-content: center;
+    background: #f3fcff;
+    border-radius: 10px;
+    padding: 24px 0;
+  }
+  .service-card__btn { align-self: center; margin-top: auto; }
+  .service-card:last-child { margin-bottom: 0; }
+  .service-card__img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  .service-card__title {
+    font-size: 22px;
+    font-weight: 400;
+    padding: 16px 20px 8px;
+  }
+  .service-card__text {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.7;
+    padding: 0 20px 16px;
+  }
+  .service-card__btn {
+    display: inline-block;
+    background: #1d1e20;
+    color: #fff;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 12px 28px;
+    margin: 0 20px 20px;
+    border-radius: 10px;
+  }
+
+  /* LOCATION */
+  .location {
+    background: #1f6d85;
+    padding: 20px 24px 24px;
+    color: #fff;
+    text-align: center;
+  }
+  .location__title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .location__address {
+    font-size: 14px;
+  }
+  .location__photo {
+    width: 80%;
+    max-width: 320px;
+    margin: 12px auto 0;
+    display: block;
+    border-radius: 10px;
+  }
+
+  /* FOOTER */
+  .footer__main {
+    background: #1f6d85;
+    padding: 24px;
+    color: #fff;
+  }
+  .footer__logo {
+    height: 30px;
+    width: auto;
+    margin: 0 auto 20px;
+    display: block;
+  }
+  .footer__contact h3,
+  .footer__hours h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .footer__contact p,
+  .footer__hours p {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .footer__hours {
+    margin-top: 16px;
+  }
+  .footer__social {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    color: #fff;
+  }
+  .footer__legal {
+    font-size: 11px;
+    margin-top: 16px;
+    opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 12px;
+  }
+  .footer__legal a:hover { text-decoration: underline; }
+
+  /* DESKTOP */
+  @media (min-width: 768px) {
+    .header { padding: 12px 40px; }
+    .header__logo img { height: 36px; }
+    .page-hero { padding: 72px 40px; }
+    .page-hero__title { font-size: 58px; font-weight: 600; }
+    .services {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      padding: 48px 40px 72px;
+      justify-content: center;
+    }
+    .service-card {
+      flex: 0 1 380px;
+      min-width: 300px;
+      max-width: 430px;
+      margin-bottom: 0;
+    }
+    .service-card__img { height: 240px; }
+    .service-card__title { font-size: 28px; }
+    .service-card__text { font-size: 15.5px; }
+    .service-card__btn { font-size: 13px; padding: 14px 32px; }
+  }
+</style>

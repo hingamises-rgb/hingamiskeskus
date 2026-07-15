@@ -1,13 +1,18 @@
 ---
 // Ühine päis: desktop nav + mobiilne täisekraani menüü (originaali järgi)
+import { RU_BY_ET, EN_BY_ET, ET_BY_RU, ET_BY_EN } from '../lib/i18n';
+type Lang = 'et' | 'ru' | 'en';
 interface Props {
   active?: string; // avaleht | teenused | broneeri | epood | liikmeks | paketid | blogi | kkk
-  lang?: 'et' | 'ru';
-  /** Sama lehe URL teises keeles (keelevahetaja sihtkoht). Vaikimisi avaleht. */
+  lang?: Lang;
+  /** Keelevahetaja URL-id (ainult dünaamilised lehed — tooted, blogi). Staatilised arvutatakse i18n-kaardist. */
+  alts?: Partial<Record<Lang, string>>;
+  /** DEPRECATED (2-keelne aeg): jäetakse tähelepanuta, keelevahetaja arvutatakse kaardist. */
   altHref?: string;
 }
-const { active = '', lang = 'et', altHref } = Astro.props;
+const { active = '', lang = 'et', alts = {} } = Astro.props;
 const ru = lang === 'ru';
+const en = lang === 'en';
 
 const SERVICES = ru
   ? [
@@ -19,6 +24,16 @@ const SERVICES = ru
       { href: '/ru/arenda-pomeshenij', label: 'Аренда помещений' },
       { href: '/ru/nashi-terapevty', label: 'Наши терапевты' },
     ]
+  : en
+  ? [
+      { href: '/en/breathwork', label: 'Breathwork' },
+      { href: '/en/floating', label: 'Floating' },
+      { href: '/en/neurovizr', label: 'Neurovizr' },
+      { href: '/en/breathwork-in-water', label: 'Breathwork in water' },
+      { href: '/en/aromatouch-body-treatment', label: 'AromaTouch body treatment' },
+      { href: '/en/room-rental', label: 'Room rental' },
+      { href: '/en/our-therapists', label: 'Our therapists' },
+    ]
   : [
       { href: '/vabastav-hingamine', label: 'Vabastav hingamine' },
       { href: '/floating', label: 'Floating' },
@@ -29,6 +44,7 @@ const SERVICES = ru
       { href: '/terapeudid', label: 'Terapeudid' },
     ];
 
+// RU navis on Блог; EN-l blogi ei ole (vanal saidil EN artikleid pole)
 const NAV = ru
   ? [
       { href: '/ru', key: 'avaleht', label: 'Главная' },
@@ -38,6 +54,15 @@ const NAV = ru
       { href: '/ru/chlenstvo', key: 'liikmeks', label: 'Членство' },
       { href: '/ru/blog', key: 'blogi', label: 'Блог' },
       { href: '/ru/chavo', key: 'kkk', label: 'ЧаВо' },
+    ]
+  : en
+  ? [
+      { href: '/en', key: 'avaleht', label: 'Home' },
+      { href: '/en/services', key: 'teenused', label: 'Services' },
+      { href: '/en/book-a-session', key: 'broneeri', label: 'Book a Session' },
+      { href: '/en/shop', key: 'epood', label: 'Shop' },
+      { href: '/en/membership', key: 'liikmeks', label: 'Membership' },
+      { href: '/en/faq', key: 'kkk', label: 'FAQ' },
     ]
   : [
       { href: '/', key: 'avaleht', label: 'Avaleht' },
@@ -49,14 +74,32 @@ const NAV = ru
       { href: '/kkk', key: 'kkk', label: 'KKK' },
     ];
 
-const homeHref = ru ? '/ru' : '/';
-const servicesLabel = ru ? 'Услуги' : 'Teenused';
-const langSwitchHref = altHref || (ru ? '/' : '/ru');
-const langSwitchLabel = ru ? 'EST' : 'RUS';
-const langSwitchAria = ru ? 'Eesti keeles' : 'На русском';
+const homeHref = ru ? '/ru' : en ? '/en' : '/';
+const servicesLabel = ru ? 'Услуги' : en ? 'Services' : 'Teenused';
+
+// Keelevahetaja: näita kahte teist keelt.
+const LANG_HOME: Record<Lang, string> = { et: '/', ru: '/ru', en: '/en' };
+const LANG_ARIA: Record<Lang, string> = { et: 'Eesti keeles', ru: 'На русском', en: 'In English' };
+// Staatilistel lehtedel arvuta URL-id i18n-kaardist praeguse tee järgi.
+const rawPath = Astro.url.pathname;
+const path = rawPath.length > 1 ? rawPath.replace(/\/$/, '') : rawPath;
+const etPath = lang === 'et' ? path : lang === 'ru' ? ET_BY_RU[path] : ET_BY_EN[path];
+const autoAlts: Partial<Record<Lang, string>> = etPath
+  ? { et: etPath, ru: RU_BY_ET[etPath], en: EN_BY_ET[etPath] }
+  : {};
+// Dünaamilistel lehtedel (tooted, blogi) võetakse alts propist; see kirjutab automaatse üle.
+const effectiveAlts: Partial<Record<Lang, string>> = { ...autoAlts, ...alts };
+const otherLangs = (['et', 'ru', 'en'] as Lang[])
+  .filter((l) => l !== lang)
+  .map((l) => ({ code: l, label: l.toUpperCase(), href: effectiveAlts[l] || LANG_HOME[l], aria: LANG_ARIA[l] }));
+
+const headerClass = ru ? 'header header--ru' : en ? 'header header--en' : 'header';
+const cartHref = ru ? '/ru/checkout' : en ? '/en/checkout' : '/checkout';
+const cartAria = ru ? 'Корзина' : en ? 'Cart' : 'Ostukorv';
+const menuAria = ru ? 'Меню' : en ? 'Menu' : 'Menüü';
 ---
 
-<header class={ru ? 'header header--ru' : 'header'} id="site-header">
+<header class={headerClass} id="site-header">
   <a href={homeHref} class="header__logo">
     <img src="/images/logo.svg" alt="Hingamiskeskus" height="30" />
   </a>
@@ -66,13 +109,17 @@ const langSwitchAria = ru ? 'Eesti keeles' : 'На русском';
     ))}
   </nav>
   <div class="header__right">
-    <a href={langSwitchHref} class="header__lang" aria-label={langSwitchAria}>{langSwitchLabel}</a>
-    <a href={ru ? '/ru/checkout' : '/checkout'} class="header__cart" aria-label={ru ? 'Корзина' : 'Ostukorv'}>
+    <div class="header__langs">
+      {otherLangs.map((l) => (
+        <a href={l.href} class="header__lang" aria-label={l.aria}>{l.label}</a>
+      ))}
+    </div>
+    <a href={cartHref} class="header__cart" aria-label={cartAria}>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
       </svg>
     </a>
-    <button class="header__burger" id="burger-btn" aria-label="Menüü" aria-expanded="false">
+    <button class="header__burger" id="burger-btn" aria-label={menuAria} aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -92,7 +139,9 @@ const langSwitchAria = ru ? 'Eesti keeles' : 'На русском';
     {NAV.filter(i => !['avaleht', 'teenused'].includes(i.key)).map(item => (
       <a href={item.href} class={active === item.key ? 'mobile-menu__link mobile-menu__link--active' : 'mobile-menu__link'}>{item.label}</a>
     ))}
-    <a href={langSwitchHref} class="mobile-menu__link mobile-menu__lang">{ru ? 'Eesti keeles' : 'На русском'}</a>
+    {otherLangs.map((l) => (
+      <a href={l.href} class="mobile-menu__link mobile-menu__lang">{l.aria}</a>
+    ))}
   </nav>
 </div>
 
@@ -158,15 +207,17 @@ const langSwitchAria = ru ? 'Eesti keeles' : 'На русском';
     text-underline-offset: 4px;
   }
   .header__right { display: flex; align-items: center; gap: 16px; }
+  .header__langs { display: flex; align-items: center; gap: 6px; }
   .header__lang {
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.5px;
     color: #1d1e20;
-    padding: 3px 8px;
+    padding: 3px 7px;
     border: 1px solid rgba(0,0,0,0.25);
     border-radius: 4px;
   }
+  .header__lang:hover { border-color: #1f6d85; color: #1f6d85; }
   :global(.mobile-menu__lang) {
     margin-top: 18px;
     font-size: 16px !important;
@@ -204,13 +255,14 @@ const langSwitchAria = ru ? 'Eesti keeles' : 'На русском';
     .header__burger { display: none; }
   }
 
-  /* Vene nav-sildid on pikemad: nav on alati nähtav nagu ET lehel,
+  /* Vene ja inglise nav-sildid on pikemad: nav on alati nähtav nagu ET lehel,
      kitsamal ekraanil tihedam paigutus, et kõik ühele reale mahuks */
-  .header--ru .header__nav a { white-space: nowrap; }
+  .header--ru .header__nav a,
+  .header--en .header__nav a { white-space: nowrap; }
   @media (min-width: 768px) and (max-width: 1279px) {
-    .header--ru { padding-left: 16px; padding-right: 16px; }
-    .header--ru .header__nav { gap: 12px; }
-    .header--ru .header__nav a { font-size: 12.5px; }
+    .header--ru, .header--en { padding-left: 16px; padding-right: 16px; }
+    .header--ru .header__nav, .header--en .header__nav { gap: 12px; }
+    .header--ru .header__nav a, .header--en .header__nav a { font-size: 12.5px; }
   }
 
   /* Mobiilne täisekraani menüü */

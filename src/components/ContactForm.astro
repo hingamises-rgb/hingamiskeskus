@@ -4,11 +4,10 @@ interface Props {
   source: string;   // mis lehelt päring tuli (läheb meili teemasse)
   title?: string;
   description?: string;
-  lang?: 'et' | 'ru';
+  lang?: 'et' | 'ru' | 'en';
 }
 const { source, lang = 'et' } = Astro.props;
-const ru = lang === 'ru';
-const t = ru
+const t = lang === 'ru'
   ? {
       title: 'Бронирование времени',
       description: 'Чтобы забронировать время, оставьте свои контактные данные, и мы сами свяжемся с вами',
@@ -16,6 +15,15 @@ const t = ru
       send: 'ОТПРАВИТЬ', sending: 'ОТПРАВКА...',
       ok: 'Спасибо! Ваше сообщение отправлено, мы скоро свяжемся с вами.',
       fail: 'Не удалось отправить, попробуйте позже.',
+    }
+  : lang === 'en'
+  ? {
+      title: 'Book a session',
+      description: 'To book a session, leave us your contact details and we will get in touch with you',
+      name: 'First name', lastname: 'Last name', phone: 'Phone', email: 'Your email', message: 'Message',
+      send: 'SEND', sending: 'SENDING...',
+      ok: 'Thank you! Your message has been sent, we will contact you soon.',
+      fail: 'Sending failed, please try again later.',
     }
   : {
       title: 'Aja broneerimine',

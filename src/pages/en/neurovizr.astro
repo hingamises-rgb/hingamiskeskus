@@ -1,0 +1,292 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import RelatedLinks from '../../components/RelatedLinks.astro';
+---
+
+<Layout
+  title="NeuroVIZR brain training and relaxation device | Hingamiskeskus"
+  description="NeuroVIZR is an innovative brain training and relaxation device that uses a combination of light and sound, supports neuroplasticity, improves focus and helps relieve stress."
+  keywords="Neurovizr"
+  lang="en"
+  alternates={{ et: '/neurovizr', ru: '/ru/neurovizr', en: '/en/neurovizr' }}
+>
+
+<!-- HEADER -->
+<Header active="teenused" lang="en" />
+
+<!-- HERO SECTION (tekst + punktid vasakul, pilt + nupp paremal) -->
+<section class="float-hero">
+  <div class="float-hero__content">
+    <div class="float-hero__text">
+      <h1 class="float-hero__title">Neurovizr</h1>
+      <p class="float-hero__subtitle">What is NeuroVIZR?</p>
+      <p>NeuroVIZR is an innovative brain- and mind-based technology that uses a combination of light and sound to support the brain&#39;s natural rhythms and promote neuroplasticity. The device is designed to help achieve deeper relaxation, improve concentration, elevate mood, and support mental recovery.</p>
+      <ul class="float-benefits__list">
+        <li>Based on AVS technology (Audio-Visual Stimulation); stress and tension fade away</li>
+        <li>Influences brainwave activity through synchronized light and sound patterns.</li>
+        <li>Guides the brain into the desired state: relaxation, focus or recovery.</li>
+        <li>Differs from ordinary sound therapy devices through its multi-layered neurodosing system (light, sound and color).</li>
+      </ul>
+    </div>
+    <div class="float-hero__media">
+      <img src="/images/teenus-neurovizr.jpg" alt="NeuroVIZR at Hingamiskeskus" class="float-hero__img" loading="lazy" />
+      <a href="tel:+37256695898" class="float-cta__btn">BOOK +372 56 695 898</a>
+    </div>
+  </div>
+</section>
+
+<!-- SEO TEXT -->
+<section class="float-seo">
+  <h2 class="float-seo__heading">How does NeuroVIZR work and how to use it?</h2>
+  <p>Using NeuroVIZR is simple and designed for everyday brain training and relaxation. The device is placed comfortably on the head, with special glasses over the eyes and headphones for listening to music or sounds. You can choose a program easily in the mobile app, which offers options such as focus, relaxation, recovery or creativity. The combined effect of light and sound quickly brings your brain into the desired state. After the session it is worth noticing how you feel; often a clearer mind or greater calm is felt already after the first time. The effect is strongest with consistent use, as the results accumulate over time.</p>
+
+  <h2 class="float-seo__heading">What is neurodosing?</h2>
+  <p>Neurodosing means gentle and precise training of the brain with the help of sensory stimuli: light, sound and color. Each session is like an individual dose, a "neurodose", that influences the brainwave you need. This process supports the brain&#39;s flexibility and the formation of new connections. Possible goals range from deep relaxation and recovery states (alpha and theta waves) to achieving focus and clarity (beta waves) and supporting creativity or better sleep (delta waves).</p>
+
+  <h2 class="float-seo__heading">AVS, Audio-Visual Stimulation and brainwave synchronization.</h2>
+  <p>At the core of NeuroVIZR is the combined effect of sound and light, called AVS technology. Rhythmic light and sound patterns begin to guide and synchronize your brain&#39;s wave activity, which is called entrainment. This makes it easier to experience guided relaxation, clarity or focus. Synchronization of the hemispheres leads to better thinking, creativity and a more stable mood.</p>
+
+  <h2 class="float-seo__heading">Programs and sessions.</h2>
+  <p>The device offers a wide range of programs designed to support different mental states. For example, "Focus and concentration" helps activate beta waves, "Relaxation and stress relief" supports deeper calming, "Recovery and sleep" helps bring the brain into a resting state, and "Creativity and inspiration" supports intuitive thinking. Depending on your needs, you choose a suitable program and can start with a short session of 5 to 11 minutes.</p>
+
+  <h2 class="float-seo__heading">Colors and their effect on the brain.</h2>
+  <p>Each color affects the brain and emotions differently: blue and turquoise calm, green supports recovery and balance, yellow stimulates attention and improves mood, red and orange tones add energy, while violet promotes creativity.</p>
+
+  <h2 class="float-seo__heading">Safety and contraindications.</h2>
+  <p>NeuroVIZR is intended for healthy adults. Its use is not recommended if you have been diagnosed with epilepsy or have a tendency toward light-induced seizures, nor in the case of serious neurological or psychiatric conditions, or in early pregnancy without a doctor&#39;s permission. During use, avoid fatigue and the influence of alcohol or drugs. Always start with low-intensity, short-duration sessions and use the device in a seated and comfortable position. If you feel uncomfortable, stop the session immediately. Remember that NeuroVIZR is not a medical device but a wellness technology that supports the brain&#39;s natural processes.</p>
+</section>
+
+<RelatedLinks lang="en" links={[
+  { href: "/en/floating", label: "Floating", desc: "Deep relaxation in Epsom salt water" },
+  { href: "/en/breathwork", label: "Breathwork", desc: "Guided breathing session in a group" },
+  { href: "/en/faq", label: "Frequently asked questions", desc: "Tips and answers" },
+]} />
+
+<Footer lang="en" />
+
+</Layout>
+
+<style>
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .header__logo img { height: 28px; width: auto; }
+  .header__right { display: flex; align-items: center; gap: 16px; }
+  .header__cart { color: #1d1e20; }
+  .header__burger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+  }
+  .header__burger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #1d1e20;
+  }
+
+  /* HERO */
+  .float-hero {
+    background: #f3fcff;
+    padding: 32px 24px;
+  }
+  .float-hero__content {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .float-hero__title {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    color: #1d1e20;
+  }
+  .float-hero__subtitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f6d85;
+    margin-bottom: 16px;
+  }
+  .float-hero__text { text-align: left; }
+  .float-hero__title { text-align: left; }
+  .float-hero__text p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1d1e20;
+    margin-bottom: 12px;
+  }
+  .float-hero__img {
+    width: 100%;
+    border-radius: 10px;
+    margin-top: 24px;
+  }
+
+  /* BENEFITS */
+  .float-benefits {
+    background: #fff;
+    padding: 32px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .float-benefits__list {
+    list-style: disc;
+    padding-left: 20px;
+  }
+  .float-benefits__list li {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #1d1e20;
+  }
+
+  /* CTA */
+  .float-info--cta {
+    text-align: center;
+    background: #fff;
+    padding: 32px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .float-cta__btn {
+    display: block;
+    text-align: center;
+    margin-top: 24px;
+    background: #1d1e20;
+    color: #fff;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 14px 32px;
+    border-radius: 10px;
+  }
+
+  /* SEO TEXT */
+  .float-seo {
+    background: #f3fcff;
+    padding: 32px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .float-seo p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #555;
+    margin-bottom: 16px;
+  }
+  .float-seo p:last-child {
+    margin-bottom: 0;
+  }
+  .float-seo__heading {
+    text-align: left;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1d1e20;
+    margin-top: 8px;
+    margin-bottom: 12px;
+  }
+
+  /* LOCATION */
+  .location {
+    background: #1f6d85;
+    padding: 20px 24px 24px;
+    color: #fff;
+    text-align: center;
+  }
+  .location__title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .location__address {
+    font-size: 14px;
+  }
+  .location__photo {
+    width: 80%;
+    max-width: 320px;
+    margin: 12px auto 0;
+    display: block;
+    border-radius: 10px;
+  }
+
+  /* FOOTER */
+  .footer__main {
+    background: #1f6d85;
+    padding: 24px;
+    color: #fff;
+  }
+  .footer__logo {
+    height: 30px;
+    width: auto;
+    margin: 0 auto 20px;
+    display: block;
+  }
+  .footer__contact h3, .footer__hours h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .footer__contact p, .footer__hours p {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .footer__hours {
+    margin-top: 16px;
+  }
+  .footer__social {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    color: #fff;
+  }
+  .footer__social a { color: #fff; }
+  .footer__legal {
+    font-size: 11px;
+    margin-top: 16px;
+    opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 12px;
+  }
+  .footer__legal a { color: #fff; text-decoration: none; }
+
+  /* DESKTOP */
+  @media (min-width: 768px) {
+    .header { padding: 12px 40px; }
+    .header__logo img { height: 36px; }
+
+    .float-hero { padding: 64px 40px; }
+    .float-hero__content {
+      display: flex;
+      align-items: flex-start;
+      gap: 64px;
+      max-width: 1200px;
+    }
+    .float-hero__text { flex: 1.15; }
+    .float-hero__media { flex: 1; position: sticky; top: 100px; }
+    .float-hero__title { font-size: 44px; line-height: 1.15; margin-bottom: 16px; }
+    .float-hero__text p { font-size: 16px; }
+    .float-benefits__list li { font-size: 16px; margin-bottom: 10px; }
+    .float-hero__img { margin-top: 0; }
+
+    .float-seo {
+      padding: 48px max(40px, calc((100% - 1100px) / 2)) 64px;
+      max-width: none;
+      margin: 0;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .float-hero__title { font-size: 40px; }
+    .float-hero { padding: 56px 40px; }
+  }
+</style>

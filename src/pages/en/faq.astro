@@ -1,0 +1,331 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+// FAQPage schema — hoia sünkroonis allpool nähtavate küsimuste-vastustega!
+const FAQ = [
+  ['What should I bring with me?', 'You do not need to bring anything in particular. We provide ecological cleaning products, a towel, earplugs and a neck pillow, and we recommend floating naked. If desired, you can bring your own preferred cosmetics (e.g. deodorant, face cream, hairbrush, etc.).'],
+  ['What else should I consider before floating?', 'It is important to come with an open mind and no specific expectations, as everyone experience is unique. A couple of hours before your appointment, avoid stimulants like coffee or energy drinks, and do not arrive on an overly empty or full stomach. On the same day, avoid shaving or waxing as the salty water may irritate the skin. People who have recently dyed their hair should wait until the rinse water runs clear.'],
+  ['Can floating be used for recovery?', 'Floating is very well suited for recovery because the water contains a high concentration of magnesium, which has restorative properties.'],
+  ['How often should I float?', 'Even every day! A very effective routine includes weekly floating sessions, as a week represents a typical cycle of highs and lows.'],
+  ['How many times should I attend breathwork sessions to experience noticeable changes in my life?', 'Even after the first session you might notice some changes. Initial shifts often occur during 4 to 6 sessions, and to see more significant changes it is recommended to attend at least 10 guided sessions.'],
+  ['Do I have to speak and share during the group sharing circle?', 'No, you do not. Sharing at the end of the circle is completely voluntary.'],
+  ['I did not experience any emotions. Does that mean I did not release anything?', 'Releasing does not only occur through emotions but also as physical sensations in the body: waves of heat or cold, tingling and similar sensations mean that suppressed tensions are being released.'],
+  ['Who are these services intended for?', 'Anyone can benefit from these services. Floating is particularly helpful for athletes to replenish magnesium levels, for pregnant women to relieve prenatal discomfort, and for people seeking relief from stress.'],
+];
+const FAQ_SCHEMA = {
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map(([q, a]) => ({
+    '@type': 'Question',
+    name: q,
+    acceptedAnswer: { '@type': 'Answer', text: a },
+  })),
+};
+---
+
+<Layout
+  title="Floating Breathwork FAQ | Hingamiskeskus Tallinn"
+  description="Find answers to our floating breathwork FAQ at Hingamiskeskus in Tallinn. Learn what to bring, how to prepare, how often to float and what to expect from your session!"
+  keywords="floating breathwork FAQ"
+  lang="en"
+  alternates={{ et: '/kkk', ru: '/ru/chavo', en: '/en/faq' }}
+  schema={FAQ_SCHEMA}
+>
+
+<!-- HEADER -->
+<Header active="kkk" lang="en" />
+
+<!-- HERO -->
+<section class="kkk-hero">
+  <h1 class="kkk-hero__title">Recommendations for floating</h1>
+</section>
+
+<!-- TIPS -->
+<section class="kkk-tips">
+  <div class="kkk-tips__grid">
+    <div class="kkk-tips__item">
+      <img src="/images/icon-ootusteta.png" alt="Come without expectations" class="kkk-tips__icon" />
+      <h3 class="kkk-tips__heading">Come without expectations</h3>
+      <p>Every person session is unique, and what others have shared may turn out very differently for you. Do not set specific expectations, just show up and have a powerful experience.</p>
+    </div>
+    <div class="kkk-tips__item">
+      <img src="/images/icon-alasti.png" alt="Float naked" class="kkk-tips__icon" />
+      <h3 class="kkk-tips__heading">Float naked</h3>
+      <p>This gives your body complete freedom and enhances relaxation. Our floating room is private, and the shower is located right next to the cabin.</p>
+    </div>
+    <div class="kkk-tips__item">
+      <img src="/images/icon-hingamine.png" alt="Focus on your breathing" class="kkk-tips__icon" />
+      <h3 class="kkk-tips__heading">Focus on your breathing</h3>
+      <p>If you have trouble relaxing or clearing your mind, focus on your breathing and notice how it helps.</p>
+    </div>
+    <div class="kkk-tips__item">
+      <img src="/images/icon-kell.png" alt="Do not worry about time" class="kkk-tips__icon" />
+      <h3 class="kkk-tips__heading">Do not worry about time</h3>
+      <p>Relaxation might take time during your first floating session, but try to forget about the clock and enjoy your experience.</p>
+    </div>
+  </div>
+</section>
+
+<!-- INTRO TEXT -->
+<section class="kkk-intro">
+  <p>We have compiled the most frequently asked questions.<br/>We hope you find your answers here!</p>
+</section>
+
+<!-- FAQ -->
+<section class="kkk-faq">
+  <h2 class="kkk-faq__title">FAQ</h2>
+
+  <div class="kkk-faq__item">
+    <h3 class="kkk-faq__question">What should I bring with me?</h3>
+    <p>You do not need to bring anything in particular. We provide ecological cleaning products, a towel, earplugs and a neck pillow, and we recommend floating naked.</p>
+    <p>If desired, you can bring your own preferred cosmetics (e.g. deodorant, face cream, hairbrush, etc.).</p>
+  </div>
+
+  <div class="kkk-faq__item">
+    <h3 class="kkk-faq__question">What else should I consider before floating?</h3>
+    <p>It is important to come with an open mind and no specific expectations, as everyone experience is unique. A couple of hours before your appointment, avoid stimulants like coffee or energy drinks, and do not arrive on an overly empty or full stomach. On the same day, avoid shaving or waxing as the salty water may irritate the skin. People who have recently dyed their hair should wait until the rinse water runs clear (we can provide a swim cap if needed).</p>
+  </div>
+
+  <div class="kkk-faq__item">
+    <h3 class="kkk-faq__question">Can floating be used for recovery?</h3>
+    <p>Floating is very well suited for recovery because the water contains a high concentration of magnesium, which has restorative properties.</p>
+  </div>
+
+  <div class="kkk-faq__item">
+    <h3 class="kkk-faq__question">How often should I float?</h3>
+    <p>Even every day! A very effective routine includes weekly floating sessions, as a week represents a typical cycle of highs and lows, and a single relaxing floating session fits perfectly into this rhythm.</p>
+  </div>
+
+  <div class="kkk-faq__item">
+    <h3 class="kkk-faq__question">How many times should I attend breathwork sessions to experience noticeable changes in my life?</h3>
+    <p>Even after the first session you might notice some changes in your life. We have observed that initial shifts often occur during 4 to 6 sessions. To see more significant changes, it is recommended to attend at least 10 guided breathwork sessions.</p>
+    <p>In general, the number of sessions depends on how deeply you wish to work on yourself and how much cleansing you aim to achieve. Sometimes going through protective mechanisms may require additional time.</p>
+  </div>
+
+  <div class="kkk-faq__item">
+    <h3 class="kkk-faq__question">Do I have to speak and share during the group sharing circle?</h3>
+    <p>No, you do not. Sharing at the end of the circle is completely voluntary.</p>
+  </div>
+
+  <div class="kkk-faq__item">
+    <h3 class="kkk-faq__question">I did not experience any emotions. Does that mean I did not release anything?</h3>
+    <p>Releasing does not only occur through emotions but also as physical sensations in the body. If you feel strong waves of heat or cold, tingling and so on, it means that deeply suppressed tensions in the body are being released.</p>
+  </div>
+
+  <div class="kkk-faq__item">
+    <h3 class="kkk-faq__question">Who are these services intended for?</h3>
+    <p>Absolutely anyone can benefit from these services in some way. Floating is particularly helpful for athletes to replenish magnesium levels, for pregnant women to reduce prenatal discomfort, and for individuals seeking relief from stress and its impact on their lives.</p>
+  </div>
+
+  <p class="kkk-faq__contact">For additional questions, feel free to contact us at <a href="mailto:Info@hingamiskeskus.ee">Info@hingamiskeskus.ee</a></p>
+</section>
+
+<Footer lang="en" />
+
+</Layout>
+
+<style>
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .header__logo img { height: 28px; width: auto; }
+  .header__right { display: flex; align-items: center; gap: 16px; }
+  .header__cart { color: #1d1e20; }
+  .header__burger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+  }
+  .header__burger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #1d1e20;
+  }
+
+  /* HERO */
+  .kkk-hero {
+    background: #f3fcff;
+    padding: 40px 24px;
+  }
+  .kkk-hero__title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1d1e20;
+  }
+
+  /* TIPS */
+  .kkk-tips {
+    padding: 40px 24px;
+    max-width: 1000px;
+    margin: 0 auto;
+    background: #f3fcff;
+  }
+  .kkk-tips__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  .kkk-tips__item {
+    text-align: center;
+  }
+  .kkk-tips__icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+  }
+  .kkk-tips__heading {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1d1e20;
+    margin-bottom: 8px;
+  }
+  .kkk-tips__item p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1d1e20;
+  }
+
+  /* INTRO */
+  .kkk-intro {
+    text-align: center;
+    padding: 48px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .kkk-intro p {
+    font-size: 20px;
+    line-height: 1.5;
+    color: #1d1e20;
+    font-weight: 500;
+  }
+
+  /* FAQ */
+  .kkk-faq {
+    padding: 0 24px 48px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .kkk-faq__title {
+    font-size: 48px;
+    font-weight: 700;
+    color: #1d1e20;
+    margin-bottom: 32px;
+  }
+  .kkk-faq__item {
+    margin-bottom: 32px;
+  }
+  .kkk-faq__question {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1d1e20;
+    margin-bottom: 12px;
+  }
+  .kkk-faq__item p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1d1e20;
+    margin-bottom: 8px;
+  }
+
+  .kkk-faq__contact {
+    font-size: 15px;
+    color: #1d1e20;
+    margin-top: 16px;
+    padding-top: 24px;
+    border-top: 1px solid #eee;
+  }
+  .kkk-faq__contact a {
+    color: #1f6d85;
+    text-decoration: underline;
+  }
+
+  /* LOCATION */
+  .location {
+    background: #1f6d85;
+    padding: 20px 24px 24px;
+    color: #fff;
+    text-align: center;
+  }
+  .location__title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .location__address {
+    font-size: 14px;
+  }
+  .location__photo {
+    width: 80%;
+    max-width: 320px;
+    margin: 12px auto 0;
+    display: block;
+    border-radius: 10px;
+  }
+
+  /* FOOTER */
+  .footer__main {
+    background: #1f6d85;
+    padding: 24px;
+    color: #fff;
+  }
+  .footer__logo {
+    height: 30px;
+    width: auto;
+    margin: 0 auto 20px;
+    display: block;
+  }
+  .footer__contact h3, .footer__hours h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .footer__contact p, .footer__hours p {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .footer__hours {
+    margin-top: 16px;
+  }
+  .footer__social {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    color: #fff;
+  }
+  .footer__social a { color: #fff; }
+  .footer__legal {
+    font-size: 11px;
+    margin-top: 16px;
+    opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 12px;
+  }
+  .footer__legal a { color: #fff; text-decoration: none; }
+
+  /* DESKTOP */
+  @media (min-width: 768px) {
+    .kkk-hero { padding: 72px 40px; }
+    .kkk-hero__title { font-size: 58px; font-weight: 600; }
+
+    .header { padding: 12px 40px; }
+    .header__logo img { height: 36px; }
+    .kkk-tips { padding: 48px 40px; }
+    .kkk-tips__grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .kkk-intro { padding: 56px 40px; }
+    .kkk-intro p { font-size: 24px; }
+    .kkk-faq { padding: 0 40px 56px; }
+    .kkk-faq__title { font-size: 56px; }
+  }
+</style>

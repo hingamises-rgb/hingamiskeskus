@@ -3,12 +3,13 @@
 // (kasutajakogemus + sisemine linkimine SEO jaoks). Hoia linke 2-3, mitte rohkem.
 interface Props {
   links: { href: string; label: string; desc?: string }[];
-  lang?: 'et' | 'ru';
+  lang?: 'et' | 'ru' | 'en';
 }
 const { links, lang = 'et' } = Astro.props;
+const relatedTitle = lang === 'ru' ? 'Смотрите также' : lang === 'en' ? 'See also' : 'Vaata ka';
 ---
 <section class="related">
-  <h2 class="related__title">{lang === 'ru' ? 'Смотрите также' : 'Vaata ka'}</h2>
+  <h2 class="related__title">{relatedTitle}</h2>
   <div class="related__grid">
     {links.map((l) => (
       <a href={l.href} class="related__card">

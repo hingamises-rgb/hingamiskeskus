@@ -2,11 +2,10 @@
 // Ühine jalus (vana saidi kujundus): Aadress + maja pilt | logo + lahtiolekuajad + FB/IG | Kontakt.
 // Asendab varasema 18 lehel dubleeritud jalusemarkupi.
 interface Props {
-  lang?: 'et' | 'ru';
+  lang?: 'et' | 'ru' | 'en';
 }
 const { lang = 'et' } = Astro.props;
-const ru = lang === 'ru';
-const t = ru
+const t = lang === 'ru'
   ? {
       address: 'Адрес',
       hours: 'Часы работы',
@@ -17,6 +16,18 @@ const t = ru
       phone: 'Телефон:',
       support: '(клиентская поддержка 10.00–17.00)',
       legal: 'Политика конфиденциальности и условия продажи',
+    }
+  : lang === 'en'
+  ? {
+      address: 'Address',
+      hours: 'Opening hours',
+      hoursWeek: 'Mon-Fri 8.30 - 20.00',
+      hoursWeekend: 'Sat-Sun 11.00 - 18.00',
+      contact: 'Contact',
+      email: 'Email:',
+      phone: 'Phone number:',
+      support: '(customer support 10.00-17.00)',
+      legal: 'Privacy Policy & Terms of Sale',
     }
   : {
       address: 'Aadress',

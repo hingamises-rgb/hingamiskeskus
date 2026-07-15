@@ -32,7 +32,9 @@
 (function() {
   var SKIP = ['/admin', '/checkout', '/makse-tehtud', '/makse-ebaonnestus'];
   var path = location.pathname;
-  for (var i = 0; i < SKIP.length; i++) if (path.indexOf(SKIP[i]) === 0) return;
+  // Ära näita checkout/makse lehtedel üheski keeles (/ru/, /en/ eesliited)
+  var noLang = path.replace(/^\/(ru|en)/, '');
+  for (var i = 0; i < SKIP.length; i++) if (noLang.indexOf(SKIP[i]) === 0 || path.indexOf(SKIP[i]) === 0) return;
 
   // --- Külastaja ID + esimese allika salvestus ---
   var vid = localStorage.getItem('hk_vid');
@@ -59,11 +61,16 @@
   } catch (e) {}
 
   // --- Popup ---
-  // Vene lehtedel venekeelsed tekstid (heading_ru/description_ru administ)
+  // Vene/inglise lehtedel vastava keele tekstid (heading_ru/en administ)
   var RU = path === '/ru' || path.indexOf('/ru/') === 0;
+  var EN = path === '/en' || path.indexOf('/en/') === 0;
+  var LANG = RU ? 'ru' : EN ? 'en' : 'et';
+  var DEVICE = window.innerWidth < 768 ? 'mobiil' : 'arvuti';
   var T = RU
-    ? { min: 'Минут', sec: 'Секунд', btn: 'ХОЧУ КУПОН', ok: 'Код уже летит на твою почту!', fail: 'Что-то пошло не так', retry: 'Что-то пошло не так, попробуй ещё раз', device: window.innerWidth < 768 ? 'mobiil' : 'arvuti' }
-    : { min: 'Minutit', sec: 'Sekundit', btn: 'SOOVIN KUPONGI', ok: 'Kood on teel Sinu emailile!', fail: 'Midagi läks valesti', retry: 'Midagi läks valesti, proovi uuesti', device: window.innerWidth < 768 ? 'mobiil' : 'arvuti' };
+    ? { min: 'Минут', sec: 'Секунд', btn: 'ХОЧУ КУПОН', ok: 'Код уже летит на твою почту!', fail: 'Что-то пошло не так', retry: 'Что-то пошло не так, попробуй ещё раз', device: DEVICE }
+    : EN
+    ? { min: 'Minutes', sec: 'Seconds', btn: 'I WANT THE COUPON', ok: 'The code is on its way to your email!', fail: 'Something went wrong', retry: 'Something went wrong, please try again', device: DEVICE }
+    : { min: 'Minutit', sec: 'Sekundit', btn: 'SOOVIN KUPONGI', ok: 'Kood on teel Sinu emailile!', fail: 'Midagi läks valesti', retry: 'Midagi läks valesti, proovi uuesti', device: DEVICE };
   // Ära näita: kui juba konverteerus, või suleti viimase 3 päeva jooksul
   if (localStorage.getItem('hk_popup_done')) return;
   var closedAt = parseInt(localStorage.getItem('hk_popup_closed') || '0', 10);
@@ -101,8 +108,8 @@
   setTimeout(function() {
     fetch('/api/popup').then(function(r) { return r.json(); }).then(function(cfg) {
       if (!cfg || !cfg.active) return;
-      document.getElementById('hk-popup-heading').textContent = (RU && cfg.heading_ru) || cfg.heading;
-      document.getElementById('hk-popup-desc').textContent = (RU && cfg.description_ru) || cfg.description;
+      document.getElementById('hk-popup-heading').textContent = (RU && cfg.heading_ru) || (EN && cfg.heading_en) || cfg.heading;
+      document.getElementById('hk-popup-desc').textContent = (RU && cfg.description_ru) || (EN && cfg.description_en) || cfg.description;
       document.querySelectorAll('.hk-popup__timer-label')[0].textContent = T.min;
       document.querySelectorAll('.hk-popup__timer-label')[1].textContent = T.sec;
       document.querySelector('.hk-popup__btn').textContent = T.btn;
@@ -140,7 +147,7 @@
         source: classifySource(),
         device: T.device,
         referrer: (JSON.parse(localStorage.getItem('hk_entry') || '{}').ref) || '',
-        lang: RU ? 'ru' : 'et'
+        lang: LANG
       })
     }).then(function(r) { return r.json().then(function(d) { return { ok: r.ok, d: d }; }); })
       .then(function(res) {

@@ -1,52 +1,53 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
 
-const HOPITUDE_URL = 'https://app.hopitude.com/et/calendar?cl=2376';
+const HOPITUDE_URL = 'https://app.hopitude.com/en/calendar?cl=2376';
 ---
 
 <Layout
-  title="Broneeri-aeg | Floating ja vabastav hingamine Tallinnas"
-  description="Broneeri-aeg floatinguks või vabastavaks hingamiseks Tallinnas. Hingamiskeskus asub Sõle 14c. Kiire online broneerimine, kogenud terapeudid ja privaatsed hubased ruumid."
-  keywords="Broneeri-aeg, Teadlik vabastav hingamine"
+  title="Book a Session – Breathwork & Floating | Hingamiskeskus"
+  description="Book a session for breathwork or floating at Hingamiskeskus in Tallinn. Release tension, find inner balance and experience deep relaxation. Book your session today!"
+  keywords="Broneeri-aeg, Teadlik vabastav hingamine, book a session"
+  lang="en"
   alternates={{ et: '/broneeri-aeg', ru: '/ru/zabronirovat-vremya', en: '/en/book-a-session' }}
 >
 
-<Header active="broneeri" altHref="/ru/zabronirovat-vremya" />
+<Header active="broneeri" lang="en" />
 
 <section class="booking">
-  <h1 class="booking__title">Floatingu- ja hingamisseansid - broneeri aeg</h1>
+  <h1 class="booking__title">Floating and breathwork sessions, book a session</h1>
 
-  <h2>Kuidas broneerida?</h2>
-  <p>1. Vali kalendrist sobiv aeg ja teenus</p>
-  <p>2. Loo endale meie broneerimissüsteemi konto</p>
-  <p>3. Vali makseviis - maksa internetipangas või sularahas kohapeal</p>
-  <p>Peale broneeringu kinnitust saadame Sinu emailile kinnituse.</p>
+  <h2>How to book?</h2>
+  <p>1. Choose a suitable time and service from the calendar</p>
+  <p>2. Create an account in our booking system</p>
+  <p>3. Choose a payment method, pay by online bank or in cash on site</p>
+  <p>After confirming your booking, we will send a confirmation to your email.</p>
 
   <div class="booking__calendar">
     <iframe
       src={HOPITUDE_URL}
-      title="Broneerimiskalender"
+      title="Booking calendar"
       loading="lazy"
       frameborder="0"
     ></iframe>
   </div>
 
-  <h2>Broneeri aeg vabastavaks hingamiseks või floatinguks Tallinnas</h2>
-  <p>Hingamiskeskus pakub vabastavat hingamist ja floatingut. Meie kogenud terapeudid juhendavad sind turvaliselt kogu protsessi vältel, olenemata sellest, kas tuled esimest korda või oled juba regulaarne külastaja. Hingamiskeskus on ainus koht Tallinnas, kus saad kogeda soojas vees hingamist.</p>
-  <p><a href="/vabastav-hingamine">Vabastav hingamine</a> aitab vabaneda emotsionaalsetest ja kehalistest pingetest, leevendada stressi ja ärevust ning saavutada sisemist selgust. Seanss kestab 2 tundi ja toimub privaatses ning rahulikus ruumis.</p>
-  <p><a href="/floating">Floating</a> ehk hõljumine Epsomi soolases vees lõdvestab lihaseid, rahustab närvisüsteemi ja parandab und. Üks tund floatingut annab kehale sama sügava puhkuse kui 4 tundi und.</p>
-  <p>Kõik seansid toimuvad Tallinna kesklinna lähedal asuvas Hingamiskeskuses aadressil Sõle 14c. Parkimine on võimalik maja ees ja Mulla tänavl.</p>
+  <h2>Book a session for breathwork or floating in Tallinn</h2>
+  <p>Hingamiskeskus offers breathwork and floating. Our experienced therapists guide you safely throughout the whole process, whether you come for the first time or are already a regular visitor. Hingamiskeskus is the only place in Tallinn where you can experience breathwork in warm water.</p>
+  <p><a href="/en/breathwork">Breathwork</a> helps release emotional and physical tension, relieve stress and anxiety, and achieve inner clarity. The session lasts 2 hours and takes place in a private and calm room.</p>
+  <p><a href="/en/floating">Floating</a>, floating in Epsom salt water, relaxes the muscles, calms the nervous system and improves sleep. One hour of floating gives the body the same deep rest as 4 hours of sleep.</p>
+  <p>All sessions take place at Hingamiskeskus near the center of Tallinn at Sõle 14c. Parking is available in front of the building and on Mulla street.</p>
 
-  <h2>Mis juhtub pärast broneeringut?</h2>
-  <p>Pärast broneerimist saadame emailile kinnituse koos praktiliste juhistega. Palume saabuda 15 minutit enne seansi algust. Esimesel külastusel tutvustab terapeut teenust ning vastab kõigile küsimustele.</p>
-  <p>Küsimuste korral võta meiega julgelt ühendust, oleme alati abivalmis!</p>
+  <h2>What happens after booking?</h2>
+  <p>After booking, we will send a confirmation to your email along with practical instructions. Please arrive 15 minutes before the session begins. On your first visit, the therapist will introduce the service and answer all your questions.</p>
+  <p>If you have any questions, feel free to contact us, we are always happy to help!</p>
 
-  <a href={HOPITUDE_URL} target="_blank" rel="noopener" class="booking__btn">BRONEERI AEG</a>
+  <a href={HOPITUDE_URL} target="_blank" rel="noopener" class="booking__btn">BOOK A SESSION</a>
 </section>
 
-<Footer />
+<Footer lang="en" />
 
 </Layout>
 

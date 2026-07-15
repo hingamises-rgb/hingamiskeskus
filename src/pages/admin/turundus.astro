@@ -6,7 +6,7 @@ import { requireDb } from '../../lib/db';
 
 const sql = requireDb();
 
-const [cfg] = await sql`SELECT active, heading, description, heading_ru, description_ru, code, timer_minutes FROM popup_config WHERE id = 1`;
+const [cfg] = await sql`SELECT active, heading, description, heading_ru, description_ru, heading_en, description_en, code, timer_minutes FROM popup_config WHERE id = 1`;
 
 // Kuude statistika: külastajad, vaatamised, popupi näitamised, konversioonid
 const monthly = await sql`
@@ -80,6 +80,14 @@ function fmtDateTime(d: string | Date) {
       </div>
       <label>Kirjeldus (vene)</label>
       <input type="text" name="description_ru" value={cfg?.description_ru || ''} />
+      <div class="row" style="margin-top:10px;">
+        <div>
+          <label>Pealkiri (inglise)</label>
+          <input type="text" name="heading_en" value={cfg?.heading_en || ''} />
+        </div>
+      </div>
+      <label>Kirjeldus (inglise)</label>
+      <input type="text" name="description_en" value={cfg?.description_en || ''} />
       <button type="submit" class="btn" style="margin-top:14px;">SALVESTA</button>
       <span id="cfg-status" style="font-size:13px; color:#1a7f37; margin-left:10px;"></span>
     </form>
@@ -164,6 +172,8 @@ function fmtDateTime(d: string | Date) {
         description: (f.elements.namedItem('description') as HTMLInputElement).value,
         heading_ru: (f.elements.namedItem('heading_ru') as HTMLInputElement).value,
         description_ru: (f.elements.namedItem('description_ru') as HTMLInputElement).value,
+        heading_en: (f.elements.namedItem('heading_en') as HTMLInputElement).value,
+        description_en: (f.elements.namedItem('description_en') as HTMLInputElement).value,
         code: (f.elements.namedItem('code') as HTMLInputElement).value,
         timer_minutes: parseInt((f.elements.namedItem('timer_minutes') as HTMLInputElement).value || '3', 10),
       }),

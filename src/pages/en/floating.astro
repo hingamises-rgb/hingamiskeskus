@@ -1,16 +1,16 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import RelatedLinks from '../components/RelatedLinks.astro';
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import RelatedLinks from '../../components/RelatedLinks.astro';
 
 // FAQPage schema — hoia sünkroonis lehe FAQ-plokiga!
 const FAQ = [
-  ['Kas floating Tallinnas sobib esmakordseks kogemuseks?', 'Jah. Enamik meie külastajatest tuleb floatingusse esimest korda ning enne seansi algust selgitab terapeut rahulikult kogu protsessi.'],
-  ['Kui palju floating Tallinnas maksab?', 'Ühe floatingu seansi hind on 40 € ja kestus 1 tund. 3 korra proovipakett maksab 75 €.'],
-  ['Kus floating Tallinnas asub?', 'Hingamiskeskus asub aadressil Sõle 14c Tallinnas, kesklinna lähedal. Parkida saab mugavalt maja ees.'],
-  ['Kas floating sobib rasedatele?', 'Jah. Floating aitab vähendada survet seljale ja jalgadele ning pakub kehale sügavat lõõgastust. Soovitame enne broneerimist meiega ühendust võtta.'],
-  ['Kas floatingus peab oskama ujuda?', 'Ei pea. Epsomi soola sisaldus vees on nii kõrge, et keha püsib loomulikult vee pinnal.'],
+  ['Is floating in Tallinn suitable for a first-time experience?', 'Yes. Most of our visitors come to floating for the first time, and before the session the therapist calmly explains the whole process.'],
+  ['How much does floating in Tallinn cost?', 'A single floating session costs 40 € and lasts 1 hour. The 3-session trial package costs 75 €.'],
+  ['Where is floating in Tallinn located?', 'Hingamiskeskus is located at Sõle 14c in Tallinn, near the city center. Convenient parking is available in front of the building.'],
+  ['Is floating suitable for pregnant women?', 'Yes. Floating helps reduce pressure on the back and legs and offers the body deep relaxation. We recommend contacting us before booking.'],
+  ['Do you need to know how to swim to float?', 'No. The Epsom salt concentration in the water is so high that the body naturally stays on the surface.'],
 ];
 const FAQ_SCHEMA = {
   '@type': 'FAQPage',
@@ -19,102 +19,103 @@ const FAQ_SCHEMA = {
 ---
 
 <Layout
-  title="Floating Tallinn | 1 tund = 4 tundi und - Hingamiskeskus"
-  description="Floating aitab kehal lõdvestuda, parandab und ja kiirendab taastumist. Magneesiumsoolveega täidetud vannis hõljumine leevendab stressi, lihaspingeid ja valusid. Floating Tallinn ootab sind külla!"
+  title="Floating Tallinn – Release Muscle Tension | Hingamiskeskus"
+  description="Floating Tallinn at Hingamiskeskus helps relax the body, improve sleep and speed up recovery. Float in Epsom salt water to relieve stress, tension and muscle pain!"
   keywords="Floating lõõgastustehnika, Floating magneesiumsoolavannis, Floating Tallinn"
+  lang="en"
   alternates={{ et: '/floating', ru: '/ru/floating', en: '/en/floating' }}
   schema={FAQ_SCHEMA}
 >
 
 <!-- HEADER -->
-<Header active="teenused" altHref="/ru/floating" />
+<Header active="teenused" lang="en" />
 
 <!-- HERO SECTION (vana lehe paigutus: tekst + punktid vasakul, püstine video + nupud paremal) -->
 <section class="float-hero">
   <div class="float-hero__content">
     <div class="float-hero__text">
-      <h1 class="float-hero__title">Floating on sügava lõõgastuse kogemus Tallinnas</h1>
-      <p class="float-hero__subtitle">1 tund floatingut = 4 tundi sügavat und</p>
-      <p>Floating on sügava lõõgastuse kogemus kehale ja meelele.</p>
-      <p>Sa lebad soojas, Epsomi soola ja veega täidetud vannis, mis toetab su keha ja loob tunde nagu hõljuksid.</p>
-      <p>Vaikus, pimedus ja kaalutus aitavad sul igapäevasest pingest lahti lasta.</p>
-      <p>Hingamiskeskus pakub floatingu kogemust Tallinnas, hubastes ja privaatsetes ruumides. Seanss kestab 60 minutit.</p>
-      <h2 class="float-benefits__title">Mida sa tunned pärast floatingut:</h2>
+      <h1 class="float-hero__title">Floating is a deep relaxation experience in Tallinn</h1>
+      <p class="float-hero__subtitle">1 hour of floating = 4 hours of deep sleep</p>
+      <p>Floating is a deep relaxation experience for the body and mind.</p>
+      <p>You lie in a warm bath filled with Epsom salt and water that supports your body and creates the feeling of floating.</p>
+      <p>Silence, darkness and weightlessness help you let go of everyday tension.</p>
+      <p>Hingamiskeskus offers the floating experience in Tallinn, in cozy and private rooms. The session lasts 60 minutes.</p>
+      <h2 class="float-benefits__title">What you feel after floating:</h2>
       <ul class="float-benefits__list">
-        <li>stress ja pinge kaovad</li>
-        <li>lihased lõdvestuvad</li>
-        <li>mõistus rahuneb ja keha puhkab</li>
-        <li>uni paraneb</li>
-        <li>magneesiumitase kehas taastub</li>
-        <li>enesetunne on värskem, kergem ja puhanum</li>
+        <li>stress and tension disappear</li>
+        <li>muscles relax</li>
+        <li>the mind calms and the body rests</li>
+        <li>sleep improves</li>
+        <li>magnesium levels in the body are restored</li>
+        <li>you feel fresher, lighter and more rested</li>
       </ul>
     </div>
     <div class="float-hero__media">
       <div class="float-hero__video">
         <iframe src="https://www.youtube.com/embed/JiqDwhFalXI" title="Floating Hingamiskeskus" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
-      <a href="/broneeri-aeg" class="float-cta__btn">BRONEERI AEG</a>
-      <a href="/e-pood" class="float-cta__promo">3X PROOVIPAKETT SOODUSHIND 75€ (120€)</a>
+      <a href="/en/book-a-session" class="float-cta__btn">BOOK A SESSION</a>
+      <a href="/en/shop" class="float-cta__promo">3X TRIAL PACKAGE SPECIAL PRICE 75€ (120€)</a>
     </div>
   </div>
 </section>
 
 <!-- INFO SECTION -->
 <section class="float-info">
-  <h2 class="float-info__heading">Floatingu seansi hind on 40€, kestvus 1h.</h2>
-  <p>Selleks, et Sinu floatingu seanss oleks võimalikult meeldiv ja lõõgastav, soovitame kohale tulla vähemalt 15 minutit enne seansi algust. See annab Sulle piisavalt aega, et saaksime tutvustada kuidas floatigu protsess välja näeb ja jõuaksid ennem seansi duši all käia.</p>
-  <p>Meie floatingu seansid toimuvad vaikuses ja privaatsetes ruumides. Sul on võimalus valida, kas soovid floatida täiesti pimedas ruumis või kasutada hubast väikest valgust. Valik on Sinu soovime, et Sinu kogemus oleks täpselt selline, nagu sulle sobib!</p>
-  <p>Ootame floatima ka liikumisraskustega inimesi. Mugava kogemuse tagamiseks soovitame enne seansile tulekut meiega ühendust võtta.</p>
-  <p><strong>Mis kohapeal on olemas:</strong> Käterätik, hoomikumantel, plätud, dušigeel, šampoon ja föön.</p>
-  <p><strong>Kellele floating sobib:</strong> Stressis ja läbipõlemise piiril olijatele, sportlastele taastumiseks, lapseootel emadele (leevendab survet seljale ja jalgadele), kroonilise seljavalu ja lihaspingete korral ning neile, kes soovivad paremat und.</p>
-  <p><strong>Kellele floating ei sobi:</strong> Epilepsia korral kui hood ei ole kontrolli all, värskete haavade või kriimustuste korral, nakkushaiguse korral ning alkoholi või narkojoobes.</p>
-  <p>Kui sul on veel küsimusi floatingu kohta, siis vaata meie <a href="/kkk" class="float-info__link">korduma kippuvaid küsimusi</a></p>
+  <h2 class="float-info__heading">The price of a floating session is €40, duration 1 hour.</h2>
+  <p>To ensure your floating session is as pleasant and relaxing as possible, we recommend arriving at least 15 minutes before the session begins. This will give you enough time for us to explain how the floating process works and to take a shower beforehand.</p>
+  <p>Our floating sessions take place in silence and privacy. You can choose whether you prefer to float in complete darkness or use a soft ambient light. The choice is yours; we want your experience to be exactly as you wish!</p>
+  <p>We also welcome individuals with mobility challenges. To ensure a comfortable experience, we recommend contacting us before your visit.</p>
+  <p><strong>What is available on site:</strong> towel, bathrobe, slippers, shower gel, shampoo and hairdryer.</p>
+  <p><strong>Who floating is for:</strong> those under stress or on the verge of burnout, athletes for recovery, expectant mothers (it relieves pressure on the back and legs), those with chronic back pain and muscle tension, and anyone who wants better sleep.</p>
+  <p><strong>Who floating is not for:</strong> in case of uncontrolled epilepsy, fresh wounds or scratches, infectious diseases, and while under the influence of alcohol or drugs.</p>
+  <p>If you have more questions about floating, see our <a href="/en/faq" class="float-info__link">frequently asked questions</a></p>
 </section>
 
 <!-- REVIEWS -->
 <section class="float-reviews">
   <div class="float-reviews__inner">
-  <h2 class="float-reviews__title">Tagasiside</h2>
+  <h2 class="float-reviews__title">Reviews</h2>
 
   <div class="float-review">
     <div class="float-review__stars">⭐⭐⭐⭐⭐</div>
-    <p class="float-review__text">"Lihtsalt nii hea on olla peale ulpimist, et kohe ei teagi, mida välja tuua – lihtsalt super äge! Suured tänud Signele ja Alarihile! Kindlasti tulen siia tagasi veel ja veel."</p>
+    <p class="float-review__text">"It is simply so good to be after floating that I do not even know what to highlight, just super awesome! Many thanks to Signe and Alarih! I will definitely come back again and again."</p>
     <p class="float-review__author">- Kaire</p>
   </div>
 
   <div class="float-review">
     <div class="float-review__stars">⭐⭐⭐⭐⭐</div>
-    <p class="float-review__text">"Floating – väga huvitav kogemus! Mõtted hajusid ning lõõgastus oli imeline! Sain oma keha täiesti vabaks lasta! Seda pole ammu juhtunud. Suured tänud!"</p>
+    <p class="float-review__text">"Floating, a very interesting experience! My thoughts dissolved and the relaxation was wonderful! I was able to let my body completely go! That has not happened in a long time. Many thanks!"</p>
     <p class="float-review__author">- E.</p>
   </div>
 
   <div class="float-review">
     <div class="float-review__stars">⭐⭐⭐⭐⭐</div>
-    <p class="float-review__text">"Mõnus, soe ja rahustav kogemus!"</p>
+    <p class="float-review__text">"A pleasant, warm and calming experience!"</p>
     <p class="float-review__author">- Sirly</p>
   </div>
 
   <div class="float-review">
     <div class="float-review__stars">⭐⭐⭐⭐⭐</div>
-    <p class="float-review__text">"Floatimine oli nii lõõgastav kui ka positiivselt üllatav elamus. Kohapeal oli omanik, kes toredasti juhendas ja andis häid nippe. Soovitan kõigile, eriti kui on kiired ajad ning vaja aeg päriselt maha võtta."</p>
+    <p class="float-review__text">"Floating was both relaxing and a positively surprising experience. The owner was on site, kindly guided me and gave good tips. I recommend it to everyone, especially during busy times when you really need to slow down."</p>
     <p class="float-review__author">- Kaarel</p>
   </div>
 
   <div class="float-review">
     <div class="float-review__stars">⭐⭐⭐⭐⭐</div>
-    <p class="float-review__text">"Juba esimese floatinguseansi järgselt tundsin õhtul, kuidas ülaselg muutus kergemaks ja õlgadesse tuli liikumisruumi juurde! Soovitan!"</p>
+    <p class="float-review__text">"Already after the first floating session, in the evening I felt how my upper back became lighter and more room to move opened up in my shoulders! I recommend it!"</p>
     <p class="float-review__author">- Liis</p>
   </div>
 
   <div class="float-review">
     <div class="float-review__stars">⭐⭐⭐⭐⭐</div>
-    <p class="float-review__text">"On väga meeldiv ning mõnus kogemus, võtta hetk endale ja lasta oma lihastel ning hingel puhata ja lõõgastuda. Ka õhkkond ning keskkond sinu ümber on meeldiv ja sõbralik."</p>
+    <p class="float-review__text">"It is a very pleasant and enjoyable experience to take a moment for yourself and let your muscles and soul rest and relax. The atmosphere and environment around you are also pleasant and friendly."</p>
     <p class="float-review__author">- Ronan</p>
   </div>
 
   <div class="float-review">
     <div class="float-review__stars">⭐⭐⭐⭐⭐</div>
-    <p class="float-review__text">"Esimene kord floatingus ja väga meeldiv kogemus. Hea rahustav kehale ning meelele. Aeg täielikult iseendale."</p>
+    <p class="float-review__text">"First time floating and a very pleasant experience. Nicely calming for body and mind. Time completely for yourself."</p>
     <p class="float-review__author">- Priidu</p>
   </div>
   </div>
@@ -124,89 +125,89 @@ const FAQ_SCHEMA = {
 <section class="float-faq">
   <div class="float-faq__item">
     <button class="float-faq__question" aria-expanded="false">
-      Kas floating Tallinnas sobib esmakordseks kogemuseks?
+      Is floating in Tallinn suitable for a first-time experience?
       <span class="float-faq__icon">+</span>
     </button>
     <div class="float-faq__answer">
-      <p>Jah. Enamik meie külastajatest tuleb floatingusse esimest korda ning enne seansi algust selgitab terapeut rahulikult kogu protsessi.</p>
+      <p>Yes. Most of our visitors come to floating for the first time, and before the session the therapist calmly explains the whole process.</p>
     </div>
   </div>
 
   <div class="float-faq__item">
     <button class="float-faq__question" aria-expanded="false">
-      Kui palju floating Tallinnas maksab?
+      How much does floating in Tallinn cost?
       <span class="float-faq__icon">+</span>
     </button>
     <div class="float-faq__answer">
-      <p>Ühe floatingu seansi hind on 40 € ja kestus 1 tund. 3 korra proovipakett maksab 75 €.</p>
+      <p>A single floating session costs 40 € and lasts 1 hour. The 3-session trial package costs 75 €.</p>
     </div>
   </div>
 
   <div class="float-faq__item">
     <button class="float-faq__question" aria-expanded="false">
-      Kus floating Tallinnas asub?
+      Where is floating in Tallinn located?
       <span class="float-faq__icon">+</span>
     </button>
     <div class="float-faq__answer">
-      <p>Hingamiskeskus asub aadressil Sõle 14c Tallinnas, kesklinna lähedal. Parkida saab mugavalt maja ees.</p>
+      <p>Hingamiskeskus is located at Sõle 14c in Tallinn, near the city center. Convenient parking is available in front of the building.</p>
     </div>
   </div>
 
   <div class="float-faq__item">
     <button class="float-faq__question" aria-expanded="false">
-      Kas floating sobib rasedatele?
+      Is floating suitable for pregnant women?
       <span class="float-faq__icon">+</span>
     </button>
     <div class="float-faq__answer">
-      <p>Jah. Floating aitab vähendada survet seljale ja jalgadele ning pakub kehale sügavat lõõgastust. Soovitame enne broneerimist meiega ühendust võtta.</p>
+      <p>Yes. Floating helps reduce pressure on the back and legs and offers the body deep relaxation. We recommend contacting us before booking.</p>
     </div>
   </div>
 
   <div class="float-faq__item">
     <button class="float-faq__question" aria-expanded="false">
-      Kas floatingus peab oskama ujuda?
+      Do you need to know how to swim to float?
       <span class="float-faq__icon">+</span>
     </button>
     <div class="float-faq__answer">
-      <p>Ei pea. Epsomi soola sisaldus vees on nii kõrge, et keha püsib loomulikult vee pinnal.</p>
+      <p>No. The Epsom salt concentration in the water is so high that the body naturally stays on the surface.</p>
     </div>
   </div>
 </section>
 
 <!-- SEO TEXT -->
 <section class="float-seo">
-  <h2 class="float-seo__heading">Floatingu ajalugu</h2>
-  <p>Floating on keskkond lõõgastumiseks, hõljudes väga soolases vees. Protsess toimub spetsiaalses kambris või vannis, mis on täidetud veega ja Epsomi soolaga. Epsomi sool võimaldab inimesel lihtsasti hõljuda vee pinnal. Vann või kamber on tavaliselt pimedas (vastavalt soovile) ja ümbritsetud vaikusega. Selles keskkonnas saad puhata ning see soodustab meele avardumist ja uute perspektiivide avastamist. Kehatemperatuuriga sarnane temperatuur kambris ja vees kaotab piiri vee ja õhu vahel ning laseb segamatult lõõgastuda.</p>
+  <h2 class="float-seo__heading">Relaxation for mind and body through floating</h2>
+  <p>Floating is an environment for relaxation, where you float effortlessly in highly saline water. The process takes place in a specialized tank or tub filled with water and Epsom salt, allowing the body to float easily on the surface. The tank or tub is typically set in darkness and silence, depending on preference. In this environment you can rest, and it promotes mental expansion and the discovery of new perspectives. The temperature in the tank and water matches body temperature, blurring the boundary between air and water and allowing for deep relaxation.</p>
 
-  <p>Floating kambri leiutas doktor John C. Lilly 1954. aastal. Tema katsetas ja kasutas kambrit isiklikult ja on kirjutanud sellel teemal ka mitmeid raamatuid.</p>
+  <p>The floating tank was invented by Dr. John C. Lilly in 1954. He personally tested and used the tank and has written several books on the subject.</p>
 
-  <p>Floatingu eesmärk on pakkuda sügavat lõõgastumist ja vaimset taastumist. Kuna inimene hõljub veepinnal, ei ole tal vaja teha jõupingutusi liikumiseks või veepinnal püsimiseks. Seega saavad lihased täielikult lõdvestuda, mis omakorda vähendab kehas pingeid.</p>
+  <p>The purpose of floating is to provide deep relaxation and mental rejuvenation. Since the body floats effortlessly on the water, there is no need for effort to stay afloat, allowing the muscles to fully relax, which in turn reduces tension in the body.</p>
 
-  <p>Tihke Epsomi soola lahuse tekitatud hõljumistunne vabastab keha gravitatsioonist, luues täielikult kaaluta oleku. Gravitatsioon, mis teadupoolest hõlmab 90% kogu kesknärvisüsteemi tegevusest, on tõenäoliselt üks suurimaid tervisehädade põhjuseid seljavalu, jala- ja liigesevalud ning lihaspinge tulenevad kõik valest kehahoiakust. Seega, kui vabastada aju ja luustik gravitatsioonist, vabaneb suur kogus energiat, mistõttu hakkab enamik ajust tegelema meelte ja vaimuga ning kõrgeneb teadlikkus sisemistest seisunditest. Aju puhkusele aitab omakorda kaasa vannis viibimise ajal valitsev vaikus ja rahu.</p>
+  <p>The dense Epsom salt solution creates a sensation of weightlessness, freeing the body from the effects of gravity. Gravity, which occupies 90% of the central nervous system activity, is likely one of the biggest causes of health issues: back pain, leg and joint pain, and muscle tension all stem from poor posture. By freeing the brain and skeletal system from gravitational forces, a large amount of energy is released, allowing most of the brain to focus on sensory perception and mental awareness. The silence and tranquility experienced in the tank further support the brain in reaching a state of deep rest.</p>
 
-  <p>Sügav lõõgastus aitab vähendada ärevust, stressitaseme langus aga soodustab sügavat und. Floating aitab võidelda unehäiretega.</p>
+  <p>Deep relaxation helps reduce anxiety, and lower stress levels promote deeper sleep. Floating helps combat sleep disorders.</p>
 
-  <p>Vee, õhu ja kehatemperatuuri ühtlustamine aitab saavutada ajus alfalainetelt (tekivad inimese ajus lõõgastushetkedel) ülemineku teetalainetele, mis võib aidata saavutada sügavamaid meditatiivseid sisundeid ja süveneda eneseteadvusesse</p>
+  <p>The harmonization of water, air, and body temperature allows the brain to shift from alpha waves (which occur during moments of relaxation) to theta waves, which can help achieve deeper meditative states and self-awareness.</p>
 
-  <p>Floatingu kasutatakse sageli stressi leevendamiseks, ärevuse vähendamiseks, lihaspingete leevendamiseks, parema une saamiseks ning üldise heaolu ja vaimse tervise parandamiseks. Paljud inimesed kogevad pärast floatingut sügavat rahulolu ja selgust ning tunnevad end füüsiliselt ja vaimselt värskena.</p>
+  <p>Floating is often used to relieve stress, reduce anxiety, release muscle tension, improve sleep quality, and enhance overall well-being and mental health. Many people experience a deep sense of satisfaction and clarity after floating and feel physically and mentally refreshed.</p>
 
-  <p>Epsom sool sisaldab 98% magneesiumi, mis mängib organismis mitmeid olulisi rolle ning on hädavajalik paljude keha funktsioonide ja protsesside jaoks.</p>
+  <p>Epsom salt consists of 98% magnesium, which plays a crucial role in many bodily functions and processes.</p>
 
-  <p>Epsomi sool aitab nahal pehmeneda, leevendades kuivust ja ketendust. See võib olla eriti kasulik inimestele, kellel on kuiv nahk või kellel esineb nahaprobleeme nagu dermatiit või ekseem. Samuti aitab Epsomi sool parandada verevarustust nahas, mis omakorda soodustab rakkude taastumist ja nahakudede paranemist.</p>
+  <p>Epsom salt helps soften the skin, relieving dryness and flakiness. This can be especially beneficial for people with dry skin or skin conditions such as dermatitis or eczema. Additionally, Epsom salt improves blood circulation in the skin, which supports cell regeneration and tissue healing.</p>
 
-  <p>Floating Epsomi soola vees aitab saavutada sügavamat lõõgastumist, vähendada stressi ja ärevust ning parandada nii keha kui ka meeleolu üldist heaolu.</p>
+  <p>Floating in Epsom salt water helps achieve deep relaxation, reduce stress and anxiety, and improve both physical and mental well-being.</p>
 
-  <p>Floatingu mõju on kinnitatud teadusuuringutes. Loe lähemalt: uuring 1 (süstemaatiline ülevaade 63 uuringust, 2025), uuring 2 (ärevuse ja depressiooni uuring, 2024), uuring 3 (teadvuse seisundid floatingu ajal, 2024)</p>
+  <p>The effects of floating are supported by scientific research: study 1 (systematic review of 63 studies, 2025), study 2 (anxiety and depression study, 2024), study 3 (states of consciousness during floating, 2024).</p>
 
 </section>
 
-<RelatedLinks links={[
-  { href: "/vabastav-hingamine", label: "Vabastav hingamine", desc: "Juhendatud hingamisseanss grupis" },
-  { href: "/soojas-vees-hingamine", label: "Soojas vees hingamine", desc: "Hingamine ja floating ühes seansis" },
-  { href: "/hakka-liikmeks", label: "Hakka liikmeks", desc: "Floating liikmele 30€ kord" },
+<RelatedLinks lang="en" links={[
+  { href: "/en/breathwork", label: "Breathwork", desc: "Guided breathing session in a group" },
+  { href: "/en/breathwork-in-water", label: "Breathwork in water", desc: "Breathing and floating in one session" },
+  { href: "/en/membership", label: "Membership", desc: "Floating for members, €30 per session" },
 ]} />
 
-<Footer />
+<Footer lang="en" />
 
 </Layout>
 
