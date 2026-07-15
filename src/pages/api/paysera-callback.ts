@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
 });
 
 function shippingLabel(val: string) {
-  if (val === 'pickup') return 'Tule ise järgi (Söle 14C, Tallinn)';
+  if (val === 'pickup') return 'Tule ise järgi (Sõle 14C, Tallinn)';
   if (val === 'dpd') return 'DPD pakiautomaat';
   if (val === 'omniva') return 'Omniva pakiautomaat';
   return val;

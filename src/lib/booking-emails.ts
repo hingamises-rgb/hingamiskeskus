@@ -109,7 +109,7 @@ function wrap(bodyHtml: string): string {
       ${bodyHtml}
     </div>
     <div style="padding: 14px 20px; font-size: 12px; color: #5a6e76; border-top: 1px solid #d7e6ec;">
-      Söle 14c, Tallinn · info@hingamiskeskus.ee · +372 5669 5898
+      Sõle 14c, Tallinn · info@hingamiskeskus.ee · +372 5669 5898
     </div>
   </div>`;
 }
