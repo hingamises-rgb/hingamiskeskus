@@ -403,7 +403,7 @@ import Layout from '../layouts/Layout.astro';
   });
 </script>
 
-<style>
+<style is:global>
   .checkout-page {
     min-height: 100vh;
     background: #fff;
@@ -629,11 +629,20 @@ import Layout from '../layouts/Layout.astro';
   }
   .order-item__remove {
     background: none;
-    border: none;
-    color: #999;
-    font-size: 14px;
+    border: 1.5px solid rgba(0,0,0,0.15);
+    border-radius: 6px;
+    color: #b3261e;
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
-    padding: 4px;
+    padding: 6px 10px;
+    min-width: 34px;
+    min-height: 34px;
+    flex-shrink: 0;
+  }
+  .order-item__remove:hover {
+    border-color: #b3261e;
+    background: rgba(179, 38, 30, 0.06);
   }
 
   .cart-empty {
