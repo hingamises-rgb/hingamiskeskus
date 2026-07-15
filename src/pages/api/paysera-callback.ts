@@ -9,7 +9,7 @@ import { grantShopPackages } from '../../lib/booking';
 const SIGN_PASSWORD = import.meta.env.PAYSERA_SIGN_PASSWORD;
 const EMAIL_USER = import.meta.env.EMAIL_USER || 'info@hingamiskeskus.ee';
 const EMAIL_PASS = import.meta.env.EMAIL_PASS || '';
-const NOTIFY_EMAIL = 'hingamises@gmail.com';
+const NOTIFY_EMAIL = 'info@hingamiskeskus.ee';
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.hostinger.com',
