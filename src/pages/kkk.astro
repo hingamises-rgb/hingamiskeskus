@@ -2,6 +2,26 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+
+// FAQPage schema — hoia sünkroonis allpool nähtavate küsimuste-vastustega!
+const FAQ = [
+  ['Mida peaks võtma kaasa?', 'Kaasa ei pea põhimõtteliselt midagi võtma, meie poolt on olemas ökoloogilised pesemisvahendid, rätik, kõrvatropid ja kaelapadi ning floatida soovitame alasti. Soovi korral võta kaasa endale vajalikud kosmeetikatooted (nt deodorant, näokreem, kamm vms).'],
+  ['Millega peaksin veel arvestama kui soovin Floatima tulla?', 'Vajalik on avatud ning ootusteta suhtumine. Paar tundi enne tulekut väldi stimulante nagu kohv ja energiajoogid, ära tule liiga tühja ega täis kõhuga ning samal päeval ei tohiks raseerida ega vahatada. Värskelt värvitud juustega tulla ei tohi, kuni juuksepesuvesi on läbipaistev.'],
+  ['Kas floatingut saab kasutada taastusraviks?', 'Floatimine sobib väga hästi taastusraviks, kuna vannivees on suures koguses magneesiumi ja magneesium on taastava toimega.'],
+  ['Kui tihti peaks Floatimas käima?', 'Kasvõi iga päev! Väga hea tulemuse annab iganädalane floatingu seanss, sest nädal on tüüpiline tsükkel oma hari- ja madalpunktidega.'],
+  ['Kui palju kordi peaksin ma hingamas käima, et kogeda märgatavat muutust oma elus?', 'Juba pärast esimest korda võib tunda muutusi. Esimesed nihked toimuvad 4-6 sessiooni ajal, suuremate muutuste jaoks on soovitatav vähemalt 10 korda juhendatult hingamas käia.'],
+  ['Kas ma grupi jagamise ringide ajal pean midagi rääkima ja jagama?', 'Ei pea. Ringi lõpus jagamine on täiesti vabatahtlik.'],
+  ['Mul ei tulnud emotsioone esile. Kas see tähendab, et ma ei vabastanudki midagi?', 'Vabastamine ei toimu ainult emotsioonidena, vaid ka füüsiliste tundmustena kehas: kuuma/külma lained, surinad jne näitavad, et pinged vabanevad.'],
+  ['Kellele need teenused mõeldud on?', 'Iga inimene võib leida endale nendelt teenustelt kasu. Eriti aitab floating sportlastel magneesiumivarusid täiendada, rasedatel leevendada sünnituseelseid valusid ning stressis inimestel taastuda.'],
+];
+const FAQ_SCHEMA = {
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map(([q, a]) => ({
+    '@type': 'Question',
+    name: q,
+    acceptedAnswer: { '@type': 'Answer', text: a },
+  })),
+};
 ---
 
 <Layout
@@ -9,6 +29,7 @@ import Footer from '../components/Footer.astro';
   description="Loe vastuseid  floatingu ja hingamise kkk kohta. Siit leiad kõik, mida vajad, et tulla teadlikult ja enesekindlalt seansile kus sa saad maksimaalse lõdvestuse"
   keywords="floating korduma kippuvad küsimused, floatingu ja hingamise kkk"
   alternates={{ et: '/kkk', ru: '/ru/chavo' }}
+  schema={FAQ_SCHEMA}
 >
 
 <!-- HEADER -->

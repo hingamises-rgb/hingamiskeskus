@@ -63,6 +63,38 @@ const cartProduct = product && !product.sold_out
 function fmtPrice(v: unknown) {
   return `€${Number(v).toFixed(2)}`;
 }
+
+// JSON-LD: artiklitele BlogPosting, toodetele Product (AI-otsingud ja rich results)
+const SCHEMA_SITE = 'https://www.hingamiskeskus.ee';
+const stripHtml = (h: unknown) => String(h || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+const pageSchema = article
+  ? {
+      '@type': 'BlogPosting',
+      headline: article.title,
+      description: article.description || '',
+      image: article.image ? SCHEMA_SITE + article.image : undefined,
+      datePublished: article.publishedTime || undefined,
+      dateModified: article.modifiedTime || article.publishedTime || undefined,
+      inLanguage: 'ru',
+      mainEntityOfPage: SCHEMA_SITE + article.path,
+      author: { '@type': 'Organization', name: 'Hingamiskeskus' },
+      publisher: { '@id': `${SCHEMA_SITE}/#organization` },
+    }
+  : {
+      '@type': 'Product',
+      name: product.title,
+      image: SCHEMA_SITE + product.image,
+      description: stripHtml(product.subtitle || '') || stripHtml(product.description).slice(0, 300),
+      sku: product.slug,
+      brand: { '@type': 'Brand', name: 'Hingamiskeskus' },
+      offers: {
+        '@type': 'Offer',
+        price: Number(product.price).toFixed(2),
+        priceCurrency: 'EUR',
+        availability: product.sold_out ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
+        url: `${SCHEMA_SITE}/ru/${product.page_slug_ru}`,
+      },
+    };
 ---
 
 <Layout
@@ -72,6 +104,7 @@ function fmtPrice(v: unknown) {
   type={article ? 'article' : 'website'}
   lang="ru"
   alternates={product ? { et: `/${product.page_slug}`, ru: `/ru/${product.page_slug_ru}` } : undefined}
+  schema={pageSchema}
 >
 
 <Header active={article ? 'blogi' : 'epood'} lang="ru" altHref={product ? `/${product.page_slug}` : undefined} />

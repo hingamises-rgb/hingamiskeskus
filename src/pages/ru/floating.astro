@@ -3,6 +3,20 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import RelatedLinks from '../../components/RelatedLinks.astro';
+
+// FAQPage schema — hoia sünkroonis lehe FAQ-plokiga!
+const FAQ = [
+  ['Подходит ли флоатинг в Таллине для первого опыта?', 'Да. Большинство наших гостей приходят на флоатинг впервые, и перед началом сеанса терапевт спокойно объясняет весь процесс.'],
+  ['Сколько стоит флоатинг в Таллине?', 'Стоимость одного сеанса флоатинга составляет 40 €, продолжительность 1 час. Пробный пакет из 3 посещений стоит 75 €.'],
+  ['Где находится флоатинг в Таллине?', 'Hingamiskeskus находится по адресу Sõle 14c, Таллинн, недалеко от центра города. Перед зданием есть удобная парковка.'],
+  ['Подходит ли флоатинг беременным?', 'Да. Флоатинг помогает снизить нагрузку на спину и ноги, а также даёт телу глубокое расслабление. Перед бронированием рекомендуем связаться с нами.'],
+  ['Нужно ли уметь плавать для флоатинга?', 'Нет. Концентрация соли Эпсома в воде настолько высокая, что тело естественным образом держится на поверхности воды.'],
+];
+const FAQ_SCHEMA = {
+  '@type': 'FAQPage',
+  inLanguage: 'ru',
+  mainEntity: FAQ.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+};
 ---
 
 <Layout
@@ -11,6 +25,7 @@ import RelatedLinks from '../../components/RelatedLinks.astro';
   keywords="флоатинг, глубокое расслабление, осознанное дыхание"
   lang="ru"
   alternates={{ et: '/floating', ru: '/ru/floating' }}
+  schema={FAQ_SCHEMA}
 >
 
 <!-- HEADER -->

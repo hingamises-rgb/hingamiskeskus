@@ -11,6 +11,8 @@ interface Props {
   lang?: 'et' | 'ru';
   /** Sama lehe teiste keelte URL-id hreflang jaoks, nt { et: '/teenused', ru: '/ru/uslugi' } */
   alternates?: Partial<Record<'et' | 'ru', string>>;
+  /** Lehespetsiifiline JSON-LD schema (nt FAQPage, Product, BlogPosting) */
+  schema?: object | object[];
 }
 const {
   title,
@@ -21,12 +23,49 @@ const {
   noindex = false,
   lang = 'et',
   alternates,
+  schema,
 } = Astro.props;
 
 const SITE = 'https://www.hingamiskeskus.ee';
 const canonicalUrl = SITE + Astro.url.pathname;
 const ogImage = image.startsWith('http') ? image : SITE + image;
 const ogLocale = lang === 'ru' ? 'ru_RU' : 'et_EE';
+
+// Saidiülene LocalBusiness JSON-LD (AI-otsingud ja Google loevad faktid otse siit).
+// NB: andmed peavad klappima jaluse ja Google Business Profile'iga (NAP-konsistentsus).
+const LOCAL_BUSINESS = {
+  '@context': 'https://schema.org',
+  '@type': 'HealthAndBeautyBusiness',
+  '@id': `${SITE}/#organization`,
+  name: 'Hingamiskeskus',
+  alternateName: lang === 'ru' ? 'Центр дыхания' : 'Hingamiskeskus OÜ',
+  description:
+    lang === 'ru'
+      ? 'Флоатинг и освобождающее дыхание в Таллине: глубокое расслабление, снятие стресса и восстановление.'
+      : 'Floating ja vabastav hingamine Tallinnas: süvalõõgastus, stressi leevendus ja taastumine.',
+  url: SITE,
+  logo: `${SITE}/images/logo.svg`,
+  image: `${SITE}/images/hoone.jpg`,
+  telephone: '+372 56695898',
+  email: 'info@hingamiskeskus.ee',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Sõle 14c',
+    addressLocality: 'Tallinn',
+    addressCountry: 'EE',
+  },
+  openingHoursSpecification: [
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '08:30', closes: '20:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Saturday', 'Sunday'], opens: '11:00', closes: '18:00' },
+  ],
+  priceRange: '€€',
+  sameAs: [
+    'https://www.facebook.com/Hingamiskeskus',
+    'https://www.instagram.com/hingamiskeskus/',
+  ],
+};
+
+const pageSchemas = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
 ---
 <!doctype html>
 <html lang={lang}>
@@ -52,6 +91,12 @@ const ogLocale = lang === 'ru' ? 'ru_RU' : 'et_EE';
   <meta property="og:site_name" content="Hingamiskeskus" />
   <meta property="og:locale" content={ogLocale} />
   <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Struktureeritud andmed (JSON-LD): ettevõtte faktid + lehespetsiifiline schema -->
+  <script type="application/ld+json" set:html={JSON.stringify(LOCAL_BUSINESS)} />
+  {pageSchemas.map((s) => (
+    <script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', ...s })} />
+  ))}
 
   <!-- Meta Pixel -->
   <script is:inline>

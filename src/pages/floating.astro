@@ -3,6 +3,19 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import RelatedLinks from '../components/RelatedLinks.astro';
+
+// FAQPage schema — hoia sünkroonis lehe FAQ-plokiga!
+const FAQ = [
+  ['Kas floating Tallinnas sobib esmakordseks kogemuseks?', 'Jah. Enamik meie külastajatest tuleb floatingusse esimest korda ning enne seansi algust selgitab terapeut rahulikult kogu protsessi.'],
+  ['Kui palju floating Tallinnas maksab?', 'Ühe floatingu seansi hind on 40 € ja kestus 1 tund. 3 korra proovipakett maksab 75 €.'],
+  ['Kus floating Tallinnas asub?', 'Hingamiskeskus asub aadressil Sõle 14c Tallinnas, kesklinna lähedal. Parkida saab mugavalt maja ees.'],
+  ['Kas floating sobib rasedatele?', 'Jah. Floating aitab vähendada survet seljale ja jalgadele ning pakub kehale sügavat lõõgastust. Soovitame enne broneerimist meiega ühendust võtta.'],
+  ['Kas floatingus peab oskama ujuda?', 'Ei pea. Epsomi soola sisaldus vees on nii kõrge, et keha püsib loomulikult vee pinnal.'],
+];
+const FAQ_SCHEMA = {
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+};
 ---
 
 <Layout
@@ -10,6 +23,7 @@ import RelatedLinks from '../components/RelatedLinks.astro';
   description="Floating aitab kehal lõdvestuda, parandab und ja kiirendab taastumist. Magneesiumsoolveega täidetud vannis hõljumine leevendab stressi, lihaspingeid ja valusid. Floating Tallinn ootab sind külla!"
   keywords="Floating lõõgastustehnika, Floating magneesiumsoolavannis, Floating Tallinn"
   alternates={{ et: '/floating', ru: '/ru/floating' }}
+  schema={FAQ_SCHEMA}
 >
 
 <!-- HEADER -->
