@@ -26,6 +26,72 @@ function shippingLabel(val: string) {
   return val;
 }
 
+// Make.com parser (kinkekaardi automaatika) loeb kirjast telefoni regexiga \+\d…
+function normPhone(p: string) {
+  const t = (p || '').replace(/[\s-]+/g, '');
+  if (!t || t.startsWith('+')) return t;
+  if (/^372\d{7,8}$/.test(t)) return '+' + t;
+  if (/^\d{7,8}$/.test(t)) return '+372' + t;
+  return t;
+}
+
+// "Kinkekaart 40€ x2, Epsomi sool 250g x1" -> [{cartName, qty}]
+function parseItems(items: string) {
+  return items.split(',').map((s) => s.trim()).filter(Boolean).map((s) => {
+    const m = s.match(/^(.*?)\s*x(\d+)$/i);
+    return m ? { cartName: m[1], qty: Math.max(1, parseInt(m[2], 10)) } : { cartName: s, qty: 1 };
+  });
+}
+
+type EmailLine = { title: string; qty: number; unit: number };
+
+// Tellimuse teavituskiri VANA Hostingeri kirja formaadis — Make.com kinkekaardi
+// automaatika on treenitud täpselt selle struktuuri peale (teema "You have received
+// a new order", "Order #<nr> summary", täispikk tootenimi + "1 × €40.00" rida,
+// Customer information plokk). Formaadi muutmine lõhub Make'i parseri!
+function orderHtml(opts: {
+  orderNo: string; name: string; lines: EmailLine[];
+  shippingPrice: number; shippingText: string; parcelText: string;
+  email: string; phone: string; address: string; note?: string;
+}) {
+  const subtotal = opts.lines.reduce((s, l) => s + l.qty * l.unit, 0);
+  const total = subtotal + opts.shippingPrice;
+  const itemsHtml = opts.lines.map((l) =>
+    `<p>${l.title}<br/>${l.qty} × €${l.unit.toFixed(2)}</p>`).join('\n');
+  return `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="font-size: 24px;">New Order #${opts.orderNo}</h1>
+        <p style="color: #666;">${new Date().toLocaleDateString('et-EE')} | ${new Date().toLocaleTimeString('et-EE', { hour: '2-digit', minute: '2-digit' })}</p>
+        <p>Hingamises OÜ received a new order from ${opts.name}.</p>
+        ${opts.note ? `<p style="color: #666;">${opts.note}</p>` : ''}
+
+        <div style="background: #f9f9f9; border: 1px solid #eee; border-radius: 8px; padding: 24px; margin: 20px 0;">
+          <h2 style="font-size: 18px; margin-top: 0;">Order #${opts.orderNo} summary</h2>
+          <hr style="border: none; border-top: 1px solid #eee;" />
+          ${itemsHtml}
+          <hr style="border: none; border-top: 1px solid #eee;" />
+          <table style="width: 100%; font-size: 14px;">
+            <tr><td>Subtotal</td><td style="text-align: right;">€${subtotal.toFixed(2)}</td></tr>
+            <tr><td>Shipping</td><td style="text-align: right;">€${opts.shippingPrice.toFixed(2)}</td></tr>
+            <tr><td><strong>Total</strong></td><td style="text-align: right;"><strong>€${total.toFixed(2)}</strong></td></tr>
+          </table>
+          <hr style="border: none; border-top: 1px solid #eee;" />
+          <p style="font-size: 14px;">Payment method: <strong>Paysera</strong></p>
+        </div>
+
+        <div style="background: #f9f9f9; border: 1px solid #eee; border-radius: 8px; padding: 24px; margin: 20px 0;">
+          <h2 style="font-size: 18px; margin-top: 0;">Customer information</h2>
+          <hr style="border: none; border-top: 1px solid #eee;" />
+          <p>${opts.name}<br/>
+          <a href="mailto:${opts.email}">${opts.email}</a><br/>
+          ${opts.phone}</p>
+          <p><strong>Saatmine:</strong> ${opts.shippingText}${opts.parcelText}</p>
+          ${opts.address ? `<p><strong>Aadress:</strong> ${opts.address}</p>` : ''}
+        </div>
+      </div>
+    `;
+}
+
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
   const data = url.searchParams.get('data') || '';
@@ -75,49 +141,76 @@ export const GET: APIRoute = async ({ request }) => {
 
     const shippingText = shippingLabel(shipping);
     const parcelText = parcel ? `<br/>Pakiautomaat: ${parcel}` : '';
-
     const shippingPrice = shipping === 'dpd' ? 3.10 : shipping === 'omniva' ? 3.46 : 0;
-    const subtotal = amount - shippingPrice;
 
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="font-size: 24px;">New Order ${orderid}</h1>
-        <p style="color: #666;">${new Date().toLocaleDateString('et-EE')} | ${new Date().toLocaleTimeString('et-EE', { hour: '2-digit', minute: '2-digit' })}</p>
-        <p>Hingamises OÜ received a new order from ${name}.</p>
+    // Täispikad tootenimed + hinnad DB-st (Make'i parser vajab pealkirja
+    // "Hingamiskeskuse kinkekaart 40 € ..." — ostukorvi lühinimest ei piisa)
+    const orderNo = orderid.replace(/\D/g, '') || orderid;
+    const phoneIntl = normPhone(phone);
+    let prodByCart = new Map<string, any>();
+    if (sql) {
+      try {
+        const rows = await sql`SELECT cart_name, title, price, category FROM products`;
+        prodByCart = new Map((rows as any[]).map((r: any) => [r.cart_name, r]));
+      } catch (err) {
+        console.error('Toodete lugemine ebaõnnestus:', err);
+      }
+    }
+    const parsed = parseItems(items).map((it) => {
+      const p = prodByCart.get(it.cartName);
+      return {
+        title: p?.title || it.cartName,
+        qty: it.qty,
+        unit: p ? Number(p.price) : 0,
+        isGift: p?.category === 'kinkekaardid',
+      };
+    });
+    // Kui hinda DB-st ei leitud (nt toode vahepeal kustutatud), jaga summa järgi
+    const knownSum = parsed.reduce((s, l) => s + (l.unit ? l.qty * l.unit : 0), 0);
+    const unknown = parsed.filter((l) => !l.unit);
+    if (unknown.length) {
+      const rest = Math.max(0, amount - shippingPrice - knownSum);
+      const perUnit = rest / unknown.reduce((s, l) => s + l.qty, 0);
+      unknown.forEach((l) => { l.unit = perUnit; });
+    }
 
-        <div style="background: #f9f9f9; border: 1px solid #eee; border-radius: 8px; padding: 24px; margin: 20px 0;">
-          <h2 style="font-size: 18px; margin-top: 0;">Order ${orderid} summary</h2>
-          <hr style="border: none; border-top: 1px solid #eee;" />
-          <p>${items}</p>
-          <hr style="border: none; border-top: 1px solid #eee;" />
-          <table style="width: 100%; font-size: 14px;">
-            <tr><td>Subtotal</td><td style="text-align: right;">€${subtotal.toFixed(2)}</td></tr>
-            <tr><td>Shipping</td><td style="text-align: right;">€${shippingPrice.toFixed(2)}</td></tr>
-            <tr><td><strong>Total</strong></td><td style="text-align: right;"><strong>€${amount.toFixed(2)}</strong></td></tr>
-          </table>
-          <hr style="border: none; border-top: 1px solid #eee;" />
-          <p style="font-size: 14px;">Payment method: <strong>Paysera</strong></p>
-        </div>
+    const giftCards = parsed.filter((l) => l.isGift);
+    const otherItems = parsed.filter((l) => !l.isGift);
+    const giftUnits = giftCards.reduce((s, l) => s + l.qty, 0);
 
-        <div style="background: #f9f9f9; border: 1px solid #eee; border-radius: 8px; padding: 24px; margin: 20px 0;">
-          <h2 style="font-size: 18px; margin-top: 0;">Customer information</h2>
-          <hr style="border: none; border-top: 1px solid #eee;" />
-          <p>${name}<br/>
-          <a href="mailto:${email}">${email}</a><br/>
-          ${phone}</p>
-          <p><strong>Saatmine:</strong> ${shippingText}${parcelText}</p>
-          ${address ? `<p><strong>Aadress:</strong> ${address}</p>` : ''}
-        </div>
-      </div>
-    `;
+    const baseOpts = {
+      orderNo, name, shippingText, parcelText, email, phone: phoneIntl, address,
+    };
+    const send = (subject: string, html: string) =>
+      transporter.sendMail({ from: `"Hingamiskeskus" <info@hingamiskeskus.ee>`, to: NOTIFY_EMAIL, subject, html });
 
     try {
-      await transporter.sendMail({
-        from: `"Hingamiskeskus" <info@hingamiskeskus.ee>`,
-        to: NOTIFY_EMAIL,
-        subject: `New Order ${orderid}`,
-        html,
-      });
+      // Iga kinkekaart ERALDI kirjaga — Make genereerib ühe kaardi kirja kohta.
+      // (Vana süsteem saatis mitu kaarti ühes kirjas ja Make tegi ainult ühe kaardi.)
+      let unitNo = 0;
+      for (const card of giftCards) {
+        for (let i = 0; i < card.qty; i++) {
+          unitNo++;
+          // Saatmiskulu (kui füüsilised kaardid postiga) viimase kaardi kirjale,
+          // et kirjade summad annaksid kokku tellimuse kogusumma
+          const lastCardEmail = unitNo === giftUnits && otherItems.length === 0;
+          await send('You have received a new order', orderHtml({
+            ...baseOpts,
+            lines: [{ title: card.title, qty: 1, unit: card.unit }],
+            shippingPrice: lastCardEmail ? shippingPrice : 0,
+            note: giftUnits > 1 ? `Kaart ${unitNo}/${giftUnits} — tellimus #${orderNo}` : undefined,
+          }));
+        }
+      }
+      // Ülejäänud tooted (või kaartideta tellimus) — üks koondkiri.
+      // Selles kirjas kinkekaarte pole, seega Make seda ei töötle.
+      if (otherItems.length || giftCards.length === 0) {
+        await send('You have received a new order', orderHtml({
+          ...baseOpts,
+          lines: otherItems.length ? otherItems : parsed,
+          shippingPrice,
+        }));
+      }
     } catch (err) {
       console.error('Email sending failed:', err);
     }
