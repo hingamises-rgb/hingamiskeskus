@@ -36,11 +36,21 @@ function normPhone(p: string) {
 }
 
 // "Kinkekaart 40€ x2, Epsomi sool 250g x1" -> [{cartName, qty}]
+// NB: tootenimi võib ISE sisaldada koma (nt venekeelsed täisnimed) — iga kirje
+// lõpeb " xN"-iga, seega liidame koma-tükke kokku, kuni jõuame xN lõpuni.
 function parseItems(items: string) {
-  return items.split(',').map((s) => s.trim()).filter(Boolean).map((s) => {
-    const m = s.match(/^(.*?)\s*x(\d+)$/i);
-    return m ? { cartName: m[1], qty: Math.max(1, parseInt(m[2], 10)) } : { cartName: s, qty: 1 };
-  });
+  const out: { cartName: string; qty: number }[] = [];
+  let buf = '';
+  for (const seg of items.split(',')) {
+    buf = buf ? buf + ',' + seg : seg;
+    const m = buf.trim().match(/^(.*?)\s*x(\d+)$/i);
+    if (m) {
+      out.push({ cartName: m[1].trim(), qty: Math.max(1, parseInt(m[2], 10)) });
+      buf = '';
+    }
+  }
+  if (buf.trim()) out.push({ cartName: buf.trim(), qty: 1 });
+  return out;
 }
 
 type EmailLine = { title: string; qty: number; unit: number };
@@ -147,17 +157,25 @@ export const GET: APIRoute = async ({ request }) => {
     // "Hingamiskeskuse kinkekaart 40 € ..." — ostukorvi lühinimest ei piisa)
     const orderNo = orderid.replace(/\D/g, '') || orderid;
     const phoneIntl = normPhone(phone);
+    // Ostukorvis võib olla ET lühinimi (cart_name) VÕI RU/EN täisnimi (title_ru/title_en,
+    // vene/inglise pood paneb korvi tõlgitud nime) — kõik viivad sama tooteni.
+    // Kirjas kasutame ALATI eestikeelset täisnime (title), Make on selle peale treenitud.
+    const norm = (s: string) => s.trim().toLowerCase();
     let prodByCart = new Map<string, any>();
     if (sql) {
       try {
-        const rows = await sql`SELECT cart_name, title, price, category FROM products`;
-        prodByCart = new Map((rows as any[]).map((r: any) => [r.cart_name, r]));
+        const rows = await sql`SELECT cart_name, title, title_ru, title_en, price, category FROM products`;
+        for (const r of rows as any[]) {
+          for (const key of [r.cart_name, r.title, r.title_ru, r.title_en]) {
+            if (key) prodByCart.set(norm(key), r);
+          }
+        }
       } catch (err) {
         console.error('Toodete lugemine ebaõnnestus:', err);
       }
     }
     const parsed = parseItems(items).map((it) => {
-      const p = prodByCart.get(it.cartName);
+      const p = prodByCart.get(norm(it.cartName));
       return {
         title: p?.title || it.cartName,
         qty: it.qty,
