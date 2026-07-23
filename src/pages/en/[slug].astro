@@ -28,7 +28,7 @@ export async function getStaticPaths() {
   }));
 }
 
-const { product } = Astro.props;
+const { product, related = [] } = Astro.props;
 
 const pageTitle = product.meta_title_en || `${product.title} | Hingamiskeskus`;
 const pageDesc = product.meta_description_en || product.subtitle || product.title;
