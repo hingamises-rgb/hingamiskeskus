@@ -101,36 +101,67 @@ const pageSchemas = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
     <script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', ...s })} />
   ))}
 
-  <!-- Meta Pixel -->
+  <!-- Meta Pixel + GA4 laetakse AINULT pärast küpsisenõusolekut (GDPR).
+       Valik salvestub localStorage hk_consent: 'all' | 'necessary'. -->
   <script is:inline>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '395736756494375');
-    fbq('track', 'PageView');
-  </script>
-  <noscript>
-    <img height="1" width="1" style="display:none"
-      src="https://www.facebook.com/tr?id=395736756494375&ev=PageView&noscript=1" />
-  </noscript>
-
-  <!-- Google Analytics 4 (gtag) -->
-  <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-S5EP0KSWTQ"></script>
-  <script is:inline>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-S5EP0KSWTQ');
+    window.hkLoadTrackers = function () {
+      if (window.hkTrackersLoaded) return;
+      window.hkTrackersLoaded = true;
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '395736756494375');
+      fbq('track', 'PageView');
+      var g = document.createElement('script');
+      g.async = true;
+      g.src = 'https://www.googletagmanager.com/gtag/js?id=G-S5EP0KSWTQ';
+      document.head.appendChild(g);
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function(){ dataLayer.push(arguments); };
+      gtag('js', new Date());
+      gtag('config', 'G-S5EP0KSWTQ');
+    };
+    if (localStorage.getItem('hk_consent') === 'all') window.hkLoadTrackers();
   </script>
 </head>
 <body>
   <slot />
   <Popup />
+
+  <!-- Küpsisenõusoleku riba (kuvatakse ainult siis, kui valikut pole tehtud) -->
+  <div id="hk-consent" hidden>
+    <p>
+      {lang === 'ru'
+        ? 'Мы используем файлы cookie для работы сайта и для статистики посещений.'
+        : lang === 'en'
+        ? 'We use cookies to run this site and to measure visits.'
+        : 'Kasutame küpsiseid lehe toimimiseks ja külastusstatistika mõõtmiseks.'}
+      <a href="/privaatsuspoliitika">{lang === 'ru' ? 'Подробнее' : lang === 'en' ? 'Learn more' : 'Loe lähemalt'}</a>
+    </p>
+    <div class="hk-consent__btns">
+      <button id="hk-consent-all">{lang === 'ru' ? 'Согласен' : lang === 'en' ? 'Accept' : 'Nõustun'}</button>
+      <button id="hk-consent-nec">{lang === 'ru' ? 'Только необходимые' : lang === 'en' ? 'Only necessary' : 'Ainult vajalikud'}</button>
+    </div>
+  </div>
+  <script is:inline>
+    (function () {
+      var box = document.getElementById('hk-consent');
+      if (!box || localStorage.getItem('hk_consent')) return;
+      box.hidden = false;
+      function choose(val) {
+        localStorage.setItem('hk_consent', val);
+        box.hidden = true;
+        if (val === 'all') window.hkLoadTrackers();
+      }
+      document.getElementById('hk-consent-all').addEventListener('click', function () { choose('all'); });
+      document.getElementById('hk-consent-nec').addEventListener('click', function () { choose('necessary'); });
+    })();
+  </script>
 </body>
 </html>
 
@@ -144,6 +175,39 @@ const pageSchemas = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
   }
 
   html { scroll-behavior: smooth; }
+
+  /* Küpsisenõusoleku riba */
+  #hk-consent {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    z-index: 500;
+    background: #1d1e20;
+    color: #fff;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+  }
+  #hk-consent[hidden] { display: none; }
+  #hk-consent p { margin: 0; font-size: 14px; }
+  #hk-consent a { color: #9fd3e4; text-decoration: underline; }
+  .hk-consent__btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  #hk-consent button {
+    font: inherit;
+    font-size: 14px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid #fff;
+  }
+  #hk-consent-all { background: #1f6d85; border-color: #1f6d85; color: #fff; font-weight: 700; }
+  #hk-consent-nec { background: none; color: #fff; }
 
   body {
     font-family: 'DM Sans', sans-serif;
