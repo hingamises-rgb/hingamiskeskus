@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import RelatedLinks from '../../components/RelatedLinks.astro';
 import { requireDb } from '../../lib/db';
 
 // Ingliskeelsed tootelehed (/en/<slug>). Inglise blogi ei ole.
@@ -103,6 +104,8 @@ const pageSchema = {
     </div>
   </div>
 </section>
+
+{product && related.length > 0 && <RelatedLinks links={related} lang="en" />}
 
 <Footer lang="en" />
 

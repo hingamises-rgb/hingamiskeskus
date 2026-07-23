@@ -5,6 +5,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { requireDb } from '../lib/db';
 import Footer from '../components/Footer.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
 
 export async function getStaticPaths() {
   const paths = [];
@@ -30,16 +31,24 @@ export async function getStaticPaths() {
     FROM products WHERE page_slug IS NOT NULL AND active = true
   `;
   for (const product of products) {
+    // Ristlingid: sama kategooria teised tooted + soolalehtedelt floating (SEO sisemine linkimine)
+    const related = products
+      .filter((p) => p.category === product.category && p.slug !== product.slug && !p.sold_out)
+      .slice(0, 3)
+      .map((p) => ({ href: `/${p.page_slug}`, label: p.cart_name }));
+    if (product.category === 'epsomi-sool') {
+      related.push({ href: '/floating', label: 'Floating Hingamiskeskuses', desc: 'Sama sool, sügavaim lõõgastus' });
+    }
     paths.push({
       params: { slug: product.page_slug },
-      props: { product },
+      props: { product, related },
     });
   }
 
   return paths;
 }
 
-const { article, product } = Astro.props;
+const { article, product, related = [] } = Astro.props;
 const publishedDate = article?.publishedTime
   ? new Date(article.publishedTime).toLocaleDateString('et-EE', { year: 'numeric', month: 'long', day: 'numeric' })
   : '';
@@ -162,6 +171,8 @@ const pageSchema = article
   </div>
 </section>
 )}
+
+{product && related.length > 0 && <RelatedLinks links={related} />}
 
 <Footer />
 
