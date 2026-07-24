@@ -102,6 +102,38 @@ function orderHtml(opts: {
     `;
 }
 
+// Kirja TEKSTIVERSIOON — Make'i parser loeb regexitega just seda osa
+// (vanal Hostingeri kirjal oli text-osa olemas, HTML üksi jätab parseri tühjaks)
+function orderTextVersion(opts: Parameters<typeof orderHtml>[0]) {
+  const subtotal = opts.lines.reduce((s, l) => s + l.qty * l.unit, 0);
+  const total = subtotal + opts.shippingPrice;
+  const itemsTxt = opts.lines.map((l) => `${l.title}\n${l.qty} × €${l.unit.toFixed(2)}`).join('\n\n');
+  return [
+    `New Order #${opts.orderNo}`,
+    `${new Date().toLocaleDateString('et-EE')} | ${new Date().toLocaleTimeString('et-EE', { hour: '2-digit', minute: '2-digit' })}`,
+    `Hingamises OÜ received a new order from ${opts.name}.`,
+    opts.note || '',
+    ``,
+    `Order #${opts.orderNo} summary`,
+    ``,
+    itemsTxt,
+    ``,
+    `Subtotal €${subtotal.toFixed(2)}`,
+    `Shipping €${opts.shippingPrice.toFixed(2)}`,
+    `Total €${total.toFixed(2)}`,
+    ``,
+    `Payment method: Paysera`,
+    ``,
+    `Customer information`,
+    `${opts.name}`,
+    `${opts.email}`,
+    `${opts.phone}`,
+    ``,
+    `Saatmine: ${opts.shippingText.replace(/<[^>]+>/g, '')}`,
+    opts.address ? `Aadress: ${opts.address}` : '',
+  ].filter((l, i) => l !== '' || i > 2).join('\n');
+}
+
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
   const data = url.searchParams.get('data') || '';
@@ -199,8 +231,11 @@ export const GET: APIRoute = async ({ request }) => {
     const baseOpts = {
       orderNo, name, shippingText, parcelText, email, phone: phoneIntl, address,
     };
-    const send = (subject: string, html: string) =>
-      transporter.sendMail({ from: `"Hingamiskeskus" <info@hingamiskeskus.ee>`, to: NOTIFY_EMAIL, subject, html });
+    const send = (subject: string, mailOpts: Parameters<typeof orderHtml>[0]) =>
+      transporter.sendMail({
+        from: `"Hingamiskeskus" <info@hingamiskeskus.ee>`, to: NOTIFY_EMAIL, subject,
+        html: orderHtml(mailOpts), text: orderTextVersion(mailOpts),
+      });
 
     try {
       // Iga kinkekaart ERALDI kirjaga — Make genereerib ühe kaardi kirja kohta.
@@ -212,22 +247,22 @@ export const GET: APIRoute = async ({ request }) => {
           // Saatmiskulu (kui füüsilised kaardid postiga) viimase kaardi kirjale,
           // et kirjade summad annaksid kokku tellimuse kogusumma
           const lastCardEmail = unitNo === giftUnits && otherItems.length === 0;
-          await send('You have received a new order', orderHtml({
+          await send('You have received a new order', {
             ...baseOpts,
             lines: [{ title: card.title, qty: 1, unit: card.unit }],
             shippingPrice: lastCardEmail ? shippingPrice : 0,
-            note: giftUnits > 1 ? `Kaart ${unitNo}/${giftUnits} — tellimus #${orderNo}` : undefined,
-          }));
+            note: giftUnits > 1 ? `Kaart ${unitNo}/${giftUnits}, tellimus #${orderNo}` : undefined,
+          });
         }
       }
       // Ülejäänud tooted (või kaartideta tellimus) — üks koondkiri.
       // Selles kirjas kinkekaarte pole, seega Make seda ei töötle.
       if (otherItems.length || giftCards.length === 0) {
-        await send('You have received a new order', orderHtml({
+        await send('You have received a new order', {
           ...baseOpts,
           lines: otherItems.length ? otherItems : parsed,
           shippingPrice,
-        }));
+        });
       }
     } catch (err) {
       console.error('Email sending failed:', err);
