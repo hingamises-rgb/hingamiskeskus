@@ -17,7 +17,7 @@ const SITE = import.meta.env.BOOKING_SITE_URL || process.env.BOOKING_SITE_URL
   || (PROD_URL ? `https://${PROD_URL}` : 'https://www.hingamiskeskus.ee');
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.hostinger.com',
+  host: 'smtp.zone.eu',
   port: 465,
   secure: true,
   auth: { user: EMAIL_USER, pass: EMAIL_PASS },

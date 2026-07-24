@@ -8,7 +8,7 @@ const EMAIL_USER = import.meta.env.EMAIL_USER || 'info@hingamiskeskus.ee';
 const EMAIL_PASS = import.meta.env.EMAIL_PASS || '';
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.hostinger.com',
+  host: 'smtp.zone.eu',
   port: 465,
   secure: true,
   auth: { user: EMAIL_USER, pass: EMAIL_PASS },
