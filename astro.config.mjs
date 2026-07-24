@@ -12,6 +12,8 @@ export default defineConfig({
   integrations: [
     sitemap({
       filter: (page) =>
+        !page.includes('/admin') &&
+        !page.includes('/broneering/') &&
         !page.includes('/checkout') &&
         !page.includes('/makse-tehtud') &&
         !page.includes('/makse-ebaonnestus') &&
